@@ -1,0 +1,112 @@
+.hero {
+      position: relative;
+  text-align: center;
+
+}
+
+.hero img {
+  width: 100%;
+  height: auto;
+  filter: brightness(40%);
+  display: block;
+}
+
+.hero button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #FF4C00;
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer; 
+  transition: background-color 0.3s ease;
+}
+
+.hero button:hover {
+  background-color: #e0a800; 
+}
+
+.hero button:active {
+  background-color: #cc8a00; 
+}
+
+.content {
+  width: 100%;
+  background: #FFC400;
+  text-align: center;
+  padding: 20px;  
+  margin: 0;      
+}
+
+.carousel-container {
+  position: absolute;
+  top: 50%;   /* mitad vertical */
+  left: 50%;  /* mitad horizontal */
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.carousel-wrapper {
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+}
+
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-item {
+  min-width: 100%;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.nav-button.left {
+  left: 10px;
+}
+
+.nav-button.right {
+  right: 10px;
+}
+
+
+.buy-button {
+  margin-top: 0;
+}
+
+.buy-button button {
+  background-color: #FF4C00 !important;
+  color: white !important;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 1.1rem;
+}
+
