@@ -1,0 +1,32 @@
+<div class="overlay" (click)="cerrarModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <button (click)="cerrarModal()" class="cerrar">X</button>
+    <h2>{{ modo === 'login' ? 'Iniciar sesión' : 'Registrarse' }}</h2>
+
+    <form (ngSubmit)="enviar()" class="form">
+      <div *ngIf="modo === 'register'">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="nombre" name="nombre" required />
+      </div>
+
+      <label>Correo</label>
+      <input type="email" [(ngModel)]="correo" name="correo" required />
+
+      <label>Contraseña</label>
+      <input type="password" [(ngModel)]="contrasena" name="contraseña" required />
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Cargando...' : (modo === 'login' ? 'Iniciar sesión' : 'Registrarse') }}
+      </button>
+    </form>
+
+    <p class="toggle">
+      {{ modo === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
+      <a href="#" (click)="alternarModo(); $event.preventDefault()">
+        {{ modo === 'login' ? 'Regístrate' : 'Inicia sesión' }}
+      </a>
+    </p>
+
+    <p class="mensaje" *ngIf="mensaje">{{ mensaje }}</p>
+  </div>
+</div>

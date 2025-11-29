@@ -1,42 +1,40 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" mode="over">
     <mat-nav-list>
-      <a mat-list-item routerLink="/inicio" (click)="drawer.close()">Inicio</a>
-      <a mat-list-item routerLink="/faq" (click)="drawer.close()">Preguntas frecuentes</a>
-      <a mat-list-item routerLink="/contacto" (click)="drawer.close()">Contáctanos</a>
-      <a mat-list-item routerLink="/metodo" (click)="drawer.close()">Método de pago</a>
+      <a mat-list-item routerLink="/home" fragment="inicio" (click)="drawer.close()">Inicio</a>
+      <a mat-list-item routerLink="/" fragment="preguntas-frecuentes" (click)="drawer.close()">Preguntas frecuentes</a>
+      <a mat-list-item routerLink="/" fragment="contacto" (click)="drawer.close()">Contáctanos</a>
       <a mat-list-item routerLink="/compra" (click)="drawer.close()">Compra de boletos</a>
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <mat-toolbar color="primary" class="toolbar">
+    <!-- Barra fija -->
+    <mat-toolbar class="toolbar fixed-toolbar">
       <button
-  type="button"
-  mat-icon-button
-  (click)="drawer.toggle()"
-  class="menu-button"
->
-<mat-icon fontIcon="menu" class="material-icons-outlined"></mat-icon>
-</button>
+        type="button"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        class="menu-button icon-box"
+      >
+        <mat-icon fontIcon="menu" class="material-icons-outlined"></mat-icon>
+      </button>
 
       <img src="pikagames.jpg" alt="logo" class="logo" />
 
       <span class="spacer"></span>
 
-      <!-- Menú normal en desktop -->
       <nav class="nav-links">
-        <a routerLink="/inicio">Inicio</a>
-        <a routerLink="/faq">Preguntas frecuentes</a>
-        <a routerLink="/contacto">Contáctanos</a>
-        <a routerLink="/metodo">Método de pago</a>
+        <a routerLink="/" fragment="inicio" >Inicio</a>
+        <a routerLink="/" fragment="preguntas-frecuentes">Preguntas frecuentes</a>
+        <a routerLink="/" fragment="contacto">Contáctanos</a>
         <a routerLink="/compra">Compra de boletos</a>
       </nav>
     </mat-toolbar>
 
-    <!-- Contenido de la página -->
-    <router-outlet></router-outlet>
+    <!-- Contenido principal -->
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
-
-

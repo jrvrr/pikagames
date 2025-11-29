@@ -1,5 +1,5 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 
 import { importProvidersFrom } from '@angular/core';
@@ -9,16 +9,27 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { HttpClientModule } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
- providers: [
-    provideRouter(routes),
+  providers: [
+    provideRouter(
+      routes,
+      withViewTransitions(),
+      withInMemoryScrolling({
+        anchorScrolling: 'enabled', 
+        scrollPositionRestoration: 'enabled', 
+      })
+    ),
     importProvidersFrom(
       BrowserAnimationsModule,
       MatSidenavModule,
       MatToolbarModule,
       MatIconModule,
       MatListModule,
-      MatButtonModule
-    )
-  ]};
+      MatButtonModule,
+      HttpClientModule
+    ), provideAnimationsAsync()
+  ]
+};

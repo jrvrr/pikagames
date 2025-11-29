@@ -1,0 +1,33 @@
+.compra-container {
+  width: auto;
+  color: #222;   
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem auto;
+  text-align: center;
+  top: 100px;
+  position: absolute;
+}
+
+button {
+  background: #ff4c00; /* Naranja */
+  color: #fff;         /* Texto blanco */
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #e94400; /* Un poco más oscuro al pasar el ratón */
+  transform: scale(1.05);
+}
+
+.no-rifas {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+

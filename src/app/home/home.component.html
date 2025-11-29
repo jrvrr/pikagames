@@ -1,33 +1,23 @@
-<div class="hero">
-  <img src="1.jpg" alt="">
-
-  <!--
-  <div class="carousel-container">
-    <button mat-icon-button (click)="prev()" class="nav-button left">
-      <mat-icon>chevron_left</mat-icon>
+<div class="hero-container" id="inicio">
+  <div class="hero-text">
+    <h1>GANA JUEGOS DIGITALES<br>CON NUESTRAS RIFAS</h1>
+    <p>
+      Participa en sorteos por los títulos más nuevos y populares a precios increíbles
+    </p>
+    <button mat-raised-button color="warn" class="hero-button" routerLink="/compra">
+      PARTICIPAR AHORA
     </button>
+  </div>
 
-    <div class="carousel-wrapper">
-      <div class="carousel-track" [style.transform]="'translateX(-' + currentIndex * 100 + '%)'">
-        <div class="carousel-item" *ngFor="let img of images">
-          <img [src]="img" alt="Publicación" />
-        </div>
-      </div>
-    </div>
-
-    <button mat-icon-button (click)="next()" class="nav-button right">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
-  </div> -->
-
-  <div class="buy-button">
-    <button mat-raised-button color="primary" routerLink="/compra">Comprar Boletos</button>
+  <div class="hero-image">
+    <img src="unnamed.png" alt="Pikachu" />
   </div>
 </div>
 
-<div class="content">
+
+<div class="content" id="preguntas-frecuentes">
   <h1>PREGUNTAS FRECUENTES</h1>
-  
+
   <div class="faq-grid">
     <div class="faq-card">
       <h2>¿Cómo puedo comprar boletos de lotería en línea?</h2>
@@ -46,7 +36,7 @@
 
     <div class="faq-card">
       <h2>¿Dónde se publican los ganadores?</h2>
-      <p>Los ganadores se publican en nuestra página web y se les notifica mediante nuestras redes sociales.</p>  
+      <p>Los ganadores se publican en nuestra página web y se les notifica mediante nuestras redes sociales.</p>
     </div>
   </div>
 
@@ -56,26 +46,136 @@
 </div>
 
 <div class="component">
-  <img src="3.jpg" alt="Imagen">
+  <div class="image-section">
+    <img src="newsuper.jpg" alt="Pika Games" />
+    <img src="holding.avif" alt="Manos con control" class="image-2" />
+  </div>
+
   <div class="overlay">
-    <h2><span class="highlight">Sobre</span> NOSOTROS</h2>
-    <h3><span class="brand">PIKA GAMES</span> - PIKA GAMES - ¿quiénes somos?</h3>
-    <p>
-      En Pika Games somos jugadores para jugadores. Nacimos con la idea de crear un espacio
-      donde los fans de Nintendo Switch pudieran encontrar sus títulos favoritos de manera
-      rápida, segura y confiable.
-    </p>
+    <h2>Sobre <span class="highlight">NOSOTROS</span></h2>
+    <h3><span class="brand">PIKA GAMES</span> — ¿Quiénes somos?</h3>
+    <p>En Pika Games somos jugadores para jugadores. Nacimos con la idea de crear un espacio donde los fans de Nintendo Switch pudieran encontrar sus títulos favoritos de manera rápida, segura y confiable.</p>
     <ul>
       <li>Un catálogo variado con los juegos más buscados y nuevos lanzamientos.</li>
       <li>Una plataforma segura para todas tus compras digitales.</li>
       <li>Entregas rápidas y soporte cercano, porque sabemos lo importante que es tu tiempo de juego.</li>
     </ul>
-    <p>
-      Además, hemos diseñado planes de suscripción exclusivos que se adaptan a cada jugador,
-      para que siempre tengas beneficios extra al formar parte de nuestra comunidad.
-    </p>
+    <p>Además, hemos diseñado planes de suscripción exclusivos que se adaptan a cada jugador, para que siempre tengas beneficios extra al formar parte de nuestra comunidad.</p>
   </div>
 </div>
 
 
+<div class="spacer" id="contacto">
+  <div class="cube">
+  <h2>Hola, ¿en qué podemos ayudarte?</h2>
+  <p>Busca en nuestras **preguntas frecuentes** o explora nuestros artículos. Si no encuentras lo que buscas, puedes contactarnos directamente.</p>
 
+<button mat-raised-button class="contact_button" (click)="toggleForm()">
+  Contáctate con nosotros
+</button>
+
+</div>
+<div *ngIf="showForm" class="contact-form">
+  <h2>Formulario de Contacto</h2>
+  <form>
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre completo</mat-label>
+        <input matInput type="text">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Correo electrónico</mat-label>
+        <input matInput type="email">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Motivo de la consulta</mat-label>
+        <input matInput type="text">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Asunto</mat-label>
+        <input matInput type="text">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>País</mat-label>
+        <input matInput type="text">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput rows="4"></textarea>
+      </mat-form-field>
+
+      <div class="full-width file-upload">
+  <span class="file-link" (click)="fileInput.click()">
+    Adjuntar archivo
+  </span>
+  <span class="file-name">{{ selectedFileName || 'Ningún archivo seleccionado' }}</span>
+  <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+</div>
+
+    </div>
+
+    <div class="buttons">
+      <button mat-raised-button class="btn-primary">Enviar</button>
+      <button mat-raised-button class="btn-cancel" (click)="toggleForm()">Cancelar</button>
+    </div>
+  </form>
+</div>
+</div>
+<footer class="footer">
+  <div class="footer-container">
+
+    <!-- LOGO Y CONTACTO -->
+    <div class="footer-section">
+      <img src="pikagames.jpg" alt="Pika Games Logo" class="logo">
+      <div class="contact-info">
+        <p><img src="phone-solid-full.svg" alt=""> +52 81 3697 5457</p>
+        <p><img src="envelope-solid-full.svg" alt=""> pikagamesstore&#64;
+gmail.com</p>
+      </div>
+    </div>
+
+    <!-- ENLACES -->
+    <div class="footer-section">
+      <h3>ENLACES</h3>
+      <ul>
+        <li><a routerLink="/" fragment="inicio">Inicio</a></li>
+        <li><a routerLink="/compra">Comprar Boletos</a></li>
+        <li><a routerLink="/" fragment="preguntas-frecuentes">Preguntas Frecuentes</a></li>
+        <li><a routerLink="/" fragment="contacto">Contacto</a></li>
+      </ul>
+    </div>
+
+    <!-- REDES SOCIALES -->
+    <div class="footer-section">
+      <h3>REDES SOCIALES</h3>
+      <div class="social-links">
+        <a href="https://wa.me/528136975457?text=Hola%20quiero%20más%20información" target="_blank">
+          <img src="square-whatsapp.svg" alt="WhatsApp">Whatsapp
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61550079205640" target="_blank">
+          <img src="square-facebook.svg" alt="Facebook">Facebook
+        </a>
+        <a href="https://www.instagram.com/pikagames.switch/" target="_blank">
+          <img src="square-instagram.svg" alt="Instagram">Instagram
+        </a>
+      </div>
+    </div>
+
+    <!-- MÉTODOS DE PAGO -->
+    <div class="footer-section">
+      <h3>MÉTODOS DE PAGO</h3>
+      <div class="payment-icons">
+        <img src="klar.png" alt="Klar">
+        <img src="visa.png" alt="Visa">
+        <img src="mastercard.png" alt="Mastercard">
+        <img src="paypal.png" alt="PayPal">
+      </div>
+    </div>
+
+  </div>
+</footer>

@@ -1,1 +1,43 @@
-<p>compra works!</p>
+<div class="compra-container">
+  <button *ngIf="!usuario" (click)="abrirAuth()">Iniciar sesión / Registrarse</button>
+
+  <button *ngIf="usuario" (click)="logout()">Cerrar sesión ({{ usuario.nombre }})</button>
+
+  <div *ngIf="rifas.length > 0; else sinRifas">
+    <h2>Rifas disponibles 🎟️</h2>
+
+    <button *ngIf="usuario?.es_admin" (click)="crearRifa()" class="crear-rifa-btn">
+      Crear nueva rifa
+    </button>
+
+    <!-- Lista de rifas -->
+    <div *ngFor="let rifa of rifas" class="rifa">
+      <h3>{{ rifa.nombre }}</h3>
+      <p>{{ rifa.descripcion }}</p>
+
+      <!-- Mostrar boletos solo a usuarios normales -->
+      <div class="boletos-container" *ngIf="!usuario?.es_admin">
+        <h4>Selecciona un boleto:</h4>
+
+        <div class="boletos-lista">
+          <button 
+  *ngFor="let num of generarBoletos(rifa.cantidad_boletos || 0)"
+  [disabled]="rifa.boletos_ocupados?.includes(num)"
+  (click)="seleccionarBoleto(rifa, num)"
+>
+  {{ num }}
+</button>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template #sinRifas>
+    <p>No hay rifas disponibles actualmente 😔</p>
+  </ng-template>
+</div>
+
+<!-- Modal de autenticación -->
+<app-auth-modal *ngIf="mostrarModal" (cerrar)="cerrarAuth()"></app-auth-modal>

@@ -1,1 +1,122 @@
-<p>admin works!</p>
+<div class="admin-container">
+
+  <h2>Panel de Administrador</h2>
+  <p>Bienvenido, {{ usuario?.nombre }}</p>
+
+  <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+
+  <hr />
+
+  <h3>Crear nueva rifa</h3>
+
+  <form (ngSubmit)="crearRifa()" #rifaForm="ngForm" class="form-box">
+
+    <label>Nombre:</label>
+    <input [(ngModel)]="nuevaRifa.nombre" name="nombre" required />
+
+    <label>Descripción:</label>
+    <textarea [(ngModel)]="nuevaRifa.descripcion" name="descripcion" required></textarea>
+
+    <label>Cantidad de boletos:</label>
+    <input type="number" [(ngModel)]="nuevaRifa.cantidad_boletos" name="cantidad_boletos" required />
+
+    <label>Cantidad de ganadores:</label>
+    <input type="number" [(ngModel)]="nuevaRifa.cantidad_ganadores" name="cantidad_ganadores" required />
+
+    <label>Modo de finalización:</label>
+    <select [(ngModel)]="nuevaRifa.modo_finalizacion" name="modo_finalizacion">
+      <option value="manual">Manual</option>
+      <option value="fecha">Por fecha</option>
+    </select>
+
+    <label *ngIf="nuevaRifa.modo_finalizacion === 'fecha'">Fecha de finalización:</label>
+    <input 
+      *ngIf="nuevaRifa.modo_finalizacion === 'fecha'" 
+      type="date" 
+      [(ngModel)]="nuevaRifa.fecha_fin" 
+      name="fecha_fin" 
+    />
+
+    <h4>Premios</h4>
+    <div class="premio-box" *ngFor="let premio of nuevaRifa.premios; let i = index">
+      <input [(ngModel)]="premio.titulo" name="titulo{{ i }}" placeholder="Título del premio" required />
+      <input type="number" [(ngModel)]="premio.cantidad" name="cantidad{{ i }}" placeholder="Cantidad" required />
+      <button 
+        type="button" 
+        class="btn-delete" 
+        (click)="eliminarPremio(i)"
+        *ngIf="nuevaRifa.premios.length > 1">
+        ❌
+      </button>
+    </div>
+
+    <button class="btn-add" type="button" (click)="agregarPremio()">➕ Agregar premio</button>
+    <br><br>
+
+    <button class="btn-submit" type="submit">Crear Rifa</button>
+  </form>
+
+  <hr />
+
+  <h3>Rifas Existentes</h3>
+
+  <div *ngIf="cargando">Cargando rifas...</div>
+
+  <ul *ngIf="!cargando" class="lista-rifas">
+    <li *ngFor="let rifa of rifas">
+      <strong>{{ rifa.nombre }}</strong> — {{ rifa.descripcion }}
+      ({{ rifa.cantidad_boletos }} boletos)
+
+      <button class="btn-edit" (click)="editar(rifa)">✏ Editar</button>
+    </li>
+  </ul>
+
+  <div *ngIf="editando" class="editar-box">
+
+    <h3>Editando rifa: {{ editando.nombre }}</h3>
+
+    <label>Nombre:</label>
+    <input [(ngModel)]="editando.nombre" name="edit_nombre" />
+
+    <label>Descripción:</label>
+    <textarea [(ngModel)]="editando.descripcion" name="edit_desc"></textarea>
+
+    <label>Cantidad boletos:</label>
+    <input type="number" [(ngModel)]="editando.cantidad_boletos" name="edit_cb" />
+
+    <label>Cantidad ganadores:</label>
+    <input type="number" [(ngModel)]="editando.cantidad_ganadores" name="edit_cg" />
+
+    <label>Modo finalización:</label>
+    <select [(ngModel)]="editando.modo_finalizacion" name="edit_modo">
+      <option value="manual">Manual</option>
+      <option value="fecha">Por fecha</option>
+    </select>
+
+    <label *ngIf="editando.modo_finalizacion === 'fecha'">Fecha fin:</label>
+    <input 
+      *ngIf="editando.modo_finalizacion === 'fecha'"
+      type="date"
+      [(ngModel)]="editando.fecha_fin"
+      name="edit_fecha"
+    />
+
+    <h4>Premios</h4>
+
+    <div class="premio-box" *ngFor="let p of editando.premios; let i = index">
+      <input [(ngModel)]="p.titulo" placeholder="Título del premio">
+      <input type="number" [(ngModel)]="p.cantidad" min="1">
+
+      <button class="btn-delete" (click)="eliminarPremioEdicion(i)">❌</button>
+    </div>
+
+    <button class="btn-add" (click)="agregarPremioEdicion()">➕ Agregar premio</button>
+
+    <br><br>
+
+    <button class="btn-save" (click)="guardarEdicion()">💾 Guardar cambios</button>
+    <button class="btn-cancel" (click)="editando = null">Cancelar</button>
+
+  </div>
+
+</div>
