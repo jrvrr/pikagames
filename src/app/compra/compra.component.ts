@@ -4,6 +4,8 @@ import { AuthService } from '../service/auth.service';
 import { CommonModule } from '@angular/common';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 
+declare var paypal: any;
+
 @Component({
   selector: 'app-compra',
   templateUrl: './compra.component.html',
@@ -15,6 +17,9 @@ export class CompraComponent implements OnInit {
   mostrarModal = false;
   usuario: any = null;
   cargando = false;
+
+  boletoSeleccionado: number | null = null;
+  rifaSeleccionada: any = null;
 
   constructor(
     private rifasService: RifasService,
@@ -29,11 +34,11 @@ export class CompraComponent implements OnInit {
   obtenerRifas(): void {
     this.cargando = true;
     this.rifasService.getRifas().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.rifas = res.rifas || [];
         this.cargando = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error al cargar rifas:', err);
         this.cargando = false;
       }
@@ -66,9 +71,8 @@ export class CompraComponent implements OnInit {
         alert('Rifa creada correctamente ✅');
         this.obtenerRifas();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error creando rifa:', err);
-        alert('Error al crear rifa');
       }
     });
   }
@@ -78,40 +82,82 @@ export class CompraComponent implements OnInit {
   }
 
   seleccionarBoleto(rifa: any, num: number): void {
-  if (!this.usuario) {
-    this.abrirAuth();
-    return;
-  }
-
-  if (this.usuario.es_admin) {
-    alert("Los administradores no pueden comprar boletos");
-    return;
-  }
-
-  if (rifa.boletos_ocupados?.includes(num)) {
-    alert("Ese boleto ya está ocupado ❌");
-    return;
-  }
-
-  if (confirm(`¿Deseas comprar el boleto #${num} de "${rifa.nombre}"?`)) {
-    this.comprarBoleto(rifa, num);
-  }
-}
-
-
-  comprarBoleto(rifa: any, num: number): void {
-    if (!this.authService.isLoggedIn()) {
-      alert('Debes iniciar sesión para comprar boletos');
+    if (!this.usuario) {
       this.abrirAuth();
       return;
     }
 
-    if (this.authService.isAdmin()) {
-      alert('Los administradores no pueden comprar boletos');
+    if (this.usuario.es_admin) {
+      alert("Los administradores no pueden comprar boletos");
       return;
     }
 
-    alert(`Comprando boleto #${num} para la rifa: ${rifa.nombre}`);
+    if (rifa.boletos_ocupados?.includes(num)) {
+      alert("Ese boleto ya está ocupado ❌");
+      return;
+    }
+
+    this.boletoSeleccionado = num;
+    this.rifaSeleccionada = rifa;
+
+    this.renderizarPayPal(rifa, num);
+  }
+
+  renderizarPayPal(rifa: any, boleto: number): void {
+    const containerId = `#paypal-button-container-${rifa.id}`;
+
+    const contenedor = document.querySelector(containerId);
+    if (contenedor) contenedor.innerHTML = "";
+
+    paypal.Buttons({
+      style: {
+        layout: "vertical",
+        color: "gold",
+        shape: "rect",
+        label: "paypal"
+      },
+
+      createOrder: (data: any, actions: any) => {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: rifa.precio || "50.00"
+            },
+            description: `Boleto #${boleto} - ${rifa.nombre}`
+          }]
+        });
+      },
+
+      onApprove: async (data: any, actions: any) => {
+        const order = await actions.order.capture();
+
+        this.registrarCompra(rifa.id, boleto);
+      },
+
+      onError: (err: any) => {
+        console.error("Error PayPal:", err);
+      }
+
+    }).render(containerId);
+  }
+
+  registrarCompra(rifaId: number, boleto: number): void {
+    const payload = {
+      usuario_id: this.usuario.id,
+      rifa_id: rifaId,
+      numero: boleto,
+      metodo_pago: "PayPal"
+    };
+
+    this.rifasService.comprarBoletos(payload).subscribe({
+      next: () => {
+        alert(`Compra exitosa Boleto #${boleto}`);
+        this.obtenerRifas();
+      },
+      error: (err: any) => {
+        console.error("Error registrando compra:", err);
+      }
+    });
   }
 
   logout(): void {

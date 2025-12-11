@@ -23,5 +23,10 @@ export class RifasService {
   //editar una rifa
   editarRifa(id: string, data: any) {
     return this.http.put(`${this.apiUrl}/${id}`, data);
-}
+  }
+
+  // Comprar un boleto
+  comprarBoletos(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/comprar`, data);
+  }
 }
