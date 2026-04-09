@@ -31,6 +31,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   scrollY = 0;
   selectedFileName: string = '';
   showForm = false;
+  showMotivos = false;
   sendStatus: 'idle' | 'sending' | 'ok' | 'error' = 'idle';
 
   formData = {
@@ -54,6 +55,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   toggleForm() {
     this.showForm = !this.showForm;
     this.sendStatus = 'idle';
+  }
+
+  selectMotivo(motivo: string) {
+    this.formData.motivo = motivo;
+    this.showMotivos = false;
   }
 
   async sendEmail(): Promise<void> {

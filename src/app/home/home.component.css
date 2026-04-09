@@ -359,6 +359,97 @@
 .btn-primary { background: var(--nin-blue); color: var(--nin-white) !important; }
 .btn-cancel { background: #888; color: var(--nin-white) !important; }
 
+/* Select Personalizado Nubrutalism */
+.custom-select {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.dropdown-icon {
+  font-size: 0.8rem;
+  transition: transform 0.2s;
+  margin-right: 2px;
+}
+
+.custom-select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--nin-white);
+  z-index: 10;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-top: -5px;
+  padding: 0;
+}
+
+.custom-option {
+  padding: 8px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+  font-weight: 700;
+  color: var(--nin-dark);
+  transition: background 0.2s, padding-left 0.2s;
+}
+
+.custom-option:last-child {
+  border-bottom: none;
+}
+
+.custom-option:hover {
+  background-color: var(--nin-yellow);
+  padding-left: 20px;
+}
+
+.error-msg-text {
+  color: var(--nin-red);
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-top: 5px;
+  display: block;
+}
+
+.error-text {
+  color: var(--nin-white) !important;
+  background: var(--nin-red) !important;
+}
+
+.brutal-input.ng-invalid.ng-touched {
+  border-color: var(--nin-red);
+  box-shadow: 4px 4px 0px var(--nin-red), 5px 5px 0px #000;
+  background-color: #ffe6e6;
+}
+
+/* Notificaciones de Estado */
+.status-msg {
+  padding: 15px;
+  font-weight: 800;
+  font-size: 1rem;
+  margin-top: 20px;
+  text-align: center;
+  justify-content: center;
+}
+
+.status-msg.success {
+  background-color: #25D366;
+  color: white;
+}
+
+.status-msg.error {
+  background-color: var(--nin-red);
+  color: white;
+}
+
+.status-msg.sending {
+  background-color: var(--nin-yellow);
+  color: black;
+}
+
+
 /* Footer */
 .brutal-footer {
   background-color: var(--nin-dark);
@@ -415,8 +506,8 @@
 }
 
 .social-btn {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -425,7 +516,7 @@
   font-weight: 900;
   text-decoration: none;
   border: 2px solid #000;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 2px 2px 0px var(--nin-yellow);
   transition: transform 0.2s;
 }
@@ -435,19 +526,29 @@
   box-shadow: 4px 4px 0px var(--nin-red);
 }
 
-.social-btn.whatsapp {
-  background-color: #25D366;
-  color: white;
+.social-icon {
+  transition: transform 0.2s;
 }
 
-.social-btn.facebook {
-  background-color: #1877F2;
-  color: white;
+/* Ajustamos cada ícono individualmente por las diferencias de padding interno de sus SVG */
+.social-btn.whatsapp .social-icon {
+  width: 77px;
+  height: 77px;
 }
 
-.social-btn.instagram {
-  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-  color: white;
+.social-btn.facebook .social-icon {
+  width: 77px;
+  height: 77px;
+}
+
+.social-btn.instagram .social-icon {
+  width: 77px;
+  height: 77px;
+}
+
+
+.social-btn:hover .social-icon {
+  transform: scale(1.1);
 }
 
 .payment-icons-brutal {

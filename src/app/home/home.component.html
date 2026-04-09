@@ -89,30 +89,38 @@
 
   <div *ngIf="showForm" class="contact-form brutal-card">
     <h2>Formulario de Contacto</h2>
-    <form class="brutal-form" (ngSubmit)="sendEmail()">
+    <form class="brutal-form" (ngSubmit)="sendEmail()" #contactForm="ngForm">
       <div class="form-grid">
         <div class="input-group">
           <label>Nombre completo</label>
-          <input type="text" class="brutal-input" [(ngModel)]="formData.nombre" name="nombre" required>
+          <input type="text" class="brutal-input" [(ngModel)]="formData.nombre" name="nombre" required maxlength="20" #nombreCtrl="ngModel">
+          <small class="error-msg-text" *ngIf="nombreCtrl.invalid && nombreCtrl.touched">Requerido.</small>
         </div>
         <div class="input-group">
           <label>Correo electrónico</label>
-          <input type="email" class="brutal-input" [(ngModel)]="formData.correo" name="correo" required>
+          <input type="email" class="brutal-input" [(ngModel)]="formData.correo" name="correo" required maxlength="20" email #correoCtrl="ngModel">
+          <small class="error-msg-text" *ngIf="correoCtrl.errors?.['required'] && correoCtrl.touched">Requerido.</small>
+          <small class="error-msg-text" *ngIf="correoCtrl.errors?.['email'] && correoCtrl.touched">Falta el arroba (&#64;).</small>
         </div>
-        <div class="input-group full-width">
+        <div class="input-group full-width" style="position: relative;">
           <label>Motivo de contacto</label>
-          <select class="brutal-input" [(ngModel)]="formData.motivo" name="motivo" required style="cursor: pointer;">
-            <option value="" disabled selected>Selecciona una opción...</option>
-            <option value="Duda sobre Rifas">Duda sobre Rifas/Sorteos</option>
-            <option value="Problemas con mi pago">Problemas con una compra/pago</option>
-            <option value="Reclamar premio">Reclamar un premio</option>
-            <option value="Soporte técnico">Soporte técnico (Cuenta, Errores)</option>
-            <option value="Sugerencia / Otro">Sugerencia u Otro motivo</option>
-          </select>
+          <div class="brutal-input custom-select" (click)="showMotivos = !showMotivos" [class.ng-invalid]="motivoCtrl.invalid && motivoCtrl.touched">
+            {{ formData.motivo || 'Selecciona una opción...' }}
+            <span class="dropdown-icon" [style.transform]="showMotivos ? 'rotate(180deg)' : 'rotate(0)'">▼</span>
+          </div>
+          <input type="hidden" [(ngModel)]="formData.motivo" name="motivo" required #motivoCtrl="ngModel">
+          <div class="custom-select-options brutal-card" *ngIf="showMotivos">
+            <div class="custom-option" (click)="selectMotivo('Duda sobre Rifas')">Duda sobre Rifas/Sorteos</div>
+            <div class="custom-option" (click)="selectMotivo('Problemas con mi pago')">Problemas con una compra/pago</div>
+            <div class="custom-option" (click)="selectMotivo('Reclamar premio')">Reclamar un premio</div>
+            <div class="custom-option" (click)="selectMotivo('Soporte técnico')">Soporte técnico (Cuenta, Errores)</div>
+            <div class="custom-option" (click)="selectMotivo('Sugerencia / Otro')">Sugerencia u Otro motivo</div>
+          </div>
         </div>
         <div class="input-group full-width">
           <label>Descripción</label>
-          <textarea rows="4" class="brutal-input" [(ngModel)]="formData.descripcion" name="descripcion" required></textarea>
+          <textarea rows="4" class="brutal-input" [(ngModel)]="formData.descripcion" name="descripcion" required maxlength="40" #descCtrl="ngModel"></textarea>
+          <small class="error-msg-text" *ngIf="descCtrl.invalid && descCtrl.touched">Requerido.</small>
         </div>
 
         <div class="full-width file-upload brutal-card-mini">
@@ -123,12 +131,12 @@
       </div>
 
       <!-- Estado del envío -->
-      <p *ngIf="sendStatus === 'ok'" class="status-msg success">✅ ¡Mensaje enviado correctamente!</p>
-      <p *ngIf="sendStatus === 'error'" class="status-msg error">❌ Error al enviar. Intenta de nuevo.</p>
-      <p *ngIf="sendStatus === 'sending'" class="status-msg sending">⏳ Enviando...</p>
+      <div *ngIf="sendStatus === 'ok'" class="status-msg success brutal-card-mini">✅ ¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.</div>
+      <div *ngIf="sendStatus === 'error'" class="status-msg error brutal-card-mini">❌ Ocurrió un error al enviar. ¿Verificaste tu conexión?</div>
+      <div *ngIf="sendStatus === 'sending'" class="status-msg sending brutal-card-mini">⏳ Enviando mensaje...</div>
 
       <div class="buttons">
-        <button type="submit" class="brutal-btn btn-primary" [disabled]="sendStatus === 'sending'">ENVIAR</button>
+        <button type="submit" class="brutal-btn btn-primary" [disabled]="sendStatus === 'sending' || contactForm.invalid">ENVIAR</button>
         <button type="button" class="brutal-btn btn-cancel" (click)="toggleForm()">CANCELAR</button>
       </div>
     </form>
@@ -158,9 +166,15 @@
     <div class="footer-section">
       <h3>SÍGUENOS</h3>
       <div class="social-links-brutal">
-        <a href="https://wa.me/528136975457?text=Hola" target="_blank" class="social-btn whatsapp">WA</a>
-        <a href="https://www.facebook.com/profile.php?id=61550079205640" target="_blank" class="social-btn facebook">FB</a>
-        <a href="https://www.instagram.com/pikagames.switch/" target="_blank" class="social-btn instagram">IG</a>
+        <a href="https://wa.me/528136975457?text=Hola" target="_blank" class="social-btn whatsapp">
+          <img src="square-whatsapp.svg" alt="WhatsApp" class="social-icon">
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61550079205640" target="_blank" class="social-btn facebook">
+          <img src="square-facebook.svg" alt="Facebook" class="social-icon">
+        </a>
+        <a href="https://www.instagram.com/pikagames.switch/" target="_blank" class="social-btn instagram">
+          <img src="square-instagram.svg" alt="Instagram" class="social-icon">
+        </a>
       </div>
     </div>
 
