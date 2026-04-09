@@ -172,6 +172,9 @@
                 <button *ngIf="rifa.estado === 'finalizada'" class="brutal-btn small-btn btn-primary icon-btn" (click)="verDetalles(rifa.id)" title="Ver Detalles">
                   <span class="material-icons">visibility</span>
                 </button>
+                <button *ngIf="rifa.estado === 'finalizada'" class="brutal-btn small-btn btn-delete icon-btn" (click)="eliminarRifaConfirm(rifa.id)" title="Eliminar Base de Datos">
+                  <span class="material-icons">delete_forever</span>
+                </button>
               </div>
             </div>
             <div *ngIf="historialRifas.length === 0" class="empty-state">

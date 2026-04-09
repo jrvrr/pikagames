@@ -90,8 +90,9 @@ export class AdminComponent implements OnInit {
             this.toastr.success('Rifa suspendida correctamente');
             this.obtenerRifas();
           },
-          error: () => {
-            this.toastr.error('Error al suspender la rifa');
+          error: (err) => {
+            const serverResponse = err.error?.error || err.statusText || 'Error desconocido';
+            Swal.fire('Error del Servidor', `Código: ${err.status}\nMensaje: ${serverResponse}`, 'error');
             this.cargando = false;
           }
         });
@@ -115,8 +116,37 @@ export class AdminComponent implements OnInit {
             this.toastr.success('Rifa activada correctamente');
             this.obtenerRifas();
           },
-          error: () => {
-            this.toastr.error('Error al activar la rifa');
+          error: (err) => {
+            const serverResponse = err.error?.error || err.statusText || 'Error desconocido';
+            Swal.fire('Error del Servidor', `Código: ${err.status}\nMensaje: ${serverResponse}`, 'error');
+            this.cargando = false;
+          }
+        });
+      }
+    });
+  }
+
+  eliminarRifaConfirm(id: string): void {
+    Swal.fire({
+      title: '¿Eliminar Definitivamente?',
+      text: 'Esta acción borrará la rifa y TODOS sus boletos, premios y compras vinculadas. ¡Esto no se puede deshacer!',
+      icon: 'error',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cargando = true;
+        this.rifasService.eliminarRifa(id).subscribe({
+          next: () => {
+            this.toastr.success('Rifa eliminada a nivel base de datos');
+            this.obtenerRifas();
+          },
+          error: (err: any) => {
+            const serverResponse = err.error?.error || err.statusText || 'Error desconocido';
+            Swal.fire('Error al eliminar', `Código: ${err.status}\nMensaje: ${serverResponse}`, 'error');
             this.cargando = false;
           }
         });
@@ -306,22 +336,43 @@ export class AdminComponent implements OnInit {
   }
 
   editar(rifa: any): void {
-    this.editando = {
-      ...rifa,
-      precio: rifa.precio || 50.00,
-      premios: rifa.premios && Array.isArray(rifa.premios) && rifa.premios.length > 0
-        ? rifa.premios.map((p: any) => ({
-            id: p.id,
-            titulo: p.titulo,
-            cantidad: p.cantidad
-          }))
-        : [{ titulo: '', cantidad: 1 }]
-    };
+    Swal.fire({
+      title: 'Cargando información fresca...',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
 
-    if (this.editando.fecha_fin) {
-      const fecha = new Date(this.editando.fecha_fin);
-      this.editando.fecha_fin = fecha.toISOString().substring(0, 10);
-    }
+    this.rifasService.getRifaPorId(rifa.id).subscribe({
+      next: (res) => {
+        if (!res.success) {
+          Swal.fire('Error', 'No se pudo cargar la información para editar', 'error');
+          return;
+        }
+
+        const dataFresca = res.rifa;
+        Swal.close();
+
+        this.editando = {
+          ...dataFresca,
+          precio: dataFresca.precio || 50.00,
+          premios: dataFresca.premios && Array.isArray(dataFresca.premios) && dataFresca.premios.length > 0
+            ? dataFresca.premios.map((p: any) => ({
+                id: p.id,
+                titulo: p.titulo,
+                cantidad: p.cantidad
+              }))
+            : [{ titulo: '', cantidad: 1 }]
+        };
+
+        if (this.editando.fecha_fin) {
+          const fecha = new Date(this.editando.fecha_fin);
+          this.editando.fecha_fin = fecha.toISOString().substring(0, 10);
+        }
+      },
+      error: () => {
+        Swal.fire('Error', 'Error al obtener detalles para editar', 'error');
+      }
+    });
   }
 
   agregarPremioEdicion(): void {

@@ -40,6 +40,11 @@ export class RifasService {
     return this.http.put(`${this.apiUrl}/${id}/estado`, { estado });
   }
 
+  // Eliminar rifa
+  eliminarRifa(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
   // Comprar un boleto
   comprarBoletos(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/comprar`, data);
