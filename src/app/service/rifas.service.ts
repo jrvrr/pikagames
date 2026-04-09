@@ -32,11 +32,11 @@ export class RifasService {
 
   // PayPal - Crear orden segura
   crearOrdenPaypal(data: { rifaId: number, numero: number, monto: string | number, usuario_id: string }): Observable<any> {
-    return this.http.post('https://www.pikarifa.shop/paypal/crear-orden', data);
+    return this.http.post('https://apipikagames.vercel.app/paypal/crear-orden', data);
   }
 
   // PayPal - Capturar pago de forma segura
   capturarPagoPaypal(data: { orderID: string, usuario_id: string, rifa_id: number, numero: number }): Observable<any> {
-    return this.http.post('https://www.pikarifa.shop/paypal/capturar', data);
+    return this.http.post('https://apipikagames.vercel.app/paypal/capturar', data);
   }
 }
