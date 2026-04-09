@@ -1,0 +1,99 @@
+<section class="error-page">
+
+  <!-- Pixel particles floating background -->
+  <div class="pixel-rain">
+    <span class="pixel" *ngFor="let p of pixels" [style.left]="p.x + '%'" [style.animation-delay]="p.delay + 's'" [style.animation-duration]="p.duration + 's'" [style.background]="p.color"></span>
+  </div>
+
+  <!-- Main card -->
+  <div class="error-card">
+
+    <!-- Top badge -->
+    <div class="error-badge">
+      <span>ERROR CRÍTICO DEL SISTEMA</span>
+    </div>
+
+    <!-- Big 404 -->
+    <div class="number-container">
+      <span class="num glitch" data-text="4">4</span>
+      <div class="plug-wrap">
+        <svg class="plug-svg" viewBox="0 0 140 200" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Cable superior -->
+          <line x1="60" y1="0" x2="60" y2="48"
+                stroke="#333" stroke-width="9" stroke-linecap="round"/>
+
+          <!-- Cuerpo del enchufe (borde negro + relleno gris) -->
+          <rect x="20" y="48" width="80" height="58" rx="10"
+                fill="#555" stroke="#111" stroke-width="4"/>
+          <!-- Reflejo/brillo del cuerpo -->
+          <rect x="26" y="54" width="32" height="10" rx="5"
+                fill="#888" opacity="0.5"/>
+
+          <!-- Pin izquierdo (con separación del cuerpo) -->
+          <rect x="36" y="108" width="14" height="34" rx="5"
+                fill="#888" stroke="#111" stroke-width="3"/>
+          <!-- Brillo del pin izq -->
+          <rect x="39" y="111" width="5" height="10" rx="3"
+                fill="#bbb" opacity="0.6"/>
+
+          <!-- Pin derecho -->
+          <rect x="70" y="108" width="14" height="34" rx="5"
+                fill="#888" stroke="#111" stroke-width="3"/>
+          <!-- Brillo del pin der -->
+          <rect x="73" y="111" width="5" height="10" rx="3"
+                fill="#bbb" opacity="0.6"/>
+
+          <!-- Cable inferior que sale por abajo y curva a la derecha -->
+          <path d="M60 142 Q60 200 110 200"
+                stroke="#333" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+          <!-- Chispas eléctricas a la derecha del cuerpo -->
+          <g class="spark-group">
+            <!-- Rayo en zigzag principal -->
+            <polyline points="100,58 112,70 104,80 116,92"
+                      fill="none" stroke="#FFD700" stroke-width="5"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Rayo secundario más pequeño -->
+            <polyline points="103,72 113,79 107,87"
+                      fill="none" stroke="#FFFFFF" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Destello circular -->
+            <circle cx="108" cy="75" r="5" fill="#FFD700" opacity="0.6"/>
+          </g>
+
+        </svg>
+      </div>
+      <span class="num glitch" data-text="4">4</span>
+    </div>
+
+    <!-- Oops tag -->
+    <div class="oops-wrap">
+      <span class="oops-tag">¡oops!</span>
+    </div>
+
+    <!-- Message -->
+    <h1 class="error-title">Página no encontrada</h1>
+    <p class="error-subtitle">
+      Algo se desconectó por aquí… La página que buscas no existe o hubo un error al cargarla.
+    </p>
+
+    <!-- Error code box -->
+    <div class="error-code-box">
+      <span class="code-label">CÓDIGO DE ERROR</span>
+      <span class="code-value" id="error-code-display">{{ errorCode }}</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="error-actions">
+      <button class="brutal-btn btn-home" id="btn-go-home" (click)="irAHome()">
+        Ir a inicio
+      </button>
+      <button class="brutal-btn btn-retry" id="btn-retry" (click)="recargar()">
+        Reintentar
+      </button>
+    </div>
+
+  </div>
+
+</section>

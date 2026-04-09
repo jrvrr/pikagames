@@ -6,12 +6,12 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://proyectopikagames.onrender.com/usuarios';
+  private apiUrl = 'http://localhost:4000/usuarios';
 
   constructor(private http: HttpClient) {}
 
   login(correo: string, contraseña: string): Observable<any> {
-    const body = { correo, contraseña };
+    const body = { correo, password: contraseña };
     return this.http.post(`${this.apiUrl}/login`, body).pipe(
       tap({
         next: (response: any) => {
@@ -23,7 +23,7 @@ export class AuthService {
     );
   }
   register(nombre: string, correo: string, contraseña: string): Observable<any> {
-    const body = { nombre, correo, contraseña };
+    const body = { nombre, correo, password: contraseña };
     return this.http.post(`${this.apiUrl}/register`, body);
   }
 

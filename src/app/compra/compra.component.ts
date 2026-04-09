@@ -3,6 +3,8 @@ import { RifasService } from '../service/rifas.service';
 import { AuthService } from '../service/auth.service';
 import { CommonModule } from '@angular/common';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
+import { firstValueFrom } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 declare var paypal: any;
 
@@ -23,7 +25,8 @@ export class CompraComponent implements OnInit {
 
   constructor(
     private rifasService: RifasService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -35,11 +38,15 @@ export class CompraComponent implements OnInit {
     this.cargando = true;
     this.rifasService.getRifas().subscribe({
       next: (res: any) => {
-        this.rifas = res.rifas || [];
+        this.rifas = (res.rifas || []).map((r: any) => ({
+          ...r,
+          boletosVisibles: 20
+        }));
         this.cargando = false;
       },
       error: (err: any) => {
         console.error('Error al cargar rifas:', err);
+        this.toastr.error('No se pudieron cargar las rifas', 'Error');
         this.cargando = false;
       }
     });
@@ -58,6 +65,7 @@ export class CompraComponent implements OnInit {
     const nuevaRifa = {
       nombre: 'Rifa de Prueba Admin',
       descripcion: 'Creada por administrador',
+      precio: 50.00,
       cantidad_boletos: 10,
       cantidad_ganadores: 1,
       modo_finalizacion: 'manual',
@@ -68,13 +76,21 @@ export class CompraComponent implements OnInit {
 
     this.rifasService.crearRifa(nuevaRifa).subscribe({
       next: () => {
-        alert('Rifa creada correctamente ✅');
+        this.toastr.success('Rifa creada correctamente', '¡Éxito!');
         this.obtenerRifas();
       },
       error: (err: any) => {
         console.error('Error creando rifa:', err);
+        this.toastr.error('Hubo un problema al crear la rifa', 'Error');
       }
     });
+  }
+
+  verMasBoletos(rifa: any): void {
+    if (!rifa.boletosVisibles) {
+      rifa.boletosVisibles = 20;
+    }
+    rifa.boletosVisibles += 20;
   }
 
   generarBoletos(cantidad: number): number[] {
@@ -88,12 +104,12 @@ export class CompraComponent implements OnInit {
     }
 
     if (this.usuario.es_admin) {
-      alert("Los administradores no pueden comprar boletos");
+      this.toastr.warning('Los administradores no pueden comprar boletos', 'Aviso');
       return;
     }
 
     if (rifa.boletos_ocupados?.includes(num)) {
-      alert("Ese boleto ya está ocupado ❌");
+      this.toastr.error('Ese boleto ya está ocupado', 'Ocupado');
       return;
     }
 
@@ -117,48 +133,56 @@ export class CompraComponent implements OnInit {
         label: "paypal"
       },
 
-      createOrder: (data: any, actions: any) => {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: rifa.precio || "50.00"
-            },
-            description: `Boleto #${boleto} - ${rifa.nombre}`
-          }]
-        });
+      createOrder: async (data: any, actions: any) => {
+        try {
+          const payload = {
+            rifaId: rifa.id,
+            numero: boleto,
+            monto: rifa.precio || "50.00",
+            usuario_id: this.usuario.id
+          };
+          const res = await firstValueFrom(this.rifasService.crearOrdenPaypal(payload));
+          return res.orderId;
+        } catch (error) {
+          console.error("Error al crear la orden", error);
+          this.toastr.error('No se pudo iniciar el pago porque el boleto no está disponible.', 'Boleto ocupado');
+          throw error;
+        }
       },
 
       onApprove: async (data: any, actions: any) => {
-        const order = await actions.order.capture();
-
-        this.registrarCompra(rifa.id, boleto);
+        try {
+          const payload = {
+            orderID: data.orderID,
+            usuario_id: this.usuario.id,
+            rifa_id: rifa.id,
+            numero: boleto
+          };
+          const res = await firstValueFrom(this.rifasService.capturarPagoPaypal(payload));
+          
+          if (res.success) {
+            this.toastr.success(`Boleto #${boleto} comprado con éxito`, '¡Compra Exitosa!');
+            this.boletoSeleccionado = null;
+            this.rifaSeleccionada = null;
+            this.obtenerRifas();
+          } else {
+            this.toastr.error('No se pudo completar el pago', 'Error');
+          }
+        } catch (error) {
+          console.error("Error al capturar el pago:", error);
+          this.toastr.error('Hubo un error al confirmar el pago', 'Error');
+        }
       },
 
       onError: (err: any) => {
         console.error("Error PayPal:", err);
+        this.toastr.warning('El pago fue cancelado o hubo un problema de conexión', 'Pago Incompleto');
       }
 
     }).render(containerId);
   }
 
-  registrarCompra(rifaId: number, boleto: number): void {
-    const payload = {
-      usuario_id: this.usuario.id,
-      rifa_id: rifaId,
-      numero: boleto,
-      metodo_pago: "PayPal"
-    };
 
-    this.rifasService.comprarBoletos(payload).subscribe({
-      next: () => {
-        alert(`Compra exitosa Boleto #${boleto}`);
-        this.obtenerRifas();
-      },
-      error: (err: any) => {
-        console.error("Error registrando compra:", err);
-      }
-    });
-  }
 
   logout(): void {
     this.authService.logout();

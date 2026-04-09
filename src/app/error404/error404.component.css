@@ -1,0 +1,333 @@
+/* ============================================
+   ERROR 404 - Neubrutalism Style (PikaRifa)
+   ============================================ */
+
+.error-page {
+  height: calc(100vh - 80px);
+  background-color: var(--nin-yellow, #FFE033);
+  background-image: radial-gradient(#00000018 2px, transparent 2px);
+  background-size: 28px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ---- Pixel rain ---- */
+.pixel-rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.pixel {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #000;
+  top: -20px;
+  opacity: 0.6;
+  animation: pixelFall linear infinite;
+}
+
+@keyframes pixelFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 0.7; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+/* ---- Main card ---- */
+.error-card {
+  position: relative;
+  z-index: 10;
+  background: var(--nin-white, #fff);
+  border: 3px solid #000;
+  border-radius: 16px;
+  box-shadow: 8px 8px 0px #000;
+  padding: 50px 60px;
+  max-width: 680px;
+  width: 100%;
+  text-align: center;
+  animation: cardPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes cardPopIn {
+  0%   { opacity: 0; transform: scale(0.85) translateY(30px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ---- Badge ---- */
+.error-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--nin-red, #E4000F);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  padding: 6px 18px;
+  border: 2px solid #000;
+  border-radius: 30px;
+  box-shadow: 3px 3px 0px #000;
+  margin-bottom: 30px;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.04); }
+}
+
+.badge-icon { font-size: 1rem; }
+
+/* ---- 404 Numbers + Plug ---- */
+.number-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  margin-bottom: 0;
+  line-height: 1;
+}
+
+.num {
+  font-size: 9rem;
+  font-weight: 900;
+  color: #000;
+  line-height: 1;
+  position: relative;
+  display: inline-block;
+  -webkit-text-stroke: 3px #000;
+  text-shadow: 5px 5px 0px var(--nin-yellow, #FFE033), 7px 7px 0px #000;
+  user-select: none;
+}
+
+/* Glitch effect */
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.glitch::before {
+  color: var(--nin-red, #E4000F);
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  animation: glitchTop 3s infinite linear;
+}
+
+.glitch::after {
+  color: var(--nin-blue, #0049D4);
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  animation: glitchBot 3s infinite linear;
+}
+
+@keyframes glitchTop {
+  0%, 90%, 100% { transform: translate(0); }
+  92%            { transform: translate(-3px, -2px); }
+  94%            { transform: translate(3px, 2px); }
+  96%            { transform: translate(-2px, 0); }
+}
+
+@keyframes glitchBot {
+  0%, 90%, 100% { transform: translate(0); }
+  92%            { transform: translate(3px, 2px); }
+  94%            { transform: translate(-3px, -2px); }
+  96%            { transform: translate(2px, 0); }
+}
+
+/* ---- Plug SVG ---- */
+.plug-wrap {
+  width: 100px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.plug-svg {
+  width: 100%;
+  height: auto;
+  animation: plugWobble 2.5s ease-in-out infinite;
+  filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.4));
+}
+
+@keyframes plugWobble {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50%       { transform: rotate(4deg) translateY(-6px); }
+}
+
+.spark-group {
+  animation: sparkFlash 1.2s ease-in-out infinite;
+  transform-origin: 90px 95px;
+}
+
+@keyframes sparkFlash {
+  0%, 40%, 100% { opacity: 1; transform: scale(1); }
+  20%, 60%      { opacity: 0; transform: scale(0.6); }
+}
+
+/* ---- Oops ---- */
+.oops-wrap {
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.oops-tag {
+  font-style: italic;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #555;
+  background: var(--nin-yellow, #FFE033);
+  border: 2px solid #000;
+  padding: 4px 16px;
+  border-radius: 20px;
+  box-shadow: 2px 2px 0px #000;
+  display: inline-block;
+}
+
+/* ---- Title & Subtitle ---- */
+.error-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #000;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px var(--nin-yellow, #FFE033);
+}
+
+.error-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  background: #f5f5f5;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: 3px 3px 0px #000;
+  text-align: left;
+}
+
+/* ---- Error code box ---- */
+.error-code-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111;
+  color: #00ff88;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 30px;
+  box-shadow: 4px 4px 0px var(--nin-red, #E4000F);
+}
+
+.code-label {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: #aaa;
+}
+
+.code-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ---- Buttons ---- */
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.brutal-btn {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+  padding: 12px 28px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-home {
+  background: var(--nin-blue, #0049D4);
+  color: #fff;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.btn-home:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+.btn-home:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+.btn-retry {
+  background: var(--nin-yellow, #FFE033);
+  color: #000;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.btn-retry:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+.btn-retry:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .error-card {
+    padding: 35px 25px;
+  }
+
+  .num {
+    font-size: 6rem;
+  }
+
+  .plug-wrap {
+    width: 65px;
+  }
+
+  .error-title {
+    font-size: 1.5rem;
+  }
+
+  .error-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .brutal-btn {
+    width: 100%;
+  }
+}

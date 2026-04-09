@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RifasService {
-  private apiUrl = 'https://proyectopikagames.onrender.com/rifas';
+  private apiUrl = 'http://localhost:4000/rifas';
 
   constructor(private http: HttpClient) {}
 
@@ -28,5 +28,15 @@ export class RifasService {
   // Comprar un boleto
   comprarBoletos(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/comprar`, data);
+  }
+
+  // PayPal - Crear orden segura
+  crearOrdenPaypal(data: { rifaId: number, numero: number, monto: string | number, usuario_id: string }): Observable<any> {
+    return this.http.post('http://localhost:4000/paypal/crear-orden', data);
+  }
+
+  // PayPal - Capturar pago de forma segura
+  capturarPagoPaypal(data: { orderID: string, usuario_id: string, rifa_id: number, numero: number }): Observable<any> {
+    return this.http.post('http://localhost:4000/paypal/capturar', data);
   }
 }

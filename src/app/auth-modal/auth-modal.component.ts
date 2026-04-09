@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-auth-modal',
@@ -20,26 +21,23 @@ export class AuthModalComponent {
   contrasena = '';
 
   loading = false;
-  mensaje = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private toastr: ToastrService) {}
 
   // 🔁 Cambiar entre login / registro
   alternarModo() {
     this.modo = this.modo === 'login' ? 'register' : 'login';
-    this.mensaje = '';
   }
 
   // 🚀 Enviar formulario (login o registro)
   enviar() {
     this.loading = true;
-    this.mensaje = '';
 
     if (this.modo === 'login') {
       this.authService.login(this.correo, this.contrasena).subscribe({
         next: (res) => {
           this.loading = false;
-          this.mensaje = 'Inicio de sesión exitoso ✅';
+          this.toastr.success('Has iniciado sesión', '¡Bienvenido!');
           this.cerrar.emit();
 
           // 🔍 Si el usuario es admin → redirigir al panel
@@ -51,7 +49,7 @@ export class AuthModalComponent {
         },
         error: (err) => {
           this.loading = false;
-          this.mensaje = 'Error al iniciar sesión ❌';
+          this.toastr.error('Credenciales incorrectas o error en el servidor', 'Error de sesión');
           console.error(err);
         }
       });
@@ -60,12 +58,12 @@ export class AuthModalComponent {
       this.authService.register(this.nombre, this.correo, this.contrasena).subscribe({
         next: (res) => {
           this.loading = false;
-          this.mensaje = 'Usuario registrado correctamente ✅';
+          this.toastr.success('Cuenta creada. Ya puedes iniciar sesión.', '¡Registro Exitoso!');
           this.alternarModo();
         },
         error: (err) => {
           this.loading = false;
-          this.mensaje = 'Error al registrar usuario ❌';
+          this.toastr.error('Ocurrió un error al registrar el usuario', 'Error');
           console.error(err);
         }
       });

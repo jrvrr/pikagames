@@ -11,6 +11,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { HttpClientModule } from '@angular/common/http';
+import { provideToastr } from 'ngx-toastr';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,6 +31,15 @@ export const appConfig: ApplicationConfig = {
       MatListModule,
       MatButtonModule,
       HttpClientModule
-    ), provideAnimationsAsync()
+    ), 
+    provideAnimationsAsync(),
+    provideToastr({
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      progressBar: true,
+      toastClass: 'ngx-toastr brutal-toast',
+      closeButton: true
+    })
   ]
 };

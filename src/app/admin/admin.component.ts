@@ -17,6 +17,7 @@ export class AdminComponent implements OnInit {
   nuevaRifa: {
     nombre: string;
     descripcion: string;
+    precio: number;
     cantidad_boletos: number;
     cantidad_ganadores: number;
     modo_finalizacion: string;
@@ -25,6 +26,7 @@ export class AdminComponent implements OnInit {
   } = {
     nombre: '',
     descripcion: '',
+    precio: 50.00,
     cantidad_boletos: 0,
     cantidad_ganadores: 1,
     modo_finalizacion: 'manual',
@@ -80,6 +82,7 @@ export class AdminComponent implements OnInit {
     // VALIDACIONES
     if (!this.nuevaRifa.nombre.trim()) return alert("El nombre es obligatorio.");
     if (!this.nuevaRifa.descripcion.trim()) return alert("La descripción es obligatoria.");
+    if (!this.nuevaRifa.precio || this.nuevaRifa.precio <= 0) return alert("El precio del boleto es inválido.");
     if (this.nuevaRifa.cantidad_boletos <= 0) return alert("Cantidad de boletos inválida.");
     if (this.nuevaRifa.cantidad_ganadores <= 0) return alert("Cantidad de ganadores inválida.");
 
@@ -105,6 +108,7 @@ export class AdminComponent implements OnInit {
 
     const nuevaRifaData = {
       ...this.nuevaRifa,
+      precio: Number(this.nuevaRifa.precio),
       fecha_fin: fechaFinEnviada,   
       premios: this.nuevaRifa.premios.map(p => ({
         titulo: p.titulo.trim(),
@@ -122,6 +126,7 @@ export class AdminComponent implements OnInit {
         this.nuevaRifa = {
           nombre: '',
           descripcion: '',
+          precio: 50.00,
           cantidad_boletos: 0,
           cantidad_ganadores: 1,
           modo_finalizacion: 'manual',
@@ -141,6 +146,7 @@ export class AdminComponent implements OnInit {
 editar(rifa: any): void {
   this.editando = {
     ...rifa,
+    precio: rifa.precio || 50.00,
     premios: rifa.premios && Array.isArray(rifa.premios) && rifa.premios.length > 0
       ? rifa.premios.map((p: any) => ({
           id: p.id,
@@ -170,6 +176,7 @@ guardarEdicion(): void {
   if (!this.editando) return;
   if (!this.editando.nombre.trim()) return alert("El nombre es obligatorio.");
   if (!this.editando.descripcion.trim()) return alert("La descripción es obligatoria.");
+  if (!this.editando.precio || this.editando.precio <= 0) return alert("Precio de boleto inválido.");
   if (this.editando.cantidad_boletos <= 0) return alert("Boletos inválidos.");
 
   for (let p of this.editando.premios) {
@@ -179,6 +186,7 @@ guardarEdicion(): void {
 
   const dataActualizada = {
     ...this.editando,
+    precio: Number(this.editando.precio),
     fecha_fin:
       this.editando.modo_finalizacion === 'fecha'
         ? `${this.editando.fecha_fin}T23:59:59`

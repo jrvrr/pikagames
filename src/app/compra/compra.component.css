@@ -1,33 +1,265 @@
-.compra-container {
-  width: auto;
-  color: #222;   
-  padding: 2rem;
-  border-radius: 12px;
-  margin: 2rem auto;
-  text-align: center;
-  top: 100px;
-  position: absolute;
+/* Container y Layout General */
+.compra-wrapper {
+  padding: 120px 5% 60px 5%; /* Top padding para navbar */
+  min-height: 85vh;
+  background-color: var(--nin-bg);
+  background-image: radial-gradient(#d1d1d1 2px, transparent 2px);
+  background-size: 30px 30px;
 }
 
-button {
-  background: #ff4c00; /* Naranja */
-  color: #fff;         /* Texto blanco */
-  border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
+.main-header-row {
+  max-width: 1000px;
+  margin: 0 auto 30px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Por si en móviles se junta mucho */
+  gap: 15px;
+}
+
+.logout-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 6px 20px 6px 10px !important;
+}
+
+.user-chip {
+  background: var(--nin-white);
+  color: var(--nin-dark);
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 3px solid #000;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.logout-text {
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.section-title {
+  text-align: left;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--nin-dark);
+  text-shadow: 3px 3px 0px var(--nin-white), 5px 5px 0px #000;
+  margin: 0;
+}
+
+.rifas-list {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.crear-rifa-btn {
+  align-self: flex-start;
+  margin-bottom: 20px;
+}
+
+/* Tarjeta de Rifa */
+.rifa-card {
+  padding: 30px;
+  background-color: var(--nin-yellow);
+}
+
+.rifa-card h3 {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  color: var(--nin-dark);
+  text-transform: uppercase;
+}
+
+.desc {
+  font-size: 1.1rem;
   font-weight: 600;
-  transition: background 0.3s ease, transform 0.2s ease;
+  margin-bottom: 20px;
+  background: var(--nin-white);
+  padding: 15px;
+  border: var(--brutal-border);
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px #000;
 }
 
-button:hover {
-  background: #e94400; /* Un poco más oscuro al pasar el ratón */
-  transform: scale(1.05);
+.admin-warning {
+  background: var(--nin-red);
+  color: white;
+  padding: 10px;
+  border: 2px solid #000;
+  font-weight: bold;
+  border-radius: 8px;
+  text-align: center;
 }
 
-.no-rifas {
-  margin-top: 2rem;
+/* Boletos Container */
+.boletos-container {
+  margin-top: 20px;
+  background: var(--nin-white);
+  padding: 20px;
+  border: var(--brutal-border);
+  border-radius: var(--brutal-radius);
+}
+
+.boletos-container h4 {
   font-size: 1.2rem;
-  color: #666;
+  font-weight: 800;
+  margin-bottom: 15px;
 }
 
+/* Grid de Boletos */
+.boletos-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Boleto individual (Neubrutalism rediseñado) */
+.boleto-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-family: 'Nunito', sans-serif;
+  background: var(--nin-white);
+  border: 3px solid #000;
+  border-radius: 12px;
+  box-shadow: 4px 4px 0px #000;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s, background 0.2s;
+}
+
+.casilla-check {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #000;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.num-text {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #000;
+  transition: color 0.2s;
+}
+
+/* Hover */
+.boleto-btn:hover:not(.ocupado) {
+  transform: translateY(-4px) translateX(-4px);
+  box-shadow: 6px 6px 0px var(--nin-red), 8px 8px 0px #000;
+  background: var(--nin-blue);
+}
+.boleto-btn:hover:not(.ocupado) .num-text {
+  color: var(--nin-white);
+}
+
+.boleto-btn:active:not(.ocupado) {
+  transform: translateY(2px) translateX(2px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+/* Estado: Seleccionado */
+.boleto-btn.seleccionado {
+  background: var(--nin-red);
+  box-shadow: 4px 4px 0px var(--nin-blue), 6px 6px 0px #000;
+  transform: translateY(-2px) translateX(-2px);
+}
+.boleto-btn.seleccionado .num-text {
+  color: var(--nin-white);
+}
+.boleto-btn.seleccionado .casilla-check {
+  background: #fff;
+  color: var(--nin-red);
+}
+
+/* Estado: Ocupado */
+.boleto-btn.ocupado {
+  background: #333;
+  box-shadow: 4px 4px 0px #000;
+  border-color: #000;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.boleto-btn.ocupado .num-text {
+  color: #aaa;
+  text-decoration: line-through;
+}
+
+.boleto-btn.ocupado .casilla-check {
+  background: #111;
+  border-color: #000;
+  color: #ff3333;
+}
+
+.ver-mas-btn {
+  width: 100%;
+  margin-top: 10px;
+  background: var(--nin-blue) !important;
+  color: #fff !important;
+}
+
+.ver-mas-btn:hover {
+  background: #0077a3 !important;
+  box-shadow: 5px 5px 0px var(--nin-red), 7px 7px 0px #000 !important;
+}
+
+/* Estado: Sin Rifas */
+.no-rifas {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+/* Loader */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+}
+
+.loader-container p {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-top: 20px;
+}
+
+.brutal-loader {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #000;
+  border-top-color: var(--nin-red);
+  border-right-color: var(--nin-yellow);
+  border-bottom-color: var(--nin-blue);
+  border-left-color: var(--nin-dark);
+  border-radius: 50%;
+  animation: brutalSpin 1s linear infinite;
+  box-shadow: 4px 4px 0px #000;
+}
+
+@keyframes brutalSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Paypal spacing */
+.paypal-container {
+  margin-top: 20px;
+}

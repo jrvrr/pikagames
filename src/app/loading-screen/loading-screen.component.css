@@ -1,0 +1,220 @@
+/* =============================================
+   LOADING SCREEN — PikaRifa  (Pokébola edition)
+   ============================================= */
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  font-family: 'Nunito', sans-serif;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.loading-overlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ---- Pokébola ---- */
+.pokeball-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Overlay fijo (no gira) — da efecto de esfera 3D */
+.pokeball-overlay {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  /* Solo el brillo oval arriba-izquierda — sombra lateral viene de media_luna.svg */
+  background:
+    radial-gradient(ellipse 28% 16% at 27% 15%, rgba(255, 255, 255, 0.70) 0%, transparent 100%);
+}
+
+.pokeball {
+  border: 2px solid #303030;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  animation: spinBall 1.8s linear infinite;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.18));
+}
+
+/* Sombra lado derecho usando media_luna.svg */
+.pokeball__shadow {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  height: 100%;
+  width: auto;
+  opacity: 0.6;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: multiply;   /* oscurece el color debajo: rojo→rojo oscuro, blanco→gris */
+}
+
+@keyframes spinBall {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mitad superior — roja */
+.pokeball__top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #e53935;
+  border-radius: 140px 140px 0 0;
+}
+
+/* Mitad inferior — blanca */
+.pokeball__bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #f5f5f5;
+  border-radius: 0 0 140px 140px;
+}
+
+/* Banda horizontal negra */
+.pokeball__band {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: #212121;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+/* Capa 1: negro exterior */
+.pokeball__button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  background: #1a1a1a;
+  /* negro */
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Capa 2: gris */
+.pokeball__button-inner {
+  width: 40px;
+  height: 40px;
+  background: #9e9e9e;
+  /* gris */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Capa 3: inner-2 — borde negro delgado + centro blanco */
+.pokeball__button-inner-2 {
+  width: 24px;
+  height: 24px;
+  background: #f5f5f5;
+  /* blanco */
+  border-radius: 50%;
+  border: 1px solid #1a1a1a;
+  /* negro delgado */
+}
+
+/* ---- Barra de progreso ---- */
+.prog-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(280px, 76vw);
+}
+
+.prog-track {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e53935, #ff7043);
+  border-radius: 99px;
+  transition: width 0.04s linear;
+  position: relative;
+}
+
+.prog-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+  animation: shimmer 0.9s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(200%);
+  }
+}
+
+.prog-pct {
+  color: #212121;
+  font-size: 0.82rem;
+  font-weight: 900;
+  min-width: 36px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 360px) {
+  .pokeball {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+  }
+
+  .pokeball__top {
+    border-radius: 110px 110px 0 0;
+  }
+
+  .pokeball__bottom {
+    border-radius: 0 0 110px 110px;
+  }
+}

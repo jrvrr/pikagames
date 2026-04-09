@@ -3,56 +3,85 @@
 }
 
 .sidenav {
-  width: 250px;
-    padding-top: 95px;
-  background-color: white;
+  width: 280px;
+  background-color: var(--nin-white);
+  border-right: var(--brutal-border);
 }
 
-.fixed-toolbar {
+.sidenav-header {
+  padding: 30px 20px;
+  text-align: center;
+  border-bottom: var(--brutal-border);
+  background-color: var(--nin-bg);
+  background-image: radial-gradient(#d1d1d1 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.logo-drawer {
+  width: 100px;
+  border-radius: 50%;
+  border: var(--brutal-border);
+  box-shadow: 4px 4px 0px #000;
+}
+
+.nintendo-nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  transition: box-shadow 0.3s ease;
-}
-
-
-.toolbar {
-  background-color: white;
-  color: #FF4C00;
+  background-color: var(--nin-white);
+  height: 80px;
+  padding: 0 40px;
+  border-bottom: var(--brutal-border);
+  box-shadow: 0px 6px 0px #000;
   display: flex;
   align-items: center;
-  height: 95px;
-  padding: 0 16px;
 }
 
-
-.icon-box {
-  border-radius: 5px;        /* bordes redondeados */
-  width: 40px;
-  height: 40px;
-  border: 2px solid #ff4c00; /* borde blanco */
-}
-
-.icon-box mat-icon {
-  color: #FF4C00;             /* color del ícono */
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
 }
 
 .logo {
-  width: 60px;
-  height: auto;
-  margin-left: 10px;
+  width: 45px;
+  height: 45px;
+  border: 2px solid #000;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 2px 2px 0px #000;
 }
 
-mat-nav-list{
-  height: 100%;
+.brand-name {
+  font-weight: 900;
+  font-size: 26px;
+  color: var(--nin-red);
+  letter-spacing: -1px;
 }
 
-.mat-mdc-list-base{
-  background: white;
+.icon-box {
+  border-radius: 8px;
+  width: 45px;
+  height: 45px;
+  border: 2px solid #000 !important;
+  background-color: var(--nin-white);
+  box-shadow: 3px 3px 0px #000;
+  margin-right: 20px;
+  transition: all var(--transition-fast);
 }
+
+.icon-box mat-icon {
+  color: var(--nin-dark);
+}
+
+.icon-box:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #000;
+}
+
 .spacer {
   flex: 1 1 auto;
 }
@@ -60,37 +89,74 @@ mat-nav-list{
 .nav-links {
   display: flex;
   align-items: center;
-  font-size: 20px;
+  gap: 30px;
 }
 
-.nav-links a {
+.nav-link {
   text-decoration: none;
-  color: #FF4C00;
-  padding: 8px 15px;
-  border: 2px solid transparent;
-  transition: 0.2s;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--nin-dark);
+  padding: 10px 5px;
+  position: relative;
+  transition: color var(--transition-fast);
 }
 
-/* Línea entre elementos */
-.nav-links a + a {
-  border-left: 2px solid #FF4C00;
+.nav-link:not(.btn-buy)::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: var(--nin-red);
+  transform: scaleX(0);
+  transition: transform var(--transition-fast);
+  transform-origin: bottom right;
+  border-radius: 10px;
 }
 
-/* Activación por hover o click */
-.nav-links a:hover,
-.nav-links a:focus,
-.nav-links a.active {
-  border: 2px solid #FFC107; /* Borde amarillo */
-  background-color: #FFC107;
-  color: white;
+.nav-link:not(.btn-buy):hover {
+  color: var(--nin-red);
 }
 
+.nav-link:not(.btn-buy):hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.btn-buy {
+  background-color: var(--nin-blue) !important;
+  color: var(--nin-white) !important;
+  border: var(--brutal-border) !important;
+  border-radius: 30px;
+  padding: 8px 24px !important;
+  box-shadow: 4px 4px 0px #000;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.btn-buy:hover {
+  background-color: #0b9ed1 !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+.btn-buy:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #000;
+}
 
 .menu-button {
   display: none;
 }
 
-@media (max-width: 817px) {
+.main-content {
+  padding-top: 80px;
+}
+
+@media (max-width: 950px) {
   .nav-links {
     display: none; 
   }
@@ -100,6 +166,18 @@ mat-nav-list{
   }
 }
 
-.mdc-list-item__primary-text {
-  color: black !important;
+.mat-mdc-list-base {
+  background: var(--nin-white);
+}
+
+.mat-mdc-list-item {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  margin: 10px 15px !important;
+  border-radius: 12px !important;
+  transition: background-color 0.2s;
+}
+
+.mat-mdc-list-item:hover {
+  background-color: #f0f0f0;
 }

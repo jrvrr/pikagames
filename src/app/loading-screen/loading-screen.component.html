@@ -1,0 +1,33 @@
+<div class="loading-overlay" [class.fade-out]="fadeOut">
+
+  <!-- Pokébola -->
+  <div class="pokeball-wrap">
+    <div class="pokeball">
+      <div class="pokeball__top"></div>
+      <div class="pokeball__bottom"></div>
+      <div class="pokeball__band"></div>
+
+      <!-- Sombra media-luna lado derecho -->
+      <img class="pokeball__shadow" src="media_luna.svg" alt="" />
+
+      <!-- Botón: gris (outer) → negro (inner) → blanco (inner-2) -->
+      <div class="pokeball__button">
+        <div class="pokeball__button-inner">
+          <div class="pokeball__button-inner-2"></div>
+        </div>
+      </div>
+
+      <!-- Overlay con brillo/sombra, gira con la bola -->
+      <div class="pokeball-overlay"></div>
+    </div>
+  </div>
+
+  <!-- Barra de progreso -->
+  <div class="prog-wrap">
+    <div class="prog-track">
+      <div class="prog-fill" [style.width.%]="progress"></div>
+    </div>
+    <span class="prog-pct">{{ progress }}%</span>
+  </div>
+
+</div>

@@ -1,45 +1,82 @@
-<div class="compra-container">
-  <button *ngIf="!usuario" (click)="abrirAuth()">Iniciar sesión / Registrarse</button>
+<div class="compra-wrapper">
+  
+  <div class="main-header-row">
+    <h2 class="section-title" *ngIf="rifas.length > 0 && !cargando">RIFAS DISPONIBLES</h2>
+    <h2 class="section-title" *ngIf="rifas.length === 0 && !cargando">NO HAY RIFAS</h2>
+    <h2 class="section-title" *ngIf="cargando">CARGANDO...</h2>
 
-  <button *ngIf="usuario" (click)="logout()">Cerrar sesión ({{ usuario.nombre }})</button>
+    <div class="auth-actions">
+      <button class="brutal-btn red" *ngIf="!usuario" (click)="abrirAuth()">INICIAR SESIÓN</button>
+      <button class="brutal-btn red logout-btn" *ngIf="usuario" (click)="logout()">
+        <span class="user-chip"> {{ usuario.nombre }}</span>
+        <span class="logout-text">SALIR</span>
+      </button>
+    </div>
+  </div>
 
-  <div *ngIf="rifas.length > 0; else sinRifas">
-    <h2>Rifas disponibles 🎟️</h2>
+  <!-- Loader -->
+  <div *ngIf="cargando" class="loader-container">
+    <div class="brutal-loader"></div>
+    <p>Cargando rifas...</p>
+  </div>
 
-    <button *ngIf="usuario?.es_admin" (click)="crearRifa()" class="crear-rifa-btn">
-      Crear nueva rifa
-    </button>
+  <!-- Content -->
+  <div *ngIf="!cargando">
+    <div *ngIf="rifas.length > 0; else sinRifas" class="rifas-list">
 
-    <!-- Lista de rifas -->
-    <div *ngFor="let rifa of rifas" class="rifa">
-      <h3>{{ rifa.nombre }}</h3>
-      <p>{{ rifa.descripcion }}</p>
+      <button *ngIf="usuario?.es_admin" (click)="crearRifa()" class="brutal-btn red crear-rifa-btn">
+        CREAR NUEVA RIFA
+      </button>
 
-      <!-- Mostrar boletos solo a usuarios normales -->
-      <div class="boletos-container" *ngIf="!usuario?.es_admin">
-        <h4>Selecciona un boleto:</h4>
+      <div *ngFor="let rifa of rifas" class="rifa-card brutal-card">
+        <h3>{{ rifa.nombre }}</h3>
+        <p class="desc">{{ rifa.descripcion }}</p>
 
-        <div class="boletos-lista">
-          <button 
-  *ngFor="let num of generarBoletos(rifa.cantidad_boletos || 0)"
-  [disabled]="rifa.boletos_ocupados?.includes(num)"
-  (click)="seleccionarBoleto(rifa, num)"
->
-  {{ num }}
-</button>
-<div id="paypal-button-container-{{ rifa.id }}"></div>
+        <!-- Administrador view warning -->
+        <div class="admin-warning" *ngIf="usuario?.es_admin">
+          Eres admin: no puedes comprar boletos en esta vista.
+        </div>
 
+        <!-- Mostrar boletos solo a usuarios normales -->
+        <div class="boletos-container" *ngIf="!usuario?.es_admin">
+          <h4>Selecciona un boleto:</h4>
+          
+          <div class="boletos-lista">
+            <button 
+              *ngFor="let num of (generarBoletos(rifa.cantidad_boletos || 0) | slice:0:(rifa.boletosVisibles || 20))"
+              class="boleto-btn"
+              [class.ocupado]="rifa.boletos_ocupados?.includes(num)"
+              [class.seleccionado]="boletoSeleccionado === num && rifaSeleccionada?.id === rifa.id"
+              [disabled]="rifa.boletos_ocupados?.includes(num)"
+              (click)="seleccionarBoleto(rifa, num)"
+            >
+              <div class="casilla-check">
+                <span *ngIf="rifa.boletos_ocupados?.includes(num)">✕</span>
+                <span *ngIf="!rifa.boletos_ocupados?.includes(num) && !(boletoSeleccionado === num && rifaSeleccionada?.id === rifa.id)"></span>
+                <span *ngIf="boletoSeleccionado === num && rifaSeleccionada?.id === rifa.id">✓</span>
+              </div>
+              <span class="num-text">{{ num }}</span>
+            </button>
+          </div>
 
+          <button *ngIf="(rifa.cantidad_boletos || 0) > (rifa.boletosVisibles || 20)" 
+                  class="brutal-btn ver-mas-btn" 
+                  (click)="verMasBoletos(rifa)">
+            VER MÁS BOLETOS ↓
+          </button>
+          
+          <div id="paypal-button-container-{{ rifa.id }}" class="paypal-container"></div>
         </div>
       </div>
     </div>
 
+    <ng-template #sinRifas>
+      <div class="no-rifas brutal-card">
+        <h2>NO HAY RIFAS ACTIVAS</h2>
+        <p>Vuelve más tarde para participar.</p>
+      </div>
+    </ng-template>
   </div>
-
-  <ng-template #sinRifas>
-    <p>No hay rifas disponibles actualmente 😔</p>
-  </ng-template>
 </div>
 
-<!-- Modal de autenticación -->
 <app-auth-modal *ngIf="mostrarModal" (cerrar)="cerrarAuth()"></app-auth-modal>

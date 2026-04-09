@@ -1,32 +1,34 @@
 <div class="overlay" (click)="cerrarModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <button (click)="cerrarModal()" class="cerrar">X</button>
-    <h2>{{ modo === 'login' ? 'Iniciar sesión' : 'Registrarse' }}</h2>
+  <div class="brutal-card modal-content" (click)="$event.stopPropagation()">
+    <button (click)="cerrarModal()" class="close-btn brutal-btn red">X</button>
+    <h2 class="auth-title">{{ modo === 'login' ? 'INICIAR SESIÓN' : 'REGISTRARSE' }}</h2>
 
-    <form (ngSubmit)="enviar()" class="form">
-      <div *ngIf="modo === 'register'">
+    <form (ngSubmit)="enviar()" class="auth-form">
+      <div *ngIf="modo === 'register'" class="input-group">
         <label>Nombre</label>
-        <input type="text" [(ngModel)]="nombre" name="nombre" required />
+        <input type="text" [(ngModel)]="nombre" name="nombre" class="brutal-input" required placeholder="Tu nombre" />
       </div>
 
-      <label>Correo</label>
-      <input type="email" [(ngModel)]="correo" name="correo" required />
+      <div class="input-group">
+        <label>Correo</label>
+        <input type="email" [(ngModel)]="correo" name="correo" class="brutal-input" required placeholder="ejemplo@correo.com" />
+      </div>
 
-      <label>Contraseña</label>
-      <input type="password" [(ngModel)]="contrasena" name="contraseña" required />
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input type="password" [(ngModel)]="contrasena" name="contraseña" class="brutal-input" required placeholder="••••••••" />
+      </div>
 
-      <button type="submit" [disabled]="loading">
-        {{ loading ? 'Cargando...' : (modo === 'login' ? 'Iniciar sesión' : 'Registrarse') }}
+      <button type="submit" class="brutal-btn submit-btn" [disabled]="loading">
+        {{ loading ? 'ENVIANDO...' : (modo === 'login' ? 'ENTRAR AHORA' : 'CREAR CUENTA') }}
       </button>
     </form>
 
     <p class="toggle">
       {{ modo === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
-      <a href="#" (click)="alternarModo(); $event.preventDefault()">
-        {{ modo === 'login' ? 'Regístrate' : 'Inicia sesión' }}
+      <a href="#" class="toggle-link" (click)="alternarModo(); $event.preventDefault()">
+        {{ modo === 'login' ? 'Regístrate aquí' : 'Inicia sesión' }}
       </a>
     </p>
-
-    <p class="mensaje" *ngIf="mensaje">{{ mensaje }}</p>
   </div>
 </div>

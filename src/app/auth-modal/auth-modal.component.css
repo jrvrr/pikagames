@@ -1,70 +1,82 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
-.modal {
-  background: white;
-  border-radius: 12px;
-  width: 380px;
-  padding: 2rem;
+.modal-content {
+  width: 90%;
+  max-width: 420px;
+  padding: 35px 30px;
   position: relative;
+  border-width: 4px;
 }
 
-.close {
+.close-btn {
   position: absolute;
-  right: 15px;
-  top: 10px;
-  background: none;
-  border: none;
-  font-size: 22px;
-  cursor: pointer;
+  right: -15px;
+  top: -15px;
+  width: 45px;
+  height: 45px;
+  padding: 0 !important;
+  font-size: 1.3rem !important;
+  border-radius: 50% !important;
 }
 
-form {
+.auth-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 900;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-family: 'Nunito', sans-serif;
+  color: var(--nin-dark);
+}
+
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 18px;
 }
 
-input {
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.input-group label {
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  color: var(--nin-dark);
+  display: block;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
 }
 
-input:focus {
-  outline: none;
-  border-color: #ffc107;
-  box-shadow: 0 0 5px rgba(255, 76, 0, 0.5);
-}
-
-button {
-  margin-top: 1rem;
-  background: #ffc107;
-  border: none;
-  padding: 0.7rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-button:hover {
-  background: #ffda47;
+.submit-btn {
+  margin-top: 15px;
+  width: 100%;
 }
 
 .toggle {
-  margin-top: 1rem;
+  margin-top: 25px;
   text-align: center;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  color: var(--nin-dark);
 }
 
-.toggle a {
-  color: #007bff;
+.toggle-link {
+  color: var(--nin-blue);
   text-decoration: none;
+  font-weight: 900;
+  margin-left: 5px;
+  text-transform: uppercase;
+}
+
+.toggle-link:hover {
+  text-decoration: underline;
+  color: var(--nin-red);
 }
 

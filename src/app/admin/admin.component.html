@@ -1,122 +1,172 @@
-<div class="admin-container">
-
-  <h2>Panel de Administrador</h2>
-  <p>Bienvenido, {{ usuario?.nombre }}</p>
-
-  <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
-
-  <hr />
-
-  <h3>Crear nueva rifa</h3>
-
-  <form (ngSubmit)="crearRifa()" #rifaForm="ngForm" class="form-box">
-
-    <label>Nombre:</label>
-    <input [(ngModel)]="nuevaRifa.nombre" name="nombre" required />
-
-    <label>Descripción:</label>
-    <textarea [(ngModel)]="nuevaRifa.descripcion" name="descripcion" required></textarea>
-
-    <label>Cantidad de boletos:</label>
-    <input type="number" [(ngModel)]="nuevaRifa.cantidad_boletos" name="cantidad_boletos" required />
-
-    <label>Cantidad de ganadores:</label>
-    <input type="number" [(ngModel)]="nuevaRifa.cantidad_ganadores" name="cantidad_ganadores" required />
-
-    <label>Modo de finalización:</label>
-    <select [(ngModel)]="nuevaRifa.modo_finalizacion" name="modo_finalizacion">
-      <option value="manual">Manual</option>
-      <option value="fecha">Por fecha</option>
-    </select>
-
-    <label *ngIf="nuevaRifa.modo_finalizacion === 'fecha'">Fecha de finalización:</label>
-    <input 
-      *ngIf="nuevaRifa.modo_finalizacion === 'fecha'" 
-      type="date" 
-      [(ngModel)]="nuevaRifa.fecha_fin" 
-      name="fecha_fin" 
-    />
-
-    <h4>Premios</h4>
-    <div class="premio-box" *ngFor="let premio of nuevaRifa.premios; let i = index">
-      <input [(ngModel)]="premio.titulo" name="titulo{{ i }}" placeholder="Título del premio" required />
-      <input type="number" [(ngModel)]="premio.cantidad" name="cantidad{{ i }}" placeholder="Cantidad" required />
-      <button 
-        type="button" 
-        class="btn-delete" 
-        (click)="eliminarPremio(i)"
-        *ngIf="nuevaRifa.premios.length > 1">
-        ❌
-      </button>
+<div class="admin-wrapper">
+  <div class="admin-container brutal-card">
+    <div class="admin-header">
+      <h2>PANEL DE ADMINISTRADOR</h2>
+      <p class="welcome">Bienvenido al área restringida, <strong>{{ usuario?.nombre }}</strong></p>
+      <button class="brutal-btn cancel-btn btn-logout" (click)="logout()">CERRAR SESIÓN</button>
     </div>
 
-    <button class="btn-add" type="button" (click)="agregarPremio()">➕ Agregar premio</button>
-    <br><br>
+    <!-- WAVE DIVIDER -->
+    <div class="wave-divider"></div>
 
-    <button class="btn-submit" type="submit">Crear Rifa</button>
-  </form>
+    <div class="admin-grid">
+      <!-- PANEL IZQUIERDO: Crear Rifa -->
+      <div class="create-section">
+        <h3 class="section-title">CREAR NUEVA RIFA</h3>
 
-  <hr />
+        <form (ngSubmit)="crearRifa()" #rifaForm="ngForm" class="form-box brutal-card-mini">
+          
+          <div class="input-group">
+            <label>Nombre de la rifa</label>
+            <input class="brutal-input" [(ngModel)]="nuevaRifa.nombre" name="nombre" placeholder="Ej. Tarjeta Nintendo eShop" required />
+          </div>
 
-  <h3>Rifas Existentes</h3>
+          <div class="input-group">
+            <label>Descripción detallada</label>
+            <textarea class="brutal-input" rows="3" [(ngModel)]="nuevaRifa.descripcion" name="descripcion" placeholder="Explica las reglas..." required></textarea>
+          </div>
 
-  <div *ngIf="cargando">Cargando rifas...</div>
+          <div class="grid-2">
+            <div class="input-group">
+              <label>Precio por Boleto (MXN)</label>
+              <input class="brutal-input" type="number" [(ngModel)]="nuevaRifa.precio" name="precio" placeholder="50.00" min="1" step="0.50" required />
+            </div>
 
-  <ul *ngIf="!cargando" class="lista-rifas">
-    <li *ngFor="let rifa of rifas">
-      <strong>{{ rifa.nombre }}</strong> — {{ rifa.descripcion }}
-      ({{ rifa.cantidad_boletos }} boletos)
+            <div class="input-group">
+              <label>Cantidad de boletos</label>
+              <input class="brutal-input" type="number" [(ngModel)]="nuevaRifa.cantidad_boletos" name="cantidad_boletos" min="1" required />
+            </div>
+          </div>
 
-      <button class="btn-edit" (click)="editar(rifa)">✏ Editar</button>
-    </li>
-  </ul>
+          <div class="grid-2">
+            <div class="input-group">
+              <label>Cantidad de ganadores</label>
+              <input class="brutal-input" type="number" [(ngModel)]="nuevaRifa.cantidad_ganadores" name="cantidad_ganadores" min="1" required />
+            </div>
 
-  <div *ngIf="editando" class="editar-box">
+            <div class="input-group">
+              <label>Modo de finalización</label>
+              <select class="brutal-input" [(ngModel)]="nuevaRifa.modo_finalizacion" name="modo_finalizacion">
+                <option value="manual">Manual (Tú decides cuándo)</option>
+                <option value="fecha">Por Fecha límite</option>
+              </select>
+            </div>
+          </div>
 
-    <h3>Editando rifa: {{ editando.nombre }}</h3>
+          <div class="input-group" *ngIf="nuevaRifa.modo_finalizacion === 'fecha'">
+            <label>Fecha de finalización</label>
+            <input class="brutal-input" type="date" [(ngModel)]="nuevaRifa.fecha_fin" name="fecha_fin" />
+          </div>
 
-    <label>Nombre:</label>
-    <input [(ngModel)]="editando.nombre" name="edit_nombre" />
+          <h4 class="subsection-title">👑 Premios de la Rifa</h4>
+          <div class="premio-box brutal-card-nano" *ngFor="let premio of nuevaRifa.premios; let i = index">
+            <div class="premio-inputs">
+              <input class="brutal-input" [(ngModel)]="premio.titulo" name="titulo{{ i }}" placeholder="Título del premio" required />
+              <input class="brutal-input win-amount" type="number" [(ngModel)]="premio.cantidad" name="cantidad{{ i }}" placeholder="Cantidad" min="1" required />
+            </div>
+            <button type="button" class="brutal-btn small-btn btn-delete" (click)="eliminarPremio(i)" *ngIf="nuevaRifa.premios.length > 1">
+              🗑️
+            </button>
+          </div>
 
-    <label>Descripción:</label>
-    <textarea [(ngModel)]="editando.descripcion" name="edit_desc"></textarea>
+          <button class="brutal-btn small-btn btn-add" type="button" (click)="agregarPremio()">➕ AGREGAR PREMIO</button>
+          
+          <div class="submit-area">
+            <button class="brutal-btn btn-primary btn-submit full-width" type="submit">🚀 CREAR RIFA AHORA</button>
+          </div>
+        </form>
+      </div>
 
-    <label>Cantidad boletos:</label>
-    <input type="number" [(ngModel)]="editando.cantidad_boletos" name="edit_cb" />
+      <!-- PANEL DERECHO: Rifas Existentes / Edición -->
+      <div class="manage-section">
+        
+        <div *ngIf="!editando">
+          <h3 class="section-title">RIFAS EXISTENTES</h3>
+          
+          <div *ngIf="cargando" class="loader-container">
+            <div class="brutal-loader"></div>
+            <p>Cargando datos...</p>
+          </div>
 
-    <label>Cantidad ganadores:</label>
-    <input type="number" [(ngModel)]="editando.cantidad_ganadores" name="edit_cg" />
+          <div *ngIf="!cargando" class="lista-rifas">
+            <div *ngFor="let rifa of rifas" class="rifa-admin-card brutal-card-nano">
+              <div class="rifa-info">
+                <h4>{{ rifa.nombre }} <span>(${{rifa.precio || 50}})</span></h4>
+                <p>{{ rifa.descripcion | slice:0:60 }}...</p>
+                <span class="badget">{{ rifa.cantidad_boletos }} boletos</span>
+              </div>
+              <button class="brutal-btn small-btn btn-edit" (click)="editar(rifa)">✏️ EDITAR</button>
+            </div>
+            
+            <div *ngIf="rifas.length === 0" class="empty-state">
+              No hay rifas creadas aún.
+            </div>
+          </div>
+        </div>
 
-    <label>Modo finalización:</label>
-    <select [(ngModel)]="editando.modo_finalizacion" name="edit_modo">
-      <option value="manual">Manual</option>
-      <option value="fecha">Por fecha</option>
-    </select>
+        <!-- MODO EDICION -->
+        <div *ngIf="editando" class="editar-box form-box brutal-card-mini editable-mode">
+          
+          <h3 class="section-title edit-title">✏️ EDITANDO: {{ editando.nombre }}</h3>
 
-    <label *ngIf="editando.modo_finalizacion === 'fecha'">Fecha fin:</label>
-    <input 
-      *ngIf="editando.modo_finalizacion === 'fecha'"
-      type="date"
-      [(ngModel)]="editando.fecha_fin"
-      name="edit_fecha"
-    />
+          <div class="input-group">
+            <label>Nombre</label>
+            <input class="brutal-input" [(ngModel)]="editando.nombre" name="edit_nombre" />
+          </div>
 
-    <h4>Premios</h4>
+          <div class="input-group">
+            <label>Descripción</label>
+            <textarea class="brutal-input" [(ngModel)]="editando.descripcion" name="edit_desc"></textarea>
+          </div>
 
-    <div class="premio-box" *ngFor="let p of editando.premios; let i = index">
-      <input [(ngModel)]="p.titulo" placeholder="Título del premio">
-      <input type="number" [(ngModel)]="p.cantidad" min="1">
+          <div class="grid-2">
+            <div class="input-group">
+              <label>Precio por Boleto (MXN)</label>
+              <input class="brutal-input" type="number" [(ngModel)]="editando.precio" name="edit_pr" required />
+            </div>
+            <div class="input-group">
+              <label>Cantidad boletos</label>
+              <input class="brutal-input" type="number" [(ngModel)]="editando.cantidad_boletos" name="edit_cb" />
+            </div>
+          </div>
 
-      <button class="btn-delete" (click)="eliminarPremioEdicion(i)">❌</button>
+          <div class="grid-2">
+            <div class="input-group">
+              <label>Cantidad ganadores</label>
+              <input class="brutal-input" type="number" [(ngModel)]="editando.cantidad_ganadores" name="edit_cg" />
+            </div>
+            <div class="input-group">
+              <label>Modo finalización</label>
+              <select class="brutal-input" [(ngModel)]="editando.modo_finalizacion" name="edit_modo">
+                <option value="manual">Manual</option>
+                <option value="fecha">Por fecha</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group" *ngIf="editando.modo_finalizacion === 'fecha'">
+            <label>Fecha fin</label>
+            <input class="brutal-input" type="date" [(ngModel)]="editando.fecha_fin" name="edit_fecha" />
+          </div>
+
+          <h4 class="subsection-title">Premios</h4>
+          <div class="premio-box brutal-card-nano" *ngFor="let p of editando.premios; let i = index">
+            <div class="premio-inputs">
+              <input class="brutal-input" [(ngModel)]="p.titulo" placeholder="Título del premio">
+              <input class="brutal-input win-amount" type="number" [(ngModel)]="p.cantidad" min="1">
+            </div>
+            <button class="brutal-btn small-btn btn-delete" (click)="eliminarPremioEdicion(i)" *ngIf="editando.premios.length > 1">🗑️</button>
+          </div>
+
+          <button class="brutal-btn small-btn btn-add" (click)="agregarPremioEdicion()">➕ Agregar premio</button>
+
+          <div class="action-buttons">
+            <button class="brutal-btn btn-primary" (click)="guardarEdicion()">💾 GUARDAR</button>
+            <button class="brutal-btn cancel-btn" (click)="editando = null">CANCELAR</button>
+          </div>
+
+        </div>
+      </div>
     </div>
-
-    <button class="btn-add" (click)="agregarPremioEdicion()">➕ Agregar premio</button>
-
-    <br><br>
-
-    <button class="btn-save" (click)="guardarEdicion()">💾 Guardar cambios</button>
-    <button class="btn-cancel" (click)="editando = null">Cancelar</button>
-
   </div>
-
 </div>

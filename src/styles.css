@@ -1,4 +1,22 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import 'ngx-toastr/toastr';
+
+/* Variables Globales Estilo Nintendo / Juguetón */
+:root {
+  --nin-red: #E60012;
+  --nin-white: #FFFFFF;
+  --nin-dark: #222222;
+  --nin-yellow: #FFCC00;
+  --nin-blue: #008CBA;
+  --nin-bg: #f5f5f5; /* Gris claro/crema */
+  
+  --brutal-border: 3px solid #000;
+  --brutal-shadow: 6px 6px 0px #000;
+  --brutal-shadow-hover: 2px 2px 0px #000;
+  --brutal-radius: 16px;
+  --transition-fast: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -7,36 +25,109 @@ html, body {
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--nin-bg);
+  color: var(--nin-dark);
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Clases de utilidad para el efecto de "Capas" (Neubrutalism) */
+.brutal-card, .brutal-card *, .brutal-card *::before, .brutal-card *::after {
+  box-sizing: border-box;
+}
 
+.brutal-card {
+  background: var(--nin-white);
+  border: var(--brutal-border);
+  border-radius: var(--brutal-radius);
+  box-shadow: var(--brutal-shadow);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.brutal-card:hover {
+  transform: translateY(4px) translateX(4px);
+  box-shadow: var(--brutal-shadow-hover);
+}
+
+.brutal-btn {
+  background: var(--nin-yellow);
+  color: var(--nin-dark) !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  border: var(--brutal-border) !important;
+  border-radius: 50px !important;
+  box-shadow: 4px 4px 0px #000 !important;
+  transition: all 0.15s ease !important;
+  text-transform: uppercase;
+  padding: 12px 30px !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brutal-btn:hover {
+  transform: translateY(2px) translateX(2px) !important;
+  box-shadow: 2px 2px 0px #000 !important;
+  background-color: #ffda47 !important;
+}
+
+.brutal-btn:active {
+  transform: translateY(4px) translateX(4px) !important;
+  box-shadow: 0px 0px 0px #000 !important;
+}
+
+.brutal-btn.red {
+  background: var(--nin-red);
+  color: var(--nin-white) !important;
+}
+
+.brutal-btn.red:hover {
+  background: #ff1a2b !important;
+}
+
+/* Brutal Input */
+.brutal-input {
+  padding: 12px 15px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #000;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 2px 2px 0px #000;
+  transition: all 0.2s;
+  color: var(--nin-dark);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.brutal-input:focus {
+  outline: none;
+  background-color: var(--nin-white);
+  box-shadow: 4px 4px 0px var(--nin-blue), 5px 5px 0px #000;
+  transform: translate(-2px, -2px);
+}
+
+/* Fix Material texts */
 .mdc-list-item__primary-text {
   color: black !important;
 }
 
-
-
-/* Scrollbar moderno */
+/* Scrollbar moderno (Estándar/Juguetón) */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 12px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #121212;
-  border-radius: 10px;
+  background: var(--nin-white);
+  border-left: 2px solid #000;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ffcb05, #ff5959);
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  background: var(--nin-red);
+  border: 2px solid #000;
+  border-radius: 6px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ffda47, #ff7373);
+  background: #cc000f;
 }
 
 /* Transiciones suaves al hacer scroll */
@@ -48,13 +139,29 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   will-change: opacity, transform, filter;
 }
 
-.fade-in-section.visible {
-  opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
+.mat-drawer-container {
+  background-color: var(--nin-bg) !important;
+  color: var(--nin-dark) !important;
 }
 
-.mat-drawer-container {
-  background-color: #ffffff !important;
-  color: #000 !important;
+/* Brutal Toast Notification */
+.brutal-toast {
+  box-shadow: 6px 6px 0px #000 !important;
+  border: 3px solid #000 !important;
+  border-radius: 0 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+}
+.toast-success {
+  background-color: var(--nin-blue) !important;
+  color: white !important;
+}
+.toast-error {
+  background-color: var(--nin-red) !important;
+  color: white !important;
+}
+.toast-warning {
+  background-color: var(--nin-yellow) !important;
+  color: black !important;
 }
