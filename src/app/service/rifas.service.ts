@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RifasService {
-  private apiUrl = 'http://localhost:4000/rifas';
+  private apiUrl = 'https://apipikagames.vercel.app/rifas';
 
   constructor(private http: HttpClient) {}
 

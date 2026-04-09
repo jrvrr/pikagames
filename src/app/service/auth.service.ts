@@ -6,7 +6,7 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:4000/usuarios';
+  private apiUrl = 'https://apipikagames.vercel.app/usuarios';
 
   constructor(private http: HttpClient) {}
 
