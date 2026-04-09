@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RifasService } from '../service/rifas.service';
 import { AuthService } from '../service/auth.service';
+import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-admin',
@@ -13,6 +15,9 @@ import { AuthService } from '../service/auth.service';
 })
 export class AdminComponent implements OnInit {
   rifas: any[] = [];
+  rifasActivas: any[] = [];
+  historialRifas: any[] = [];
+  currentTab: 'crear' | 'activas' | 'historial' = 'activas';
 
   nuevaRifa: {
     nombre: string;
@@ -40,13 +45,14 @@ export class AdminComponent implements OnInit {
 
   constructor(
     private rifasService: RifasService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.usuario = this.authService.getUsuarioActual();
     if (!this.usuario?.es_admin) {
-      alert('Solo los administradores pueden acceder aquí.');
+      this.toastr.error('Solo los administradores pueden acceder aquí.');
       window.location.href = '/';
     }
     this.obtenerRifas();
@@ -57,10 +63,166 @@ export class AdminComponent implements OnInit {
     this.rifasService.getRifas().subscribe({
       next: (res) => {
         this.rifas = res.rifas || [];
+        this.rifasActivas = this.rifas.filter(r => r.estado === 'activa');
+        this.historialRifas = this.rifas.filter(r => r.estado !== 'activa');
         this.cargando = false;
       },
       error: () => {
+        this.toastr.error('Error al cargar las rifas');
         this.cargando = false;
+      }
+    });
+  }
+
+  suspenderRifa(id: string): void {
+    Swal.fire({
+      title: '¿Suspender Rifa?',
+      text: '¿Estás seguro de que deseas suspender esta rifa?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, suspender',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cargando = true;
+        this.rifasService.cambiarEstado(id, 'suspendida').subscribe({
+          next: () => {
+            this.toastr.success('Rifa suspendida correctamente');
+            this.obtenerRifas();
+          },
+          error: () => {
+            this.toastr.error('Error al suspender la rifa');
+            this.cargando = false;
+          }
+        });
+      }
+    });
+  }
+
+  activarRifa(id: string): void {
+    Swal.fire({
+      title: '¿Re-Activar Rifa?',
+      text: '¿Estás seguro de reactivar esta rifa?',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, activar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cargando = true;
+        this.rifasService.cambiarEstado(id, 'activa').subscribe({
+          next: () => {
+            this.toastr.success('Rifa activada correctamente');
+            this.obtenerRifas();
+          },
+          error: () => {
+            this.toastr.error('Error al activar la rifa');
+            this.cargando = false;
+          }
+        });
+      }
+    });
+  }
+
+  terminarRifa(id: string): void {
+    Swal.fire({
+      title: '¿Elegir ganadores?',
+      text: 'Esta acción es irreversible y finalizará la rifa.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, terminar y elegir'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cargando = true;
+        this.rifasService.elegirGanador(id).subscribe({
+          next: (res) => {
+            this.obtenerRifas();
+            
+            // Format HTML details to show the winners
+            let winnersHtml = '<ul style="text-align: left; list-style: none; padding: 0;">';
+            res.ganadores.forEach((g: any) => {
+              winnersHtml += `<li>🎉 <b>Premio:</b> ${g.premio} <br>🎟️ <b>Boleto:</b> ${g.numero_boleto} <br>👤 <b>Ganador:</b> ${g.ganador_nombre}</li><hr>`;
+            });
+            winnersHtml += '</ul>';
+
+            Swal.fire({
+              title: '¡Rifa Finalizada!',
+              html: `¡Hemos elegido a los afortunados! <br><br> ${winnersHtml}`,
+              icon: 'success'
+            });
+          },
+          error: (err) => {
+            this.toastr.error(err?.error?.error || 'Error al terminar la rifa');
+            this.cargando = false;
+          }
+        });
+      }
+    });
+  }
+
+  verDetalles(id: string): void {
+    Swal.fire({
+      title: 'Cargando...',
+      text: 'Buscando participantes y ganadores',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    this.rifasService.getRifaPorId(id).subscribe({
+      next: (res) => {
+        if (!res.success) {
+          Swal.fire('Error', 'No se pudo cargar la info', 'error');
+          return;
+        }
+
+        const data = res.rifa;
+        let html = '';
+
+        const disponibles = data.cantidad_boletos - (data.participantes ? data.participantes.length : 0);
+        html += `<div style="text-align: center; margin-bottom: 20px;">
+                   <span style="font-size: 1.2rem; background: var(--nin-yellow); padding: 5px 15px; border: 2px solid #000; border-radius: 8px; font-weight: 900; box-shadow: 3px 3px 0 #000;">
+                     Boletos Libres: ${disponibles} de ${data.cantidad_boletos}
+                   </span>
+                 </div>`;
+
+        if (data.ganadores && data.ganadores.length > 0) {
+          html += '<h3 style="color:var(--nin-red); font-weight:900;">🏆 GANADORES 🏆</h3>';
+          html += '<ul style="text-align: left; list-style: none; padding: 0;">';
+          data.ganadores.forEach((g: any) => {
+            html += `<li>🎁 <b>${g.premio}</b> <br>🎟️ Número: ${g.numero_boleto} <br>👤 ${g.ganador_nombre} <br>📧 <small>${g.ganador_email}</small></li><hr style="margin:8px 0; border-top:2px solid #000;">`;
+          });
+          html += '</ul><br>';
+        }
+
+        if (data.participantes && data.participantes.length > 0) {
+          html += `<h4 style="color:var(--nin-blue); font-weight:800; margin-top:20px;">👥 PARTICIPANTES (${data.participantes.length})</h4>`;
+          html += '<div style="max-height: 250px; overflow-y: auto; border: 2px solid #000; padding:10px; border-radius: 8px; text-align: left;">';
+          html += '<ul style="list-style: none; padding: 0; margin: 0;">';
+          data.participantes.forEach((p: any) => {
+            let statusIcon = p.estado === 'VENDIDO' ? '💰' : '⏳';
+            html += `<li style="margin-bottom:8px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
+                        ${statusIcon} <b>#${p.numero}</b> - ${p.nombre} <br><small style="color:#666;">${p.email}</small>
+                     </li>`;
+          });
+          html += '</ul></div>';
+        } else {
+          html += '<p>No hubo participantes.</p>';
+        }
+
+        Swal.fire({
+          title: `Detalles de ${data.nombre}`,
+          html: html,
+          width: '600px',
+          confirmButtonText: 'Cerrar',
+          confirmButtonColor: '#008CBA'
+        });
+      },
+      error: () => {
+        Swal.fire('Error', 'Error al obtener detalles', 'error');
       }
     });
   }
@@ -75,27 +237,27 @@ export class AdminComponent implements OnInit {
 
   crearRifa(): void {
     if (!this.usuario?.es_admin) {
-      alert('Solo los administradores pueden crear rifas.');
+      this.toastr.error('Solo los administradores pueden crear rifas.');
       return;
     }
 
     // VALIDACIONES
-    if (!this.nuevaRifa.nombre.trim()) return alert("El nombre es obligatorio.");
-    if (!this.nuevaRifa.descripcion.trim()) return alert("La descripción es obligatoria.");
-    if (!this.nuevaRifa.precio || this.nuevaRifa.precio <= 0) return alert("El precio del boleto es inválido.");
-    if (this.nuevaRifa.cantidad_boletos <= 0) return alert("Cantidad de boletos inválida.");
-    if (this.nuevaRifa.cantidad_ganadores <= 0) return alert("Cantidad de ganadores inválida.");
+    if (!this.nuevaRifa.nombre.trim()) { this.toastr.warning("El nombre es obligatorio."); return; }
+    if (!this.nuevaRifa.descripcion.trim()) { this.toastr.warning("La descripción es obligatoria."); return; }
+    if (!this.nuevaRifa.precio || this.nuevaRifa.precio <= 0) { this.toastr.warning("El precio del boleto es inválido."); return; }
+    if (this.nuevaRifa.cantidad_boletos <= 0) { this.toastr.warning("Cantidad de boletos inválida."); return; }
+    if (this.nuevaRifa.cantidad_ganadores <= 0) { this.toastr.warning("Cantidad de ganadores inválida."); return; }
 
     for (let p of this.nuevaRifa.premios) {
-      if (!p.titulo.trim()) return alert("Todos los premios deben tener título.");
-      if (p.cantidad <= 0) return alert("Cantidad de premio inválida.");
+      if (!p.titulo.trim()) { this.toastr.warning("Todos los premios deben tener título."); return; }
+      if (p.cantidad <= 0) { this.toastr.warning("Cantidad de premio inválida."); return; }
     }
 
     let fechaFinEnviada: string | null = null;
 
     if (this.nuevaRifa.modo_finalizacion === "fecha") {
       if (!this.nuevaRifa.fecha_fin?.trim()) {
-        alert("Debes seleccionar una fecha de finalización.");
+        this.toastr.warning("Debes seleccionar una fecha de finalización.");
         return;
       }
 
@@ -119,7 +281,7 @@ export class AdminComponent implements OnInit {
 
     this.rifasService.crearRifa(nuevaRifaData).subscribe({
       next: () => {
-        alert('🎉 Rifa creada correctamente');
+        this.toastr.success('Rifa creada correctamente');
         this.obtenerRifas();
 
         // RESET
@@ -134,7 +296,7 @@ export class AdminComponent implements OnInit {
           premios: [{ titulo: '', cantidad: 1 }]
         };
       },
-      error: () => alert('Error al crear la rifa')
+      error: () => this.toastr.error('Error al crear la rifa')
     });
   }
 
@@ -143,66 +305,66 @@ export class AdminComponent implements OnInit {
     window.location.href = '/';
   }
 
-editar(rifa: any): void {
-  this.editando = {
-    ...rifa,
-    precio: rifa.precio || 50.00,
-    premios: rifa.premios && Array.isArray(rifa.premios) && rifa.premios.length > 0
-      ? rifa.premios.map((p: any) => ({
-          id: p.id,
-          titulo: p.titulo,
-          cantidad: p.cantidad
-        }))
-      : [{ titulo: '', cantidad: 1 }]
-  };
+  editar(rifa: any): void {
+    this.editando = {
+      ...rifa,
+      precio: rifa.precio || 50.00,
+      premios: rifa.premios && Array.isArray(rifa.premios) && rifa.premios.length > 0
+        ? rifa.premios.map((p: any) => ({
+            id: p.id,
+            titulo: p.titulo,
+            cantidad: p.cantidad
+          }))
+        : [{ titulo: '', cantidad: 1 }]
+    };
 
-  if (this.editando.fecha_fin) {
-    const fecha = new Date(this.editando.fecha_fin);
-    this.editando.fecha_fin = fecha.toISOString().substring(0, 10);
-  }
-}
-
-agregarPremioEdicion(): void {
-  if (!this.editando.premios) this.editando.premios = [];
-  this.editando.premios.push({ titulo: '', cantidad: 1 });
-}
-
-eliminarPremioEdicion(index: number): void {
-  if (!this.editando.premios) return;
-  this.editando.premios.splice(index, 1);
-}
-
-guardarEdicion(): void {
-  if (!this.editando) return;
-  if (!this.editando.nombre.trim()) return alert("El nombre es obligatorio.");
-  if (!this.editando.descripcion.trim()) return alert("La descripción es obligatoria.");
-  if (!this.editando.precio || this.editando.precio <= 0) return alert("Precio de boleto inválido.");
-  if (this.editando.cantidad_boletos <= 0) return alert("Boletos inválidos.");
-
-  for (let p of this.editando.premios) {
-    if (!p.titulo.trim()) return alert("Todos los premios deben tener título.");
-    if (p.cantidad <= 0) return alert("Cantidad inválida.");
-  }
-
-  const dataActualizada = {
-    ...this.editando,
-    precio: Number(this.editando.precio),
-    fecha_fin:
-      this.editando.modo_finalizacion === 'fecha'
-        ? `${this.editando.fecha_fin}T23:59:59`
-        : null
-  };
-
-  this.rifasService.editarRifa(this.editando.id, dataActualizada).subscribe({
-    next: () => {
-      alert("Rifa actualizada correctamente");
-      this.obtenerRifas();
-      this.editando = null;
-    },
-    error: (err) => {
-      console.error(err);
-      alert("Error al actualizar la rifa");
+    if (this.editando.fecha_fin) {
+      const fecha = new Date(this.editando.fecha_fin);
+      this.editando.fecha_fin = fecha.toISOString().substring(0, 10);
     }
-  });
-}
+  }
+
+  agregarPremioEdicion(): void {
+    if (!this.editando.premios) this.editando.premios = [];
+    this.editando.premios.push({ titulo: '', cantidad: 1 });
+  }
+
+  eliminarPremioEdicion(index: number): void {
+    if (!this.editando.premios) return;
+    this.editando.premios.splice(index, 1);
+  }
+
+  guardarEdicion(): void {
+    if (!this.editando) return;
+    if (!this.editando.nombre.trim()) { this.toastr.warning("El nombre es obligatorio."); return; }
+    if (!this.editando.descripcion.trim()) { this.toastr.warning("La descripción es obligatoria."); return; }
+    if (!this.editando.precio || this.editando.precio <= 0) { this.toastr.warning("Precio de boleto inválido."); return; }
+    if (this.editando.cantidad_boletos <= 0) { this.toastr.warning("Boletos inválidos."); return; }
+
+    for (let p of this.editando.premios) {
+      if (!p.titulo.trim()) { this.toastr.warning("Todos los premios deben tener título."); return; }
+      if (p.cantidad <= 0) { this.toastr.warning("Cantidad inválida."); return; }
+    }
+
+    const dataActualizada = {
+      ...this.editando,
+      precio: Number(this.editando.precio),
+      fecha_fin:
+        this.editando.modo_finalizacion === 'fecha'
+          ? `${this.editando.fecha_fin}T23:59:59`
+          : null
+    };
+
+    this.rifasService.editarRifa(this.editando.id, dataActualizada).subscribe({
+      next: () => {
+        this.toastr.success("Rifa actualizada correctamente");
+        this.obtenerRifas();
+        this.editando = null;
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Error al actualizar la rifa");
+      }
+    });
+  }
 }

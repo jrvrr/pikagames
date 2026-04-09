@@ -1,5 +1,6 @@
 .admin-wrapper {
-  padding: 120px 5% 60px 5%;
+  position: relative;
+  padding: 60px 5% 60px 5%;
   min-height: 85vh;
   background-color: var(--nin-bg);
   background-image: radial-gradient(#d1d1d1 2px, transparent 2px);
@@ -44,17 +45,23 @@
   margin-bottom: 40px;
 }
 
-/* Grid Layout */
+/* Single Layout */
 .admin-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 40px;
+  display: block;
 }
 
-@media(min-width: 900px) {
-  .admin-grid {
-    grid-template-columns: 45% 55%;
-  }
+.create-section-inner {
+  padding: 30px;
+}
+
+.btn-logout-top {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 15px !important;
+  z-index: 100;
+  display: inline-flex;
+  border-radius: 8px !important; /* Más cuadrado */
 }
 
 .section-title {
@@ -230,4 +237,107 @@
 @keyframes brutalSpin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+/* Tabs & Formal History Styling */
+.tabs-container {
+  padding: 0;
+  overflow: hidden;
+}
+.brutal-tabs {
+  display: flex;
+  border-bottom: 3px solid #000;
+  background: var(--nin-white);
+  flex-wrap: wrap;
+}
+.brutal-tab-btn {
+  flex: 1;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: transparent;
+  color: var(--nin-dark);
+  border: none;
+  border-right: 3px solid #000;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-transform: uppercase;
+}
+.brutal-tab-btn:last-child {
+  border-right: none;
+}
+.brutal-tab-btn.active-tab {
+  background: var(--nin-blue);
+  color: var(--nin-white);
+}
+.brutal-tab-btn:hover:not(.active-tab) {
+  background: #f0f0f0;
+}
+
+.lista-rifas {
+  padding: 20px;
+}
+
+/* Status Badges */
+.badges-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.status-activa {
+  background: #4CAF50;
+  color: white;
+}
+.status-finalizada {
+  background: var(--nin-red);
+  color: white;
+}
+.status-suspendida {
+  background: var(--nin-dark);
+  color: var(--nin-yellow);
+}
+
+/* Icon Buttons Setup */
+.admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media(min-width: 600px) {
+  .admin-actions {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px !important;
+}
+.icon-text-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.icon-text-btn .material-icons {
+  font-size: 1.2rem;
+}
+
+.status-suspend {
+  background: #333 !important;
+  color: #fff !important;
+}
+.status-activate {
+  background: #4CAF50 !important;
+  color: #fff !important;
+}
+.status-win {
+  background: var(--nin-yellow) !important;
+  color: #000 !important;
+}
+.state-inactiva {
+  background: #eef1f5;
+  filter: grayscale(0.2);
 }

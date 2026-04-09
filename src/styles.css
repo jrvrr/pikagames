@@ -165,3 +165,51 @@ body {
   background-color: var(--nin-yellow) !important;
   color: black !important;
 }
+
+/* Brutal SweetAlert */
+.swal2-popup {
+  border: var(--brutal-border) !important;
+  border-radius: var(--brutal-radius) !important;
+  box-shadow: var(--brutal-shadow) !important;
+  font-family: 'Nunito', sans-serif !important;
+  background-color: var(--nin-white) !important;
+  color: var(--nin-dark) !important;
+}
+.swal2-popup .swal2-title {
+  font-weight: 900 !important;
+  text-transform: uppercase;
+}
+.swal2-confirm {
+  background-color: var(--nin-blue) !important;
+  color: var(--nin-white) !important;
+  border: var(--brutal-border) !important;
+  border-radius: 50px !important;
+  box-shadow: 4px 4px 0px #000 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  padding: 12px 30px !important;
+  transition: all 0.15s ease !important;
+  outline: none !important;
+}
+.swal2-cancel {
+  background-color: var(--nin-red) !important;
+  color: var(--nin-white) !important;
+  border: var(--brutal-border) !important;
+  border-radius: 50px !important;
+  box-shadow: 4px 4px 0px #000 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  padding: 12px 30px !important;
+  transition: all 0.15s ease !important;
+  outline: none !important;
+}
+.swal2-confirm:hover, .swal2-cancel:hover {
+  transform: translateY(2px) translateX(2px) !important;
+  box-shadow: 2px 2px 0px #000 !important;
+}
+.swal2-html-container {
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+}

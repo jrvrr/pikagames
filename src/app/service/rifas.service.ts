@@ -15,6 +15,11 @@ export class RifasService {
     return this.http.get(this.apiUrl);
   }
 
+  // Obtener una rifa por ID
+  getRifaPorId(id: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`);
+  }
+
   // Crear una nueva rifa
   crearRifa(data: any): Observable<any> {
     return this.http.post(this.apiUrl, data);
@@ -23,6 +28,16 @@ export class RifasService {
   //editar una rifa
   editarRifa(id: string, data: any) {
     return this.http.put(`${this.apiUrl}/${id}`, data);
+  }
+
+  // Elegir ganadores (Terminar rifa)
+  elegirGanador(id: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/elegir-ganadores`, {});
+  }
+
+  // Cambiar estado (Suspender/Activar)
+  cambiarEstado(id: string, estado: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/estado`, { estado });
   }
 
   // Comprar un boleto
