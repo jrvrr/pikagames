@@ -29,10 +29,66 @@ export class AuthModalComponent {
   // 🔁 Cambiar entre login / registro
   alternarModo() {
     this.modo = this.modo === 'login' ? 'register' : 'login';
+    this.mostrarContrasena = false; // Resetear visibilidad al cambiar
+  }
+
+  // 🛡️ Validaciones inmediatas (para eventos blur)
+  validarNombre() {
+    if (this.modo === 'register' && !this.nombre.trim()) {
+      this.toastr.warning('El nombre es obligatorio', 'Campo incompleto');
+    }
+  }
+
+  validarCorreo() {
+    if (!this.correo.trim()) {
+      this.toastr.warning('El correo es obligatorio', 'Campo incompleto');
+    } else if (!this.correo.includes('@')) {
+      this.toastr.warning('El correo debe incluir un @', 'Formato inválido');
+    }
+  }
+
+  validarContrasena() {
+    if (!this.contrasena.trim()) {
+      this.toastr.warning('La contraseña es obligatoria', 'Campo incompleto');
+    }
   }
 
   // 🚀 Enviar formulario (login o registro)
   enviar() {
+    // 1. Validaciones Básicas de campos vacíos
+    if (!this.correo.trim()) {
+      this.toastr.warning('El correo es obligatorio', 'Campo incompleto');
+      return;
+    }
+    if (!this.contrasena.trim()) {
+      this.toastr.warning('la contraseña es obligatoria', 'Campo incompleto');
+      return;
+    }
+    if (this.modo === 'register' && !this.nombre.trim()) {
+      this.toastr.warning('El nombre es obligatorio', 'Campo incompleto');
+      return;
+    }
+
+    // 2. Validación de Formato de Correo
+    if (!this.correo.includes('@')) {
+      this.toastr.warning('El correo debe ser válido (incluir @)', 'Formato inválido');
+      return;
+    }
+
+    // 3. Validación de Límites de Caracteres
+    if (this.modo === 'register' && this.nombre.length > 20) {
+      this.toastr.warning('El nombre no puede superar los 20 caracteres', 'Límite excedido');
+      return;
+    }
+    if (this.correo.length > 25) {
+      this.toastr.warning('El correo no puede superar los 25 caracteres', 'Límite excedido');
+      return;
+    }
+    if (this.contrasena.length > 10) {
+      this.toastr.warning('La contraseña no puede superar los 10 caracteres', 'Límite excedido');
+      return;
+    }
+
     this.loading = true;
 
     if (this.modo === 'login') {

@@ -29,8 +29,22 @@
       </button>
 
       <div *ngFor="let rifa of rifas" class="rifa-card brutal-card">
-        <h3>{{ rifa.nombre }}</h3>
+        <div class="rifa-header">
+          <h3>{{ rifa.nombre }}</h3>
+          <span class="price-tag">${{ rifa.precio | number:'1.2-2' }} MXN</span>
+        </div>
+        
         <p class="desc">{{ rifa.descripcion }}</p>
+
+        <div class="premios-section" *ngIf="rifa.premios && rifa.premios.length > 0">
+          <h4 class="premios-title">PREMIOS:</h4>
+          <ul class="premios-list">
+            <li *ngFor="let premio of rifa.premios">
+              <span class="premio-icon">🎁</span>
+              <span class="premio-text"><b>{{ premio.cantidad }}x</b> {{ premio.titulo }}</span>
+            </li>
+          </ul>
+        </div>
 
         <!-- Administrador view warning -->
         <div class="admin-warning" *ngIf="usuario?.es_admin">

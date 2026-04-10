@@ -6,12 +6,12 @@
     <form (ngSubmit)="enviar()" class="auth-form">
       <div *ngIf="modo === 'register'" class="input-group">
         <label>Nombre</label>
-        <input type="text" [(ngModel)]="nombre" name="nombre" class="brutal-input" required placeholder="Tu nombre" />
+        <input type="text" [(ngModel)]="nombre" name="nombre" class="brutal-input" required placeholder="Tu nombre" maxlength="20" (blur)="validarNombre()" />
       </div>
 
       <div class="input-group">
         <label>Correo</label>
-        <input type="email" [(ngModel)]="correo" name="correo" class="brutal-input" required placeholder="ejemplo@correo.com" />
+        <input type="email" [(ngModel)]="correo" name="correo" class="brutal-input" required placeholder="ejemplo@correo.com" maxlength="25" (blur)="validarCorreo()" />
       </div>
 
       <div class="input-group">
@@ -22,7 +22,9 @@
                  name="contraseña" 
                  class="brutal-input" 
                  required 
-                 placeholder="••••••••" />
+                 placeholder="••••••••"
+                 maxlength="10"
+                 (blur)="validarContrasena()" />
           <button type="button" 
                   class="toggle-password-btn" 
                   (click)="mostrarContrasena = !mostrarContrasena"
