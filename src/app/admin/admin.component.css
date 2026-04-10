@@ -23,11 +23,11 @@
 }
 
 .admin-header h2 {
-  font-size: 3rem;
+  font-size: 4rem;
   font-weight: 900;
   text-transform: uppercase;
   color: var(--nin-dark);
-  text-shadow: 3px 3px 0px var(--nin-yellow), 5px 5px 0px #000;
+  text-shadow: none;
   margin-bottom: 10px;
 }
 

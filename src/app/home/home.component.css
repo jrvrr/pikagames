@@ -19,13 +19,13 @@
 }
 
 .hero-title {
-  font-size: 3.5rem;
+  font-size: 4.5rem;
   font-weight: 900;
   color: var(--nin-dark);
   line-height: 1.1;
   text-transform: uppercase;
   margin-bottom: 20px;
-  text-shadow: 3px 3px 0px var(--nin-white), 5px 5px 0px #000;
+  text-shadow: none;
 }
 
 .hero-accent {
@@ -569,7 +569,7 @@
 
 @media (max-width: 768px) {
   .hero-container { padding-top: 100px; padding-bottom: 20px; }
-  .hero-title { font-size: 2.2rem; }
+  .hero-title { font-size: 3rem; }
   .image-backdrop { width: 80%; margin: 0 auto; }
   .form-grid { grid-template-columns: 1fr; }
   .about-container { flex-direction: column; width: 100%; }
