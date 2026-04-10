@@ -59,9 +59,9 @@
 <!-- About Us -->
 <div class="component about-section" data-aos="fade-up">
   <div class="about-container brutal-card">
-    <div class="image-section">
+    <div class="image-section" #marioSection>
       <img src="newsuper.jpg" alt="Pika Games" class="brutal-img" />
-      <img src="holding.avif" alt="Manos con control" class="image-2" [style.transform]="'translateY(' + (scrollY * -0.07) + 'px)'" />
+      <img src="holding.avif" alt="Manos con control" class="image-2" [style.left]="pathLeft + '%'" [style.top]="pathTop + '%'" />
     </div>
 
     <div class="overlay">

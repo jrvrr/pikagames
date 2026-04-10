@@ -5,8 +5,8 @@
   align-items: center;
   justify-content: space-around;
   gap: 20px;
-  min-height: 85vh;
-  padding: 80px 5% 40px 5%;
+  min-height: 75vh;
+  padding: 20px 40px;
   background-color: var(--nin-bg);
   background-image: radial-gradient(#d1d1d1 2px, transparent 2px);
   background-size: 30px 30px;
@@ -72,13 +72,21 @@
 .image-backdrop img {
   width: 110%;
   transform: scale(1.1) translateY(-10px);
-  filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.8));
+  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.8));
 }
 
 @keyframes floatAnim {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(2deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-15px) rotate(2deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
 }
 
 .float-anim {
@@ -140,10 +148,25 @@
   box-shadow: 2px 2px 0px #000;
 }
 
-.bg-yellow { background: var(--nin-yellow); color: #000; }
-.bg-red { background: var(--nin-red); color: #fff; }
-.bg-blue { background: #0b9ed1; color: #fff; }
-.bg-dark { background: var(--nin-dark); color: #fff; }
+.bg-yellow {
+  background: var(--nin-yellow);
+  color: #000;
+}
+
+.bg-red {
+  background: var(--nin-red);
+  color: #fff;
+}
+
+.bg-blue {
+  background: #0b9ed1;
+  color: #fff;
+}
+
+.bg-dark {
+  background: var(--nin-dark);
+  color: #fff;
+}
 
 .faq-card h2 {
   font-size: 1.2rem;
@@ -168,9 +191,11 @@
 .about-container {
   display: flex;
   max-width: 1000px;
-  overflow: hidden;
+  overflow: visible;
+  /* Changed from hidden to allow orbit outside the Mario frame */
   flex-wrap: wrap;
   padding: 0;
+  position: relative;
 }
 
 .image-section {
@@ -178,6 +203,8 @@
   min-width: 300px;
   position: relative;
   background: var(--nin-dark);
+  overflow: visible;
+  /* Allow controller to fly out of this specific section */
 }
 
 .brutal-img {
@@ -185,19 +212,26 @@
   height: 100%;
   object-fit: cover;
   border-right: var(--brutal-border);
+  /* Clipping Mario image manually since container is now overflow: visible */
+  border-radius: var(--brutal-radius) 0 0 var(--brutal-radius);
 }
 
 .image-2 {
+  background: white;
   position: absolute;
-  bottom: 20px;
-  right: -20px;
+  /* Top and Left are controlled via Angular bindings now based on scroll */
+  top: 80%;
+  left: 100%;
+  transform: translate(-50%, -50%);
   width: 150px;
   height: 150px;
   border: var(--brutal-border);
   border-radius: 50%;
   box-shadow: 4px 4px 0px #000;
   object-fit: cover;
-  z-index: 5;
+  z-index: 100;
+  /* Increased to stay on top of everything */
+  transition: top 0.1s linear, left 0.1s linear;
 }
 
 .overlay {
@@ -213,8 +247,14 @@
   color: var(--nin-dark);
 }
 
-.highlight { color: var(--nin-red); }
-.brand { color: var(--nin-blue); font-weight: 900; }
+.highlight {
+  color: var(--nin-red);
+}
+
+.brand {
+  color: var(--nin-blue);
+  font-weight: 900;
+}
 
 .brutal-list {
   list-style: none;
@@ -326,7 +366,9 @@
   transform: translate(-2px, -2px);
 }
 
-.full-width { grid-column: 1 / -1; }
+.full-width {
+  grid-column: 1 / -1;
+}
 
 .brutal-card-mini {
   display: flex;
@@ -356,8 +398,15 @@
   gap: 15px;
 }
 
-.btn-primary { background: var(--nin-blue); color: var(--nin-white) !important; }
-.btn-cancel { background: #888; color: var(--nin-white) !important; }
+.btn-primary {
+  background: var(--nin-blue);
+  color: var(--nin-white) !important;
+}
+
+.btn-cancel {
+  background: #888;
+  color: var(--nin-white) !important;
+}
 
 /* Select Personalizado Nubrutalism */
 .custom-select {
@@ -489,7 +538,9 @@
   padding: 0;
 }
 
-.footer-links li { margin-bottom: 10px; }
+.footer-links li {
+  margin-bottom: 10px;
+}
 
 .footer-links a {
   color: var(--nin-white);
@@ -498,7 +549,9 @@
   transition: color 0.2s;
 }
 
-.footer-links a:hover { color: var(--nin-red); }
+.footer-links a:hover {
+  color: var(--nin-red);
+}
 
 .social-links-brutal {
   display: flex;
@@ -568,23 +621,64 @@
 }
 
 @media (max-width: 768px) {
-  .hero-container { padding-top: 100px; padding-bottom: 20px; }
-  .hero-title { font-size: 3rem; }
-  .image-backdrop { width: 80%; margin: 0 auto; }
-  .form-grid { grid-template-columns: 1fr; }
-  .about-container { flex-direction: column; width: 100%; }
-  .image-section, .overlay { min-width: unset; width: 100%; padding: 25px; }
-  .image-2 { bottom: -20px; right: 20px; width: 100px; height: 100px; }
-  .overlay { border-top: var(--brutal-border); border-left: none; }
-  .cube { padding: 25px; }
+  .hero-container {
+    padding-top: 100px;
+    padding-bottom: 20px;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+  }
+
+  .image-backdrop {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .image-section,
+  .overlay {
+    min-width: unset;
+    width: 100%;
+    padding: 25px;
+  }
+
+  .image-2 {
+    width: 100px;
+    height: 100px;
+  }
+
+  .brutal-img {
+    border-radius: var(--brutal-radius) var(--brutal-radius) 0 0;
+    border-right: none;
+    border-bottom: var(--brutal-border);
+  }
+
+  .overlay {
+    border-top: var(--brutal-border);
+    border-left: none;
+  }
+
+  .cube {
+    padding: 25px;
+  }
 }
 
 /* --- SCROLL ANIMATIONS --- */
 [data-aos] {
-  opacity: 1; /* Garantiza que siempre estén visibles aunque falle el JS */
+  opacity: 1;
+  /* Garantiza que siempre estén visibles aunque falle el JS */
   transition-property: opacity, transform;
   transition-duration: 0.6s;
-  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 [data-aos="fade-up"]:not(.aos-animate) {
@@ -610,12 +704,33 @@
 }
 
 @keyframes popIn {
-  0% { opacity: 0; transform: translateY(40px) scale(0.95); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-[data-aos-delay="100"] { transition-delay: 0.1s; }
-[data-aos-delay="200"] { transition-delay: 0.2s; }
-[data-aos-delay="300"] { transition-delay: 0.3s; }
-[data-aos-delay="400"] { transition-delay: 0.4s; }
-[data-aos-delay="500"] { transition-delay: 0.5s; }
+[data-aos-delay="100"] {
+  transition-delay: 0.1s;
+}
+
+[data-aos-delay="200"] {
+  transition-delay: 0.2s;
+}
+
+[data-aos-delay="300"] {
+  transition-delay: 0.3s;
+}
+
+[data-aos-delay="400"] {
+  transition-delay: 0.4s;
+}
+
+[data-aos-delay="500"] {
+  transition-delay: 0.5s;
+}

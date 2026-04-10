@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -40,6 +40,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
     motivo: '',
     descripcion: ''
   };
+
+  @ViewChild('marioSection') marioSection!: ElementRef;
+
+  pathTop: number = 80;
+  pathLeft: number = 100;
 
   constructor(private dialog: MatDialog, private route: ActivatedRoute) {
     emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -117,6 +122,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     scroller.addEventListener('scroll', (event: any) => {
       this.scrollY = event.target.scrollTop || window.scrollY || 0;
+      this.calculateControllerPath();
     });
 
     const observer = new IntersectionObserver((entries) => {
@@ -141,5 +147,43 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }
       });
     }, 500);
+  }
+  calculateControllerPath() {
+    if (!this.marioSection || !this.marioSection.nativeElement) return;
+    
+    const rect = this.marioSection.nativeElement.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    
+    const totalDistance = windowHeight + rect.height;
+    const currentDistance = windowHeight - rect.top;
+    
+    // Calculate progress between 0 and 1
+    let progress = currentDistance / totalDistance;
+    progress = Math.max(0, Math.min(1, progress));
+    
+    // Path routing (orbiting only the Mario image section):
+    // 0.0 - 0.25: Move up right side
+    // 0.25 - 0.50: Move left across top
+    // 0.50 - 0.75: Move down left side
+    // 0.75 - 1.00: Move right across bottom
+    let p = progress * 4;
+    if (p <= 1) {
+      // Start near bottom-right
+      this.pathTop = 80 - (p * 80);
+      this.pathLeft = 100;
+    } else if (p <= 2) {
+      // Top-right to Top-left
+      this.pathTop = 0;
+      this.pathLeft = 100 - ((p - 1) * 100);
+    } else if (p <= 3) {
+      // Top-left to Bottom-left
+      this.pathTop = (p - 2) * 100;
+      this.pathLeft = 0;
+    } else {
+      // Bottom-left to original location Bottom-right
+      this.pathTop = 100;
+      this.pathLeft = Math.min((p - 3) * 100, 100);
+      this.pathTop = 100 - ((p - 3) * 20); 
+    }
   }
 }

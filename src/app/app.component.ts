@@ -1,6 +1,7 @@
 import { Component, HostListener } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { RouterLink } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -9,7 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
 
-import { AfterViewInit, ElementRef } from '@angular/core';
+import { AfterViewInit, ElementRef, ViewChild, OnInit } from '@angular/core';
 
 
 @Component({
@@ -29,7 +30,8 @@ import { AfterViewInit, ElementRef } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements OnInit, AfterViewInit {
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   title(title: any) {
     throw new Error('Method not implemented.');
   }
@@ -38,9 +40,19 @@ export class AppComponent implements AfterViewInit {
 
   onLoadingDone(): void {
     this.showLoading = false;
+    // Forzar scroll al inicio con varios intentos para asegurar que se aplique tras renderizado
+    const resetScroll = () => {
+      if (this.scrollContainer && this.scrollContainer.nativeElement) {
+        this.scrollContainer.nativeElement.scrollTop = 0;
+        this.scrollContainer.nativeElement.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    };
+    resetScroll();
+    setTimeout(resetScroll, 100);
+    setTimeout(resetScroll, 500);
   }
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef, private router: Router) {}
 
   ngAfterViewInit() {
     const observer = new IntersectionObserver((entries) => {
@@ -59,6 +71,21 @@ export class AppComponent implements AfterViewInit {
 
   ngOnInit() {
     this.onResize();
+    
+    // Escuchar cambios de navegación para resetear el scroll del contenedor lateral
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      const resetScroll = () => {
+        if (this.scrollContainer && this.scrollContainer.nativeElement) {
+          this.scrollContainer.nativeElement.scrollTop = 0;
+          this.scrollContainer.nativeElement.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      };
+      resetScroll();
+      setTimeout(resetScroll, 20);
+      setTimeout(resetScroll, 200);
+    });
   }
 
   @HostListener('window:resize', [])
