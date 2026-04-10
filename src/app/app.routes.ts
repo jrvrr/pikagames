@@ -9,7 +9,6 @@ import { Error404Component } from './error404/error404.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
-  { path: 'admin', component: AdminComponent },
   { path: 'pago', component: PagoComponent },
   { path: 'compra', component: CompraComponent },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },

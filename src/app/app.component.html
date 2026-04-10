@@ -10,7 +10,9 @@
       <a mat-list-item routerLink="/home" fragment="inicio" (click)="drawer.close()">Inicio</a>
       <a mat-list-item routerLink="/" fragment="preguntas-frecuentes" (click)="drawer.close()">Preguntas frecuentes</a>
       <a mat-list-item routerLink="/" fragment="contacto" (click)="drawer.close()">Contáctanos</a>
-      <a mat-list-item routerLink="/compra" (click)="drawer.close()">Compra de boletos</a>
+      <a mat-list-item [routerLink]="esAdmin ? '/admin' : '/compra'" (click)="drawer.close()">
+        {{ esAdmin ? 'Panel Admin' : 'Compra de boletos' }}
+      </a>
     </mat-nav-list>
   </mat-sidenav>
 
@@ -37,7 +39,9 @@
         <a routerLink="/" fragment="inicio" class="nav-link">Inicio</a>
         <a routerLink="/" fragment="preguntas-frecuentes" class="nav-link">Preguntas frecuentes</a>
         <a routerLink="/" fragment="contacto" class="nav-link">Contacto</a>
-        <a routerLink="/compra" class="nav-link btn-buy">Compra de boletos</a>
+        <a [routerLink]="esAdmin ? '/admin' : '/compra'" class="nav-link btn-buy">
+          {{ esAdmin ? 'Panel Admin' : 'Compra de boletos' }}
+        </a>
       </nav>
     </mat-toolbar>
 

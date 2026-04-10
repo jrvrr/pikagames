@@ -16,7 +16,20 @@
 
       <div class="input-group">
         <label>Contraseña</label>
-        <input type="password" [(ngModel)]="contrasena" name="contraseña" class="brutal-input" required placeholder="••••••••" />
+        <div class="password-wrapper">
+          <input [type]="mostrarContrasena ? 'text' : 'password'" 
+                 [(ngModel)]="contrasena" 
+                 name="contraseña" 
+                 class="brutal-input" 
+                 required 
+                 placeholder="••••••••" />
+          <button type="button" 
+                  class="toggle-password-btn" 
+                  (click)="mostrarContrasena = !mostrarContrasena"
+                  tabindex="-1">
+            <mat-icon>{{ mostrarContrasena ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
       </div>
 
       <button type="submit" class="brutal-btn submit-btn" [disabled]="loading">

@@ -38,7 +38,7 @@ export class AuthService {
 
   isAdmin(): boolean {
     const user = this.getUsuarioActual();
-    return user && user.rol === 'admin';
+    return !!(user && user.es_admin);
   }
 
   isLoggedIn(): boolean {

@@ -54,6 +54,41 @@
   font-size: 0.9rem;
 }
 
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper .brutal-input {
+  padding-right: 50px; /* Espacio para el botón */
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--nin-dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: transform 0.1s ease;
+}
+
+.toggle-password-btn:hover {
+  transform: scale(1.1);
+  color: var(--nin-red);
+}
+
+.toggle-password-btn mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
 .submit-btn {
   margin-top: 15px;
   width: 100%;

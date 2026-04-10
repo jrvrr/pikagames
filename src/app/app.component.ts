@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingScreenComponent } from './loading-screen/loading-screen.component';
+import { AuthService } from './service/auth.service';
 
 import { AfterViewInit, ElementRef, ViewChild, OnInit } from '@angular/core';
 
@@ -52,7 +53,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     setTimeout(resetScroll, 500);
   }
 
-  constructor(private el: ElementRef, private router: Router) {}
+  constructor(private el: ElementRef, private router: Router, private authService: AuthService) {}
+
+  get esAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
 
   ngAfterViewInit() {
     const observer = new IntersectionObserver((entries) => {
