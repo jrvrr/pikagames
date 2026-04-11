@@ -57,6 +57,7 @@
   max-width: 450px;
   z-index: 5;
   will-change: transform;
+  transform: translate3d(0, calc(var(--scroll-y, 0) * 0.25px), 0);
   transform-style: preserve-3d;
   backface-visibility: hidden;
 }
@@ -82,15 +83,15 @@
 
 @keyframes floatAnim {
   0% {
-    transform: translateY(0px) rotate(0deg);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
 
   50% {
-    transform: translateY(-15px) rotate(2deg);
+    transform: translate3d(0, -15px, 0) rotate(2deg);
   }
 
   100% {
-    transform: translateY(0px) rotate(0deg);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
 }
 
@@ -224,10 +225,10 @@
 .image-2 {
   background: white;
   position: absolute;
-  /* Top and Left are controlled via Angular bindings now based on scroll */
-  top: 80%;
-  left: 100%;
-  transform: translate(-50%, -50%);
+  /* Top and Left are controlled via CSS Variables updated in TS based on scroll */
+  top: var(--path-top, 80%);
+  left: var(--path-left, 100%);
+  transform: translate3d(-50%, -50%, 0);
   width: 150px;
   height: 150px;
   border: var(--brutal-border);
@@ -235,9 +236,9 @@
   box-shadow: 4px 4px 0px #000;
   object-fit: cover;
   z-index: 100;
-  /* Increased to stay on top of everything */
   will-change: top, left;
   transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
 .overlay {

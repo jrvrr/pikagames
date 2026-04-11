@@ -41,9 +41,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
   };
 
   @ViewChild('marioSection') marioSection!: ElementRef;
-
-  pathTop: number = 80;
-  pathLeft: number = 100;
+  
+  private marioOffsetTop = 0;
+  private marioHeight = 0;
+  private isMarioVisible = false;
 
   constructor(
     private dialog: MatDialog, 
@@ -143,16 +144,28 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     const scroller = document.querySelector('mat-sidenav-content') || document.querySelector('.mat-drawer-content') || window;
+    const root = document.documentElement;
+
+    // Cache initial layout values
+    this.updateMarioCache();
 
     this.ngZone.runOutsideAngular(() => {
+      // Resize listener to update cache
+      window.addEventListener('resize', () => {
+        this.updateMarioCache();
+      });
+
       scroller.addEventListener('scroll', (event: any) => {
         const top = event.target.scrollTop || window.scrollY || 0;
         
         requestAnimationFrame(() => {
-          if (this.scrollY !== top) {
-            this.scrollY = top;
-            this.calculateControllerPath();
-            this.cdr.detectChanges(); // Manually trigger CD only on frame update
+          // 1. Update Global Scroll Variable
+          root.style.setProperty('--scroll-y', `${top}`);
+          this.scrollY = top; // Keep internal state for logic if needed
+
+          // 2. Update Controller Path if Mario section is visible
+          if (this.isMarioVisible) {
+            this.calculateControllerPath(top, root);
           }
         });
       });
@@ -160,6 +173,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
+        if (entry.target === this.marioSection.nativeElement) {
+          this.isMarioVisible = entry.isIntersecting;
+        }
+
         if (entry.isIntersecting) {
           entry.target.classList.add('aos-animate');
         } else {
@@ -168,8 +185,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
       });
     }, { threshold: 0.1 });
 
+    if (this.marioSection) {
+      observer.observe(this.marioSection.nativeElement);
+    }
+
     document.querySelectorAll('[data-aos]').forEach(el => {
-      observer.observe(el);
+      if (el !== this.marioSection?.nativeElement) {
+        observer.observe(el);
+      }
     });
 
     setTimeout(() => {
@@ -181,42 +204,47 @@ export class HomeComponent implements OnInit, AfterViewInit {
       });
     }, 500);
   }
-  calculateControllerPath() {
+
+  private updateMarioCache() {
     if (!this.marioSection || !this.marioSection.nativeElement) return;
-    
     const rect = this.marioSection.nativeElement.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
+    const scrollPos = window.scrollY || document.documentElement.scrollTop;
+    this.marioOffsetTop = rect.top + scrollPos;
+    this.marioHeight = rect.height;
+  }
+
+  calculateControllerPath(top: number, root: HTMLElement) {
+    if (!this.marioHeight) return;
     
-    const totalDistance = windowHeight + rect.height;
-    const currentDistance = windowHeight - rect.top;
+    const windowHeight = window.innerHeight;
+    const marioTopRelative = this.marioOffsetTop - top;
+    
+    const totalDistance = windowHeight + this.marioHeight;
+    const currentDistance = windowHeight - marioTopRelative;
     
     // Calculate progress between 0 and 1
     let progress = currentDistance / totalDistance;
     progress = Math.max(0, Math.min(1, progress));
     
-    // Path routing (orbiting only the Mario image section):
-    // 0.0 - 0.25: Move up right side
-    // 0.25 - 0.50: Move left across top
-    // 0.50 - 0.75: Move down left side
-    // 0.75 - 1.00: Move right across bottom
     let p = progress * 4;
+    let pTop = 80;
+    let pLeft = 100;
+
     if (p <= 1) {
-      // Start near bottom-right
-      this.pathTop = 80 - (p * 80);
-      this.pathLeft = 100;
+      pTop = 80 - (p * 80);
+      pLeft = 100;
     } else if (p <= 2) {
-      // Top-right to Top-left
-      this.pathTop = 0;
-      this.pathLeft = 100 - ((p - 1) * 100);
+      pTop = 0;
+      pLeft = 100 - ((p - 1) * 100);
     } else if (p <= 3) {
-      // Top-left to Bottom-left
-      this.pathTop = (p - 2) * 100;
-      this.pathLeft = 0;
+      pTop = (p - 2) * 100;
+      pLeft = 0;
     } else {
-      // Bottom-left to original location Bottom-right
-      this.pathTop = 100;
-      this.pathLeft = Math.min((p - 3) * 100, 100);
-      this.pathTop = 100 - ((p - 3) * 20); 
+      pLeft = Math.min((p - 3) * 100, 100);
+      pTop = 100 - ((p - 3) * 20); 
     }
+
+    root.style.setProperty('--path-top', `${pTop}%`);
+    root.style.setProperty('--path-left', `${pLeft}%`);
   }
 }
