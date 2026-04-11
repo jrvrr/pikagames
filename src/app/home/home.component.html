@@ -77,6 +77,7 @@
   </div>
 </div>
 
+
 <!-- Contact -->
 <div class="spacer contact-section" id="contacto">
   <div class="cube brutal-card">
@@ -98,7 +99,7 @@
         </div>
         <div class="input-group">
           <label>Correo electrónico</label>
-          <input type="email" class="brutal-input" [(ngModel)]="formData.correo" name="correo" required maxlength="30" email #correoCtrl="ngModel">
+          <input type="email" class="brutal-input" [(ngModel)]="formData.correo" name="correo" required maxlength="40" email #correoCtrl="ngModel">
           <small class="error-msg-text" *ngIf="correoCtrl.errors?.['required'] && correoCtrl.touched">Requerido.</small>
           <small class="error-msg-text" *ngIf="correoCtrl.errors?.['email'] && correoCtrl.touched">Falta el arroba (&#64;).</small>
         </div>

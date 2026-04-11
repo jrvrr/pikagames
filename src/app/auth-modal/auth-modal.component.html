@@ -11,7 +11,7 @@
 
       <div class="input-group">
         <label>Correo</label>
-        <input type="email" [(ngModel)]="correo" name="correo" class="brutal-input" required placeholder="ejemplo@correo.com" maxlength="25" (blur)="validarCorreo()" />
+        <input type="email" [(ngModel)]="correo" name="correo" class="brutal-input" required placeholder="ejemplo@correo.com" maxlength="40" (blur)="validarCorreo()" />
       </div>
 
       <div class="input-group">
@@ -19,11 +19,11 @@
         <div class="password-wrapper">
           <input [type]="mostrarContrasena ? 'text' : 'password'" 
                  [(ngModel)]="contrasena" 
-                 name="contraseña" 
+                 name="contrasena" 
                  class="brutal-input" 
                  required 
                  placeholder="••••••••"
-                 maxlength="10"
+                 maxlength="40"
                  (blur)="validarContrasena()" />
           <button type="button" 
                   class="toggle-password-btn" 
@@ -31,6 +31,22 @@
                   tabindex="-1">
             <mat-icon>{{ mostrarContrasena ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
+        </div>
+        
+        <!-- Validation Requirements (Real-time) -->
+        <div class="password-validation" *ngIf="modo === 'register' && contrasena.length > 0">
+          <div class="val-rule" [class.valid]="cumpleLongitud()">
+            <mat-icon>{{ cumpleLongitud() ? 'check_circle' : 'circle' }}</mat-icon>
+            <span>Al menos 8 caracteres</span>
+          </div>
+          <div class="val-rule" [class.valid]="tieneMayuscula()">
+            <mat-icon>{{ tieneMayuscula() ? 'check_circle' : 'circle' }}</mat-icon>
+            <span>Una mayúscula</span>
+          </div>
+          <div class="val-rule" [class.valid]="tieneNumero()">
+            <mat-icon>{{ tieneNumero() ? 'check_circle' : 'circle' }}</mat-icon>
+            <span>Al menos un número</span>
+          </div>
         </div>
       </div>
 

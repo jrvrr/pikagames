@@ -21,8 +21,20 @@ export class AuthModalComponent {
   correo = '';
   contrasena = '';
   mostrarContrasena = false;
-
   loading = false;
+
+  // Real-time validation helpers
+  tieneMayuscula(): boolean {
+    return /[A-Z]/.test(this.contrasena);
+  }
+  
+  tieneNumero(): boolean {
+    return /[0-9]/.test(this.contrasena);
+  }
+  
+  cumpleLongitud(): boolean {
+    return this.contrasena.length >= 8;
+  }
 
   constructor(private authService: AuthService, private toastr: ToastrService) {}
 
@@ -75,18 +87,33 @@ export class AuthModalComponent {
       return;
     }
 
-    // 3. Validación de Límites de Caracteres
     if (this.modo === 'register' && this.nombre.length > 20) {
       this.toastr.warning('El nombre no puede superar los 20 caracteres', 'Límite excedido');
       return;
     }
-    if (this.correo.length > 25) {
-      this.toastr.warning('El correo no puede superar los 25 caracteres', 'Límite excedido');
+    if (this.correo.length > 40) {
+      this.toastr.warning('El correo no puede superar los 40 caracteres', 'Límite excedido');
       return;
     }
-    if (this.contrasena.length > 10) {
-      this.toastr.warning('La contraseña no puede superar los 10 caracteres', 'Límite excedido');
+    if (this.contrasena.length > 40) {
+      this.toastr.warning('La contraseña no puede superar los 40 caracteres', 'Límite excedido');
       return;
+    }
+
+    // 4. Validación de Complejidad (solo para registro)
+    if (this.modo === 'register') {
+      if (!this.cumpleLongitud()) {
+        this.toastr.error('La contraseña debe tener al menos 8 caracteres', 'Seguridad insuficiente');
+        return;
+      }
+      if (!this.tieneMayuscula()) {
+        this.toastr.error('La contraseña debe incluir al menos una mayúscula', 'Seguridad insuficiente');
+        return;
+      }
+      if (!this.tieneNumero()) {
+        this.toastr.error('La contraseña debe incluir al menos un número', 'Seguridad insuficiente');
+        return;
+      }
     }
 
     this.loading = true;

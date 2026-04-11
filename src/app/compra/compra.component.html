@@ -15,6 +15,27 @@
       </button>
     </div>
   </div>
+  
+  <!-- Winners Section (Latest Raffle) -->
+  <div class="ganadores-section-compra" *ngIf="ultimaRifaFinalizada">
+    <div class="ganador-main-card-compra brutal-card">
+      <div class="ganadores-header-compra">
+        <h3 class="section-title-mini">ÚLTIMO GANADOR</h3>
+        <span class="badget status-finalizada-compra">FINALIZADA</span>
+      </div>
+      
+      <div class="winners-list-compra">
+        <div *ngFor="let g of ultimaRifaFinalizada.ganadores" class="ganador-item-compra brutal-card-mini">
+          <div class="ganador-avatar-compra">🏆</div>
+          <div class="ganador-details-compra">
+            <span class="ganador-name-compra">{{ g.ganador_nombre }}</span>
+            <span class="raffle-origin">En: {{ ultimaRifaFinalizada.nombre }}</span>
+            <span class="ganador-prize-compra">{{ g.premio }} (Boleto #{{ g.numero_boleto }})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Loader -->
   <div *ngIf="cargando" class="loader-container">

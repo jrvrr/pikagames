@@ -351,3 +351,116 @@
 .paypal-container {
   margin-top: 20px;
 }
+
+/* Winners Section (Latest Raffle) in Compra */
+.ganadores-section-compra {
+  max-width: 1000px;
+  margin: 0 auto 40px auto;
+  border-bottom: 5px solid #000;
+  padding-bottom: 20px;
+}
+
+.ganador-main-card-compra {
+  background: var(--nin-white);
+  padding: 30px;
+  border: 4px solid #000;
+}
+
+.ganadores-header-compra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #ddd;
+}
+
+.section-title-mini {
+  font-size: 1.5rem;
+  font-weight: 950;
+  margin: 0;
+  color: var(--nin-dark);
+}
+
+.status-finalizada-compra {
+  background: var(--nin-dark);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 4px 12px;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0px #000;
+}
+
+.winners-list-compra {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.ganador-item-compra {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #fdfdfd;
+  padding: 15px;
+  border: 3px solid #000;
+  transition: transform 0.2s;
+}
+
+.ganador-item-compra:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 6px 6px 0px var(--nin-yellow), 8px 8px 0px #000;
+}
+
+.ganador-avatar-compra {
+  font-size: 1.8rem;
+  background: var(--nin-yellow);
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #000;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.ganador-details-compra {
+  display: flex;
+  flex-direction: column;
+}
+
+.ganador-name-compra {
+  font-weight: 950;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  color: var(--nin-red);
+}
+
+.raffle-origin {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #555;
+  margin: 2px 0;
+}
+
+.ganador-prize-compra {
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: #000;
+  padding-top: 2px;
+}
+
+/* Response for Mobile */
+@media (max-width: 600px) {
+  .section-title-mini {
+    font-size: 1.2rem;
+  }
+  
+  .ganadores-header-compra {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

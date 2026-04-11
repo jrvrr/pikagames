@@ -19,6 +19,7 @@ export class CompraComponent implements OnInit {
   mostrarModal = false;
   usuario: any = null;
   cargando = false;
+  ultimaRifaFinalizada: any = null;
 
   boletoSeleccionado: number | null = null;
   rifaSeleccionada: any = null;
@@ -38,10 +39,34 @@ export class CompraComponent implements OnInit {
     this.cargando = true;
     this.rifasService.getRifas().subscribe({
       next: (res: any) => {
-        this.rifas = (res.rifas || []).map((r: any) => ({
+        const rawRifas = res.rifas || [];
+        this.rifas = rawRifas.filter((r: any) => r.estado === 'activa').map((r: any) => ({
           ...r,
           boletosVisibles: 20
         }));
+
+        // Buscar última rifa finalizada (ordenando por ID o fecha si es posible, o simplemente revirtiendo)
+        const finalizadas = rawRifas
+          .filter((r: any) => r.estado === 'finalizada')
+          .sort((a: any, b: any) => {
+            // Intentar ordenar por ID o created_at
+            const valA = a.created_at || a.id;
+            const valB = b.created_at || b.id;
+            return valA > valB ? -1 : 1;
+          });
+
+        if (finalizadas.length > 0) {
+          const idUltima = finalizadas[0].id;
+          // Tenemos que pedir los detalles completos para tener la lista de ganadores
+          this.rifasService.getRifaPorId(idUltima).subscribe({
+            next: (detalleRes) => {
+              if (detalleRes.success) {
+                this.ultimaRifaFinalizada = detalleRes.rifa;
+              }
+            }
+          });
+        }
+
         this.cargando = false;
       },
       error: (err: any) => {

@@ -122,3 +122,45 @@
   color: var(--nin-red);
 }
 
+
+.password-validation {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #f0f0f0;
+  padding: 10px;
+  border: 2px solid #000;
+  border-radius: 8px;
+}
+
+.val-rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.val-rule mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.val-rule.valid {
+  color: #2e7d32; /* Green */
+}
+
+.val-rule.valid mat-icon {
+  color: #2e7d32;
+}
+
+/* Response for Mobile */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 25px 20px;
+  }
+}
