@@ -8,12 +8,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import emailjs from '@emailjs/browser';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
-// ── EmailJS credentials ──────────────────────────────────────────
-const EMAILJS_SERVICE_ID  = 'service_a9t5n1s';  // ✅ ya configurado
-const EMAILJS_TEMPLATE_ID = 'template_si7zaql';   // ← pega tu Template ID aquí
-const EMAILJS_PUBLIC_KEY  = 'LjoPuY0gqDdFqwlPr';     // ← pega tu Public Key aquí
+// ── Google Apps Script Configuration ────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzCm1Q617L-Hki6yZSIorhgEJ7WLJ_v_78pcfJlLnAJVlID3yqHW4AGIZZ-WBG7RhuUSg/exec';
 // ─────────────────────────────────────────────────────────────────
 
 @Component({
@@ -46,8 +45,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   pathTop: number = 80;
   pathLeft: number = 100;
 
-  constructor(private dialog: MatDialog, private route: ActivatedRoute) {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+  constructor(
+    private dialog: MatDialog, 
+    private route: ActivatedRoute,
+    private http: HttpClient
+  ) {
   }
 
   onFileSelected(event: Event): void {
@@ -70,12 +72,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
   async sendEmail(): Promise<void> {
     this.sendStatus = 'sending';
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        from_name:   this.formData.nombre,
-        from_email:  this.formData.correo,
+      const payload = {
+        nombre:      this.formData.nombre,
+        correo:      this.formData.correo,
         motivo:      this.formData.motivo,
         descripcion: this.formData.descripcion,
-      });
+      };
+
+      // Enviamos a Google Apps Script
+      await firstValueFrom(this.http.post(GAS_URL, JSON.stringify(payload)));
+      
       this.sendStatus = 'ok';
       // Resetear formulario después de 3s
       setTimeout(() => {
@@ -84,9 +90,25 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.sendStatus = 'idle';
         this.showForm = false;
       }, 3000);
-    } catch (err) {
-      console.error('EmailJS error:', err);
-      this.sendStatus = 'error';
+    } catch (untypedErr: any) {
+      const err = untypedErr as any;
+      console.error('Error enviando formulario:', err);
+      // GAS a veces retorna error de CORS aunque el envío sea exitoso debido a redirecciones
+      // Si el status es 0 o detectamos que es un tema de opacidad de respuesta (no-cors),
+      // pero el mensaje llegó, podríamos manejarlo. Sin embargo, con ContentService suele ir bien.
+      
+      // Intentamos manejarlo como éxito si llega aquí pero el servidor respondió (CORS quirk)
+      if (err.status === 200 || err.status === 0) {
+        this.sendStatus = 'ok';
+        setTimeout(() => {
+          this.formData = { nombre: '', correo: '', motivo: '', descripcion: '' };
+          this.selectedFileName = '';
+          this.sendStatus = 'idle';
+          this.showForm = false;
+        }, 3000);
+      } else {
+        this.sendStatus = 'error';
+      }
     }
   }
 

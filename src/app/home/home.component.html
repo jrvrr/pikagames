@@ -98,7 +98,7 @@
         </div>
         <div class="input-group">
           <label>Correo electrónico</label>
-          <input type="email" class="brutal-input" [(ngModel)]="formData.correo" name="correo" required maxlength="20" email #correoCtrl="ngModel">
+          <input type="email" class="brutal-input" [(ngModel)]="formData.correo" name="correo" required maxlength="30" email #correoCtrl="ngModel">
           <small class="error-msg-text" *ngIf="correoCtrl.errors?.['required'] && correoCtrl.touched">Requerido.</small>
           <small class="error-msg-text" *ngIf="correoCtrl.errors?.['email'] && correoCtrl.touched">Falta el arroba (&#64;).</small>
         </div>
@@ -131,9 +131,9 @@
       </div>
 
       <!-- Estado del envío -->
-      <div *ngIf="sendStatus === 'ok'" class="status-msg success brutal-card-mini">✅ ¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.</div>
-      <div *ngIf="sendStatus === 'error'" class="status-msg error brutal-card-mini">❌ Ocurrió un error al enviar. ¿Verificaste tu conexión?</div>
-      <div *ngIf="sendStatus === 'sending'" class="status-msg sending brutal-card-mini">⏳ Enviando mensaje...</div>
+      <div *ngIf="sendStatus === 'ok'" class="status-msg success brutal-card-mini">¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.</div>
+      <div *ngIf="sendStatus === 'error'" class="status-msg error brutal-card-mini">Ocurrió un error al enviar. ¿Verificaste tu conexión?</div>
+      <div *ngIf="sendStatus === 'sending'" class="status-msg sending brutal-card-mini">Enviando mensaje...</div>
 
       <div class="buttons">
         <button type="submit" class="brutal-btn btn-primary" [disabled]="sendStatus === 'sending' || contactForm.invalid">ENVIAR</button>
