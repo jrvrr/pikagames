@@ -64,6 +64,13 @@
   padding-right: 50px; /* Espacio para el botón */
 }
 
+/* Ocultar el ojo por defecto de navegadores como Edge/IE */
+.password-wrapper input::-ms-reveal,
+.password-wrapper input::-ms-clear {
+  display: none;
+}
+
+
 .toggle-password-btn {
   position: absolute;
   right: 10px;
