@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: space-around;
   gap: 20px;
-  min-height: 75jvh;
+  min-height: 75vh;
   padding: 20px 40px;
   background-color: var(--nin-bg);
   background-image: radial-gradient(#d1d1d1 2px, transparent 2px);
@@ -56,6 +56,9 @@
   width: 100%;
   max-width: 450px;
   z-index: 5;
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
 .image-backdrop {
@@ -67,6 +70,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .image-backdrop img {
@@ -231,7 +236,8 @@
   object-fit: cover;
   z-index: 100;
   /* Increased to stay on top of everything */
-  transition: top 0.1s linear, left 0.1s linear;
+  will-change: top, left;
+  transform-style: preserve-3d;
 }
 
 .overlay {

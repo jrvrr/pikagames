@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, NgZone, ChangeDetectorRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -48,7 +48,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
   constructor(
     private dialog: MatDialog, 
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
   }
 
@@ -142,9 +144,18 @@ export class HomeComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     const scroller = document.querySelector('mat-sidenav-content') || document.querySelector('.mat-drawer-content') || window;
 
-    scroller.addEventListener('scroll', (event: any) => {
-      this.scrollY = event.target.scrollTop || window.scrollY || 0;
-      this.calculateControllerPath();
+    this.ngZone.runOutsideAngular(() => {
+      scroller.addEventListener('scroll', (event: any) => {
+        const top = event.target.scrollTop || window.scrollY || 0;
+        
+        requestAnimationFrame(() => {
+          if (this.scrollY !== top) {
+            this.scrollY = top;
+            this.calculateControllerPath();
+            this.cdr.detectChanges(); // Manually trigger CD only on frame update
+          }
+        });
+      });
     });
 
     const observer = new IntersectionObserver((entries) => {
