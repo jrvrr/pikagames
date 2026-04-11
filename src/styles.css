@@ -214,3 +214,89 @@ body {
   font-weight: 600 !important;
   font-size: 1.1rem !important;
 }
+
+/* --- Price Badge Star (Global) --- */
+.price-badge-star {
+  position: absolute;
+  top: -10px;
+  right: -5px;
+  width: 100px;
+  height: 100px;
+  background-color: var(--nin-blue);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Burst shape */
+  clip-path: polygon(50% 0%, 58% 18%, 75% 6%, 79% 25%, 94% 19%, 89% 37%, 100% 50%, 89% 63%, 94% 81%, 79% 75%, 75% 94%, 58% 82%, 50% 100%, 42% 82%, 25% 94%, 21% 75%, 6% 81%, 11% 63%, 0% 50%, 11% 37%, 6% 19%, 21% 25%, 25% 6%, 42% 18%);
+  z-index: 10;
+  transform: rotate(5deg);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: floatBurst 3s ease-in-out infinite;
+  cursor: pointer;
+}
+
+/* Sombra de líneas (Hatching) */
+.price-badge-star::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #000,
+    #000 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  clip-path: polygon(50% 0%, 58% 18%, 75% 6%, 79% 25%, 94% 19%, 89% 37%, 100% 50%, 89% 63%, 94% 81%, 79% 75%, 75% 94%, 58% 82%, 50% 100%, 42% 82%, 25% 94%, 21% 75%, 6% 81%, 11% 63%, 0% 50%, 11% 37%, 6% 19%, 21% 25%, 25% 6%, 42% 18%);
+  z-index: -1;
+}
+
+/* Capa de fondo para el color */
+.price-badge-star::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--nin-blue);
+  clip-path: polygon(50% 2%, 57% 19%, 73% 8%, 77% 26%, 91% 21%, 87% 38%, 97% 50%, 87% 62%, 91% 79%, 77% 74%, 73% 92%, 57% 81%, 50% 98%, 43% 81%, 27% 92%, 23% 74%, 9% 79%, 13% 62%, 3% 50%, 13% 38%, 9% 21%, 23% 26%, 27% 8%, 43% 19%);
+  z-index: -1;
+}
+
+.price-badge-star.header-badge {
+  position: absolute;
+  top: -40px;
+  right: -60px;
+  width: 90px;
+  height: 90px;
+  animation-direction: alternate-reverse;
+}
+
+.price-badge-star:hover,
+.price-badge-star:active {
+  transform: scale(1.2) rotate(-10deg) translateY(-5px);
+  background-color: #0088cc;
+}
+
+.price-label {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 950;
+  letter-spacing: 1px;
+  margin-bottom: -4px;
+  text-shadow: 2px 2px 0px #000;
+}
+
+.price-amount {
+  color: var(--nin-yellow);
+  font-size: 1.5rem;
+  font-weight: 950;
+  text-shadow: 2px 2px 0px #000;
+}
+
+@keyframes floatBurst {
+  0%, 100% { transform: translateY(0) rotate(5deg); }
+  50% { transform: translateY(-12px) rotate(-3deg); }
+}

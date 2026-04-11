@@ -5,6 +5,15 @@
   background-color: var(--nin-bg);
   background-image: radial-gradient(#d1d1d1 2px, transparent 2px);
   background-size: 30px 30px;
+  overflow-x: hidden; /* Evita que la estrella genere scroll */
+  position: relative;
+}
+
+.title-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .main-header-row {
@@ -32,6 +41,84 @@
   border: 3px solid #000;
   font-size: 0.9rem;
   font-weight: 900;
+  text-transform: uppercase;
+}
+
+.premios-section {
+  background: rgba(255, 255, 255, 0.4);
+  border: 3px dashed #000;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 25px;
+}
+
+.premios-title {
+  font-size: 1.1rem;
+  font-weight: 950;
+  color: #000;
+  margin: 0 0 15px 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.premios-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.premio-card {
+  position: relative;
+  background: var(--nin-white);
+  border: 3px solid #000;
+  border-radius: 12px;
+  padding: 15px;
+  min-width: 140px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.premio-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 7px 7px 0px #000;
+  background-color: #fff9e6;
+}
+
+.premio-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--nin-red);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 900;
+  padding: 4px 8px;
+  border: 2px solid #000;
+  border-radius: 50px;
+  box-shadow: 2px 2px 0px #000;
+  z-index: 2;
+}
+
+.premio-icon-container {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  filter: drop-shadow(2px 2px 0 #000);
+}
+
+.premio-info {
+  text-align: center;
+}
+
+.premio-nombre {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #000;
   text-transform: uppercase;
 }
 
@@ -66,6 +153,7 @@
 .rifa-card {
   padding: 30px;
   background-color: var(--nin-yellow);
+  position: relative; /* Fixed: Price badge now correctly anchored to card */
 }
 
 .rifa-card h3 {

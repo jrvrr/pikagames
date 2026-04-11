@@ -1,7 +1,9 @@
 <div class="compra-wrapper">
   
   <div class="main-header-row">
-    <h2 class="section-title" *ngIf="rifas.length > 0 && !cargando" style="font-family: 'Roboto', sans-serif; font-weight: 900;">RIFAS DISPONIBLES</h2>
+    <div class="title-container">
+      <h2 class="section-title" *ngIf="rifas.length > 0 && !cargando" style="font-family: 'Roboto', sans-serif; font-weight: 900;">RIFAS DISPONIBLES</h2>
+    </div>
     <h2 class="section-title" *ngIf="rifas.length === 0 && !cargando">NO HAY RIFAS</h2>
     <h2 class="section-title" *ngIf="cargando">CARGANDO...</h2>
 
@@ -31,19 +33,27 @@
       <div *ngFor="let rifa of rifas" class="rifa-card brutal-card">
         <div class="rifa-header">
           <h3>{{ rifa.nombre }}</h3>
-          <span class="price-tag">${{ rifa.precio | number:'1.2-2' }} MXN</span>
+          <div class="price-badge-star">
+            <span class="price-label">PRECIO</span>
+            <span class="price-amount">${{ rifa.precio | number:'1.2-2' }}</span>
+          </div>
         </div>
         
         <p class="desc">{{ rifa.descripcion }}</p>
 
         <div class="premios-section" *ngIf="rifa.premios && rifa.premios.length > 0">
-          <h4 class="premios-title">PREMIOS:</h4>
-          <ul class="premios-list">
-            <li *ngFor="let premio of rifa.premios">
-              <span class="premio-icon">🎁</span>
-              <span class="premio-text"><b>{{ premio.cantidad }}x</b> {{ premio.titulo }}</span>
-            </li>
-          </ul>
+          <h4 class="premios-title">🏆 PREMIOS EN JUEGO</h4>
+          <div class="premios-grid">
+            <div *ngFor="let premio of rifa.premios" class="premio-card">
+              <div class="premio-badge">{{ premio.cantidad }}x</div>
+              <div class="premio-icon-container">
+                <span class="premio-icon-main">🎁</span>
+              </div>
+              <div class="premio-info">
+                <span class="premio-nombre">{{ premio.titulo }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Administrador view warning -->
