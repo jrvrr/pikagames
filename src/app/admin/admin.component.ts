@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RifasService } from '../service/rifas.service';
@@ -18,7 +18,18 @@ export class AdminComponent implements OnInit {
   rifasActivas: any[] = [];
   historialRifas: any[] = [];
   participantesPendientes: any[] = [];
-  currentTab: 'crear' | 'activas' | 'historial' | 'pendientes' = 'activas';
+  usuarios: any[] = [];
+  currentTab: 'dashboard' | 'crear' | 'rifas' | 'pendientes' | 'clientes' = 'dashboard';
+  today = new Date();
+  isSidebarCollapsed = false;
+  isSidebarVisible = true;
+
+  stats = {
+    boletosVendidos: 0,
+    rifasActivas: 0,
+    clientesTotales: 0,
+    rifasRecientes: [] as any[]
+  };
 
   nuevaRifa: {
     nombre: string;
@@ -51,22 +62,58 @@ export class AdminComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.checkScreenSize();
     this.usuario = this.authService.getUsuarioActual();
     if (!this.usuario?.es_admin) {
       this.toastr.error('Solo los administradores pueden acceder aquí.');
       window.location.href = '/';
     }
-    this.obtenerRifas();
-    this.obtenerPendientes();
+    this.cargarTodo();
     
     // Exponer métodos para el modal de detalles
     (window as any).adminComponent = this;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkScreenSize();
+  }
+
+  private checkScreenSize() {
+    if (window.innerWidth < 768) {
+      this.isSidebarVisible = false;
+      this.isSidebarCollapsed = false;
+    } else {
+      this.isSidebarVisible = true;
+    }
+  }
+
+  toggleSidebar() {
+    if (window.innerWidth < 768) {
+      this.isSidebarVisible = !this.isSidebarVisible;
+    } else {
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    }
+  }
+
+  toggleSidebarMobile() {
+    this.isSidebarVisible = !this.isSidebarVisible;
+  }
+
+  cargarTodo(): void {
+    this.obtenerRifas();
+    this.obtenerPendientes();
+    this.obtenerUsuarios();
   }
 
   cambiarTab(tab: any): void {
     this.currentTab = tab;
     if (tab === 'pendientes') {
       this.obtenerPendientes();
+    } else if (tab === 'clientes') {
+      this.obtenerUsuarios();
+    } else if (tab === 'dashboard') {
+      this.cargarTodo();
     } else {
       this.obtenerRifas();
     }
@@ -88,6 +135,7 @@ export class AdminComponent implements OnInit {
         this.rifas = res.rifas || [];
         this.rifasActivas = this.rifas.filter(r => r.estado === 'activa');
         this.historialRifas = this.rifas.filter(r => r.estado !== 'activa');
+        this.calcularEstadisticas();
         this.cargando = false;
       },
       error: () => {
@@ -95,6 +143,29 @@ export class AdminComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  obtenerUsuarios(): void {
+    this.authService.getUsuarios().subscribe({
+      next: (res: any) => {
+        this.usuarios = res.usuarios || [];
+        this.stats.clientesTotales = this.usuarios.length;
+      },
+      error: () => this.toastr.error('Error al cargar usuarios')
+    });
+  }
+
+  calcularEstadisticas(): void {
+    this.stats.rifasActivas = this.rifasActivas.length;
+    this.stats.rifasRecientes = this.rifas.slice(0, 5);
+    
+    let totalVendidos = 0;
+    this.rifas.forEach(r => {
+      if (r.boletos_ocupados && Array.isArray(r.boletos_ocupados)) {
+        totalVendidos += r.boletos_ocupados.length;
+      }
+    });
+    this.stats.boletosVendidos = totalVendidos;
   }
 
   suspenderRifa(id: string): void {
@@ -234,26 +305,30 @@ export class AdminComponent implements OnInit {
 
         const data = res.rifa;
         let html = '';
-
-        const disponibles = data.cantidad_boletos - (data.participantes ? data.participantes.length : 0);
+        const disponibles = (data.cantidad_boletos || 0) - (data.participantes ? data.participantes.length : 0);
         html += `<div style="text-align: center; margin-bottom: 20px;">
-                   <span style="font-size: 1.2rem; background: var(--nin-yellow); padding: 5px 15px; border: 2px solid #000; border-radius: 8px; font-weight: 900; box-shadow: 3px 3px 0 #000;">
-                     Boletos Libres: ${disponibles} de ${data.cantidad_boletos}
+                   <span style="font-size: 1.1rem; background: #fef3c7; color: #92400e; padding: 6px 16px; border-radius: 8px; font-weight: 700; border: 1px solid #f59e0b;">
+                     Boletos Libres: ${disponibles} de ${data.cantidad_boletos || 0}
                    </span>
                  </div>`;
 
         if (data.ganadores && data.ganadores.length > 0) {
-          html += '<h3 style="color:var(--nin-red); font-weight:900;">🏆 GANADORES 🏆</h3>';
+          html += '<h3 style="color:#ef4444; font-weight:800; margin-bottom:10px;">🏆 GANADORES 🏆</h3>';
           html += '<ul style="text-align: left; list-style: none; padding: 0;">';
           data.ganadores.forEach((g: any) => {
-            html += `<li>🎁 <b>${g.premio}</b> <br>🎟️ Número: ${g.numero_boleto} <br>👤 ${g.ganador_nombre} <br>📧 <small>${g.ganador_email}</small></li><hr style="margin:8px 0; border-top:2px solid #000;">`;
+            html += `<li style="padding: 10px; background: #fff1f2; border-radius: 8px; margin-bottom: 8px; border: 1px solid #fecdd3;">
+                      🎁 <b>${g.premio}</b> <br>
+                      🎟️ Boleto: #${g.numero_boleto} <br>
+                      👤 ${g.ganador_nombre} <br>
+                      <small style="color:#666;">${g.ganador_email}</small>
+                    </li>`;
           });
           html += '</ul><br>';
         }
 
         if (data.participantes && data.participantes.length > 0) {
-          html += `<h4 style="color:var(--nin-blue); font-weight:800; margin-top:20px;">👥 PARTICIPANTES (${data.participantes.length})</h4>`;
-          html += '<div style="max-height: 350px; overflow-y: auto; border: 2px solid #000; padding:10px; border-radius: 8px; text-align: left;">';
+          html += `<h4 style="color:#4f46e5; font-weight:800; margin-top:20px; margin-bottom:10px;">👥 PARTICIPANTES (${data.participantes.length})</h4>`;
+          html += '<div style="max-height: 350px; overflow-y: auto; border: 1px solid #e5e7eb; padding:10px; border-radius: 8px; text-align: left; background: #f9fafb;">';
           html += '<ul style="list-style: none; padding: 0; margin: 0;">';
           data.participantes.forEach((p: any) => {
             const isVendido = p.estado === 'VENDIDO';
@@ -262,24 +337,24 @@ export class AdminComponent implements OnInit {
             
             if (!isVendido) {
               actions = `
-                <div style="margin-top:5px; display:flex; gap:5px;">
+                <div style="margin-top:8px; display:flex; gap:8px;">
                   <button onclick="window.adminComponent.confirmarPagoManual('${data.id}', ${p.numero})" 
-                          style="background:#387F39; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; font-weight:bold;">
-                    CONFIRMAR PAGO
+                          style="background:#10b981; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
+                    CONFIRMAR
                   </button>
                   <button onclick="window.adminComponent.eliminarParticipante('${data.id}', ${p.numero})" 
-                          style="background:#dc3545; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; font-weight:bold;">
+                          style="background:#ef4444; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
                     LIBERAR
                   </button>
                 </div>
               `;
             }
 
-            html += `<li style="margin-bottom:12px; border-bottom:1px dashed #ccc; padding-bottom:10px;">
+            html += `<li style="margin-bottom:12px; padding:12px; background:white; border-radius:8px; border:1px solid #e5e7eb; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                          <span>${statusIcon} <b>#${p.numero}</b> - ${p.nombre}</span>
+                          <span style="font-weight:600;">${statusIcon} #${p.numero} - ${p.nombre}</span>
                         </div>
-                        <small style="color:#666;">${p.email}</small>
+                        <div style="color:#6b7280; font-size:0.8rem; margin-top:2px;">${p.email}</div>
                         ${actions}
                      </li>`;
           });

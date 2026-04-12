@@ -44,4 +44,8 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getUsuarioActual();
   }
+
+  getUsuarios(): Observable<any> {
+    return this.http.get(this.apiUrl);
+  }
 }

@@ -153,7 +153,10 @@
 }
 
 .main-content {
-  padding-top: 90px;
+  height: calc(100vh - 80px); /* 80px es el height del nintendo-nav */
+  margin-top: 80px;
+  overflow: hidden;
+  position: relative;
 }
 
 @media (max-width: 950px) {
