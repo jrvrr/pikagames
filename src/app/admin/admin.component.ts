@@ -244,7 +244,7 @@ export class AdminComponent implements OnInit {
               actions = `
                 <div style="margin-top:5px; display:flex; gap:5px;">
                   <button onclick="window.adminComponent.confirmarPagoManual('${data.id}', ${p.numero})" 
-                          style="background:#28a745; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; font-weight:bold;">
+                          style="background:#387F39; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; font-weight:bold;">
                     CONFIRMAR PAGO
                   </button>
                   <button onclick="window.adminComponent.eliminarParticipante('${data.id}', ${p.numero})" 

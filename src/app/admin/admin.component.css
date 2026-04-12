@@ -284,7 +284,7 @@
   margin-top: 8px;
 }
 .status-activa {
-  background: #4CAF50;
+  background: #387F39;
   color: white;
 }
 .status-finalizada {
@@ -330,7 +330,7 @@
   color: #fff !important;
 }
 .status-activate {
-  background: #4CAF50 !important;
+  background: #387F39 !important;
   color: #fff !important;
 }
 .status-win {
