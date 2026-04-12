@@ -17,7 +17,8 @@ export class AdminComponent implements OnInit {
   rifas: any[] = [];
   rifasActivas: any[] = [];
   historialRifas: any[] = [];
-  currentTab: 'crear' | 'activas' | 'historial' = 'activas';
+  participantesPendientes: any[] = [];
+  currentTab: 'crear' | 'activas' | 'historial' | 'pendientes' = 'activas';
 
   nuevaRifa: {
     nombre: string;
@@ -56,15 +57,34 @@ export class AdminComponent implements OnInit {
       window.location.href = '/';
     }
     this.obtenerRifas();
+    this.obtenerPendientes();
     
     // Exponer métodos para el modal de detalles
     (window as any).adminComponent = this;
   }
 
+  cambiarTab(tab: any): void {
+    this.currentTab = tab;
+    if (tab === 'pendientes') {
+      this.obtenerPendientes();
+    } else {
+      this.obtenerRifas();
+    }
+  }
+
+  obtenerPendientes(): void {
+    this.rifasService.getParticipantesPendientes().subscribe({
+      next: (res: any) => {
+        this.participantesPendientes = res.pendientes || [];
+      },
+      error: () => this.toastr.error('Error al cargar pendientes')
+    });
+  }
+
   obtenerRifas(): void {
     this.cargando = true;
     this.rifasService.getRifas().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.rifas = res.rifas || [];
         this.rifasActivas = this.rifas.filter(r => r.estado === 'activa');
         this.historialRifas = this.rifas.filter(r => r.estado !== 'activa');
@@ -295,7 +315,11 @@ export class AdminComponent implements OnInit {
         this.rifasService.confirmarPagoManual(idRifa, numero).subscribe({
           next: () => {
             this.toastr.success('Boleto confirmado exitosamente');
-            this.verDetalles(idRifa); // Recargar modal
+            if (this.currentTab === 'pendientes') {
+              this.obtenerPendientes();
+            } else {
+              this.verDetalles(idRifa); // Recargar modal
+            }
           },
           error: (err) => {
             this.toastr.error('Error al confirmar el pago');
@@ -320,7 +344,11 @@ export class AdminComponent implements OnInit {
         this.rifasService.eliminarParticipante(idRifa, numero).subscribe({
           next: () => {
             this.toastr.success('Boleto liberado');
-            this.verDetalles(idRifa); // Recargar modal
+            if (this.currentTab === 'pendientes') {
+              this.obtenerPendientes();
+            } else {
+              this.verDetalles(idRifa); // Recargar modal
+            }
           },
           error: (err) => {
             this.toastr.error('Error al liberar el boleto');

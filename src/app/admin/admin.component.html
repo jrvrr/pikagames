@@ -20,20 +20,27 @@
           <button 
             class="brutal-tab-btn icon-text-btn" 
             [class.active-tab]="currentTab === 'crear'" 
-            (click)="currentTab = 'crear'">
+            (click)="cambiarTab('crear')">
             <span class="material-icons">add_circle</span> Crear Rifa
           </button>
           <button 
             class="brutal-tab-btn icon-text-btn" 
             [class.active-tab]="currentTab === 'activas'" 
-            (click)="currentTab = 'activas'">
+            (click)="cambiarTab('activas')">
             <span class="material-icons">play_circle</span> Activas
           </button>
           <button 
             class="brutal-tab-btn icon-text-btn" 
             [class.active-tab]="currentTab === 'historial'" 
-            (click)="currentTab = 'historial'">
+            (click)="cambiarTab('historial')">
             <span class="material-icons">history</span> Historial
+          </button>
+          <button 
+            class="brutal-tab-btn icon-text-btn" 
+            [class.active-tab]="currentTab === 'pendientes'" 
+            (click)="cambiarTab('pendientes')">
+            <span class="material-icons" [class.pulse-icon]="participantesPendientes.length > 0">notifications_active</span> Pendientes 
+            <span class="count-badge" *ngIf="participantesPendientes.length > 0">{{participantesPendientes.length}}</span>
           </button>
         </div>
 
@@ -179,6 +186,44 @@
             </div>
             <div *ngIf="historialRifas.length === 0" class="empty-state">
               No hay rifas en el historial.
+            </div>
+          </ng-container>
+
+          <!-- TAB PENDIENTES -->
+          <ng-container *ngIf="currentTab === 'pendientes'">
+            <div class="pendientes-container">
+              <h3 class="subsection-title">VALIDAR PAGOS (OXXO/TRANSFERENCIA)</h3>
+              
+              <div class="pending-list scrollbar-brutal">
+                <div *ngFor="let p of participantesPendientes" class="pending-card brutal-card-nano">
+                  <div class="pending-info">
+                    <div class="pending-main">
+                      <span class="ticket-id">🎟️ #{{p.numero}}</span>
+                      <span class="rifa-name">{{p.rifa_nombre}}</span>
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">👤 {{p.usuario_nombre}}</span>
+                      <span class="user-email">{{p.usuario_correo}}</span>
+                    </div>
+                    <div class="time-detail">
+                      <span class="material-icons">schedule</span>
+                      Apartado: {{p.reservado_at | date:'short'}}
+                    </div>
+                  </div>
+                  <div class="pending-actions">
+                    <button class="brutal-btn small-btn btn-confirm-green icon-text-btn" (click)="confirmarPagoManual(p.rifa_id, p.numero)">
+                      <span class="material-icons">check_circle</span> CONFIRMAR
+                    </button>
+                    <button class="brutal-btn small-btn btn-release-red icon-text-btn" (click)="eliminarParticipante(p.rifa_id, p.numero)">
+                      <span class="material-icons">cancel</span> LIBERAR
+                    </button>
+                  </div>
+                </div>
+                
+                <div *ngIf="participantesPendientes.length === 0" class="empty-state">
+                  🎉 ¡Genial! No hay pagos pendientes por validar.
+                </div>
+              </div>
             </div>
           </ng-container>
         </div>

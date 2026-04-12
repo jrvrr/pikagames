@@ -341,3 +341,141 @@
   background: #eef1f5;
   filter: grayscale(0.2);
 }
+
+/* --- PENDIENTES TAB STYLING --- */
+.count-badge {
+  background: var(--nin-red);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  position: relative;
+  top: -10px;
+  left: -5px;
+  border: 1px solid #000;
+  box-shadow: 1px 1px 0 #000;
+}
+
+.pulse-icon {
+  animation: pulse-brutal 1.5s infinite;
+  color: var(--nin-red);
+}
+
+@keyframes pulse-brutal {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.pendientes-container {
+  padding: 30px;
+}
+
+.pending-list {
+  max-height: 600px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px;
+}
+
+.scrollbar-brutal::-webkit-scrollbar {
+  width: 12px;
+}
+.scrollbar-brutal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border: 2px solid #000;
+}
+.scrollbar-brutal::-webkit-scrollbar-thumb {
+  background: var(--nin-yellow);
+  border: 2px solid #000;
+}
+
+.pending-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background: white !important;
+  padding: 20px !important;
+}
+
+.pending-info {
+  flex: 1;
+  min-width: 250px;
+}
+
+.pending-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ticket-id {
+  font-size: 1.4rem;
+  font-weight: 900;
+  background: var(--nin-dark);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.rifa-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--nin-blue);
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.user-name {
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.time-detail {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 5px;
+}
+
+.time-detail .material-icons {
+  font-size: 1rem;
+}
+
+.pending-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-confirm-green {
+  background: #387F39 !important;
+  color: white !important;
+}
+
+.btn-release-red {
+  background: var(--nin-red) !important;
+  color: white !important;
+}
+
+@media (max-width: 768px) {
+  .pending-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

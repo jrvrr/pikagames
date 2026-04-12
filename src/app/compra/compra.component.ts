@@ -190,7 +190,8 @@ export class CompraComponent implements OnInit {
       error: (err) => {
         this.reservando = false;
         console.error('Error al apartar:', err);
-        this.toastr.error('Error de conexión o el boleto ya fue tomado', 'Error');
+        const mensajeError = err.error?.error || 'Error de conexión o el boleto ya fue tomado';
+        this.toastr.error(mensajeError, 'Error');
       }
     });
   }
