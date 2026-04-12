@@ -23,6 +23,9 @@ export class CompraComponent implements OnInit {
 
   boletoSeleccionado: number | null = null;
   rifaSeleccionada: any = null;
+  reservando = false;
+  apartadoExitoso = false;
+  metodoPagoSeleccionado: 'paypal' | 'oxxo' | 'spei' = 'paypal';
 
   constructor(
     private rifasService: RifasService,
@@ -140,8 +143,62 @@ export class CompraComponent implements OnInit {
 
     this.boletoSeleccionado = num;
     this.rifaSeleccionada = rifa;
+    this.apartadoExitoso = false;
+    
+    // NO renderizar PayPal automáticamente aquí para evitar errores prematuros
+    // Solo se renderizará si el usuario lo elige explícitamente o es el default
+    if (this.metodoPagoSeleccionado === 'paypal') {
+      setTimeout(() => this.renderizarPayPal(rifa, num), 100);
+    }
+  }
 
-    this.renderizarPayPal(rifa, num);
+  seleccionarMetodo(metodo: 'paypal' | 'oxxo' | 'spei'): void {
+    this.metodoPagoSeleccionado = metodo;
+    this.apartadoExitoso = false; // Resetear éxito si cambia de método
+    
+    if (metodo === 'paypal' && this.boletoSeleccionado) {
+      setTimeout(() => {
+        this.renderizarPayPal(this.rifaSeleccionada, this.boletoSeleccionado!);
+      }, 100);
+    }
+  }
+
+  apartarPorTransferencia(rifa: any, num: number): void {
+    if (!this.usuario) {
+      this.abrirAuth();
+      return;
+    }
+
+    this.reservando = true;
+    const payload = {
+      user_id: this.usuario.id,
+      boletos: [num] // El backend espera un arreglo de números
+    };
+
+    this.rifasService.comprarBoletos(rifa.id, payload).subscribe({
+      next: (res) => {
+        this.reservando = false;
+        if (res.success) {
+          this.toastr.success(`Boleto #${num} apartado. Envía el comprobante por WhatsApp.`, '¡Boleto Apartado!');
+          this.apartadoExitoso = true;
+          // Actualizamos la lista para que el boleto aparezca ocupado para otros
+          this.obtenerRifas();
+        } else {
+          this.toastr.error(res.error || 'No se pudo apartar el boleto', 'Error');
+        }
+      },
+      error: (err) => {
+        this.reservando = false;
+        console.error('Error al apartar:', err);
+        this.toastr.error('Error de conexión o el boleto ya fue tomado', 'Error');
+      }
+    });
+  }
+
+  generarLinkWhatsapp(rifa: any, num: number): string {
+    const phone = '525620980834';
+    const text = `Hola Pika Games! 👋 He apartado el boleto #${num} para la rifa de "${rifa.nombre}" mediante ${this.metodoPagoSeleccionado.toUpperCase()}. Aquí adjunto mi comprobante de pago.`;
+    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   }
 
   renderizarPayPal(rifa: any, boleto: number): void {

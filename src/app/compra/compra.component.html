@@ -110,7 +110,84 @@
             VER MÁS BOLETOS ↓
           </button>
           
-          <div id="paypal-button-container-{{ rifa.id }}" class="paypal-container"></div>
+          <div *ngIf="boletoSeleccionado && rifaSeleccionada?.id === rifa.id" class="pago-opciones">
+            <h5 class="pago-title">Boleto #{{ boletoSeleccionado }} seleccionado</h5>
+            
+            <div class="metodo-selector">
+              <label class="metodo-option" [class.active]="metodoPagoSeleccionado === 'paypal'">
+                <input type="radio" name="metodo" (change)="seleccionarMetodo('paypal')" [checked]="metodoPagoSeleccionado === 'paypal'">
+                <span>PayPal / Tarjeta</span>
+              </label>
+              <label class="metodo-option" [class.active]="metodoPagoSeleccionado === 'oxxo'">
+                <input type="radio" name="metodo" (change)="seleccionarMetodo('oxxo')" [checked]="metodoPagoSeleccionado === 'oxxo'">
+                <span>Oxxo o 7Eleven</span>
+              </label>
+              <label class="metodo-option" [class.active]="metodoPagoSeleccionado === 'spei'">
+                <input type="radio" name="metodo" (change)="seleccionarMetodo('spei')" [checked]="metodoPagoSeleccionado === 'spei'">
+                <span>Transferencia Bancaria</span>
+              </label>
+            </div>
+
+            <div class="pago-botones" *ngIf="!apartadoExitoso">
+              <!-- PayPal -->
+              <div *ngIf="metodoPagoSeleccionado === 'paypal'" id="paypal-button-container-{{ rifa.id }}" class="paypal-container"></div>
+              
+              <!-- OXXO -->
+              <div *ngIf="metodoPagoSeleccionado === 'oxxo'" class="metodo-info-card">
+                <p class="instruccion-pro">Para completar tu pedido, realiza el pago correspondiente mediante los datos que a continuación se detallan.</p>
+                <div class="resumen-datos">
+                  <span class="dato-label">OXXO O 7ELEVEN</span>
+                  <p>Dirígete a tu lugar cercano con la siguiente información:</p>
+                  <div class="dato-box">
+                    <small>Número de cuenta:</small>
+                    <strong>4169 1614 5560 1061</strong>
+                  </div>
+                  <div class="dato-box">
+                    <small>Banco:</small>
+                    <strong>BANCOPPEL</strong>
+                  </div>
+                </div>
+                <button class="brutal-btn green transfer-btn" (click)="apartarPorTransferencia(rifa, boletoSeleccionado)" [disabled]="reservando">
+                  {{ reservando ? 'APARTANDO...' : 'RESERVAR Y OBTENER TICKET' }}
+                </button>
+              </div>
+
+              <!-- SPEI -->
+              <div *ngIf="metodoPagoSeleccionado === 'spei'" class="metodo-info-card">
+                <p class="instruccion-pro">Para completar tu pedido, realiza el pago correspondiente mediante los datos que a continuación se detallan.</p>
+                <div class="resumen-datos">
+                  <span class="dato-label">SPEI (Transferencia)</span>
+                  <p>Dirígete a tu aplicación de banco e ingresa la siguiente información:</p>
+                  <div class="dato-box">
+                    <small>CLABE:</small>
+                    <strong>137888105075633395</strong>
+                  </div>
+                  <div class="dato-box">
+                    <small>Banco:</small>
+                    <strong>BANCOPPEL</strong>
+                  </div>
+                  <div class="dato-box">
+                    <small>Nombre:</small>
+                    <strong>Pika Games</strong>
+                  </div>
+                </div>
+                <button class="brutal-btn green transfer-btn" (click)="apartarPorTransferencia(rifa, boletoSeleccionado)" [disabled]="reservando">
+                  {{ reservando ? 'APARTANDO...' : 'RESERVAR Y OBTENER TICKET' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="whatsapp-success" *ngIf="apartadoExitoso">
+              <div class="success-banner">¡RESERVADO!</div>
+              <p class="num-exito">Has apartado el boleto #{{boletoSeleccionado}}</p>
+              <p class="instruccion-final">
+                Para finalizar, envía tu comprobante de pago por WhatsApp al <span class="phone-highlight">56 2098 0834</span>
+              </p>
+              <a [href]="generarLinkWhatsapp(rifa, boletoSeleccionado)" target="_blank" class="brutal-btn whatsapp-btn">
+                📱 ENVIAR COMPROBANTE AHORA
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -56,6 +56,9 @@ export class AdminComponent implements OnInit {
       window.location.href = '/';
     }
     this.obtenerRifas();
+    
+    // Exponer métodos para el modal de detalles
+    (window as any).adminComponent = this;
   }
 
   obtenerRifas(): void {
@@ -230,12 +233,34 @@ export class AdminComponent implements OnInit {
 
         if (data.participantes && data.participantes.length > 0) {
           html += `<h4 style="color:var(--nin-blue); font-weight:800; margin-top:20px;">👥 PARTICIPANTES (${data.participantes.length})</h4>`;
-          html += '<div style="max-height: 250px; overflow-y: auto; border: 2px solid #000; padding:10px; border-radius: 8px; text-align: left;">';
+          html += '<div style="max-height: 350px; overflow-y: auto; border: 2px solid #000; padding:10px; border-radius: 8px; text-align: left;">';
           html += '<ul style="list-style: none; padding: 0; margin: 0;">';
           data.participantes.forEach((p: any) => {
-            let statusIcon = p.estado === 'VENDIDO' ? '💰' : '⏳';
-            html += `<li style="margin-bottom:8px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
-                        ${statusIcon} <b>#${p.numero}</b> - ${p.nombre} <br><small style="color:#666;">${p.email}</small>
+            const isVendido = p.estado === 'VENDIDO';
+            let statusIcon = isVendido ? '💰' : '⏳';
+            let actions = '';
+            
+            if (!isVendido) {
+              actions = `
+                <div style="margin-top:5px; display:flex; gap:5px;">
+                  <button onclick="window.adminComponent.confirmarPagoManual('${data.id}', ${p.numero})" 
+                          style="background:#28a745; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; font-weight:bold;">
+                    CONFIRMAR PAGO
+                  </button>
+                  <button onclick="window.adminComponent.eliminarParticipante('${data.id}', ${p.numero})" 
+                          style="background:#dc3545; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer; font-weight:bold;">
+                    LIBERAR
+                  </button>
+                </div>
+              `;
+            }
+
+            html += `<li style="margin-bottom:12px; border-bottom:1px dashed #ccc; padding-bottom:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <span>${statusIcon} <b>#${p.numero}</b> - ${p.nombre}</span>
+                        </div>
+                        <small style="color:#666;">${p.email}</small>
+                        ${actions}
                      </li>`;
           });
           html += '</ul></div>';
@@ -253,6 +278,55 @@ export class AdminComponent implements OnInit {
       },
       error: () => {
         Swal.fire('Error', 'Error al obtener detalles', 'error');
+      }
+    });
+  }
+
+  confirmarPagoManual(idRifa: string, numero: number): void {
+    Swal.fire({
+      title: '¿Confirmar Pago?',
+      text: `¿Deseas marcar el boleto #${numero} como VENDIDO?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, confirmar',
+      cancelButtonText: 'No'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.rifasService.confirmarPagoManual(idRifa, numero).subscribe({
+          next: () => {
+            this.toastr.success('Boleto confirmado exitosamente');
+            this.verDetalles(idRifa); // Recargar modal
+          },
+          error: (err) => {
+            this.toastr.error('Error al confirmar el pago');
+            console.error(err);
+          }
+        });
+      }
+    });
+  }
+
+  eliminarParticipante(idRifa: string, numero: number): void {
+    Swal.fire({
+      title: '¿Liberar Boleto?',
+      text: `¿Deseas eliminar la reserva del boleto #${numero}? Volverá a estar disponible.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Sí, liberar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.rifasService.eliminarParticipante(idRifa, numero).subscribe({
+          next: () => {
+            this.toastr.success('Boleto liberado');
+            this.verDetalles(idRifa); // Recargar modal
+          },
+          error: (err) => {
+            this.toastr.error('Error al liberar el boleto');
+            console.error(err);
+          }
+        });
       }
     });
   }

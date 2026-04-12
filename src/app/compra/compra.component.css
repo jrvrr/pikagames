@@ -347,9 +347,187 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Pago Opciones */
+.pago-opciones {
+  margin-top: 25px;
+  padding: 30px;
+  background: var(--nin-white);
+  border: 4px solid #000;
+  border-radius: 12px;
+  box-shadow: 10px 10px 0px #000;
+  text-align: center;
+  animation: slideDown 0.3s ease-out;
+}
+
+.metodo-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.metodo-option {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  border: 3px solid #000;
+  cursor: pointer;
+  background: var(--nin-bg);
+  transition: all 0.2s;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.metodo-option:hover {
+  background: var(--nin-yellow);
+  transform: translate(-3px, -3px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+.metodo-option.active {
+  background: var(--nin-yellow);
+  border-color: #000;
+  box-shadow: 5px 5px 0 #000;
+  transform: translate(-2px, -2px);
+}
+
+.metodo-option input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--nin-red);
+}
+
+.metodo-info-card {
+  text-align: left;
+  animation: fadeIn 0.3s ease;
+}
+
+.instruccion-pro {
+  font-weight: 800;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.resumen-datos {
+  background: #fdfdfd;
+  border: 3px dashed #000;
+  padding: 20px;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.dato-label {
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  background: var(--nin-red);
+  color: white;
+  padding: 2px 10px;
+  border: 2px solid #000;
+  font-weight: 900;
+  font-size: 0.8rem;
+}
+
+.dato-box {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dato-box small {
+  font-weight: 900;
+  color: #666;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.dato-box strong {
+  font-size: 1.2rem;
+  font-weight: 950;
+  color: var(--nin-dark);
+  letter-spacing: 1px;
+}
+
+.pago-title {
+  margin: 0 0 25px 0;
+  font-size: 1.2rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  color: var(--nin-red);
+}
+
+.transfer-btn {
+  width: 100%;
+  padding: 15px !important;
+  font-size: 1rem !important;
+}
+
+.whatsapp-success {
+  padding: 20px;
+  animation: bounceIn 0.5s;
+  background: #fff;
+  border: 4px solid #000;
+  border-radius: 12px;
+  box-shadow: 8px 8px 0px #000;
+  margin-top: 20px;
+}
+
+.success-banner {
+  background: var(--nin-blue);
+  color: white;
+  font-weight: 950;
+  font-size: 1.5rem;
+  padding: 10px;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  display: inline-block;
+  transform: rotate(-2deg);
+  margin-bottom: 15px;
+}
+
+.num-exito {
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.phone-highlight {
+  color: var(--nin-red);
+  font-weight: 950;
+  background: var(--nin-yellow);
+  padding: 2px 8px;
+  border: 2px solid #000;
+}
+
+.instruccion-final {
+  font-weight: 800;
+  color: var(--nin-dark);
+  margin-bottom: 25px;
+  font-size: 1rem;
+}
+
+.whatsapp-btn {
+  width: 100% !important;
+  background-color: #25d366 !important;
+  color: #fff !important;
+  padding: 18px !important;
+  font-size: 1.1rem !important;
+  gap: 10px;
+}
+
 /* Paypal spacing */
 .paypal-container {
-  margin-top: 20px;
+  margin-top: 10px;
+  min-height: 150px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Winners Section (Latest Raffle) in Compra */

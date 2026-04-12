@@ -45,9 +45,10 @@ export class RifasService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  // Comprar un boleto
-  comprarBoletos(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/comprar`, data);
+  // Apartar un boleto (Reserva manual para OXXO/Transferencia)
+  comprarBoletos(rifaId: string, payload: any): Observable<any> {
+    // Sincronizado con backend POST /boletos/:rifa_id/apartar
+    return this.http.post(`https://apipikagames.vercel.app/boletos/${rifaId}/apartar`, payload);
   }
 
   // PayPal - Crear orden segura
@@ -58,5 +59,15 @@ export class RifasService {
   // PayPal - Capturar pago de forma segura
   capturarPagoPaypal(data: { orderID: string, usuario_id: string, rifa_id: number, numero: number }): Observable<any> {
     return this.http.post('https://apipikagames.vercel.app/paypal/capturar', data);
+  }
+
+  // Confirmar pago manual (Admin)
+  confirmarPagoManual(idRifa: string, numero: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${idRifa}/participantes/${numero}/confirmar`, {});
+  }
+
+  // Eliminar participante/reserva (Admin)
+  eliminarParticipante(idRifa: string, numero: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${idRifa}/participantes/${numero}`);
   }
 }
