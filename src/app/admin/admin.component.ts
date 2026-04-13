@@ -56,6 +56,8 @@ export class AdminComponent implements OnInit {
   usuario: any = null;
   cargando = false;
   editando: any = null;
+  usuarioSeleccionado: any = null;
+  editandoUsuario: any = null;
 
   constructor(
     private rifasService: RifasService,
@@ -626,6 +628,74 @@ export class AdminComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.toastr.error("Error al actualizar la rifa");
+      }
+    });
+  }
+
+  // --- GESTIÓN DE USUARIOS ---
+  verDetallesUsuario(u: any): void {
+    this.usuarioSeleccionado = u;
+  }
+
+  eliminarUsuarioConfirm(u: any): void {
+    if (u.es_admin) {
+      this.toastr.warning("No se puede eliminar a un administrador");
+      return;
+    }
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Vas a eliminar permanentemente a ${u.nombre}. Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#EF4444',
+      cancelButtonColor: '#64748B',
+      confirmButtonText: 'Sí, eliminar permanentemente',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.authService.eliminarUsuario(u.id, this.usuario.id).subscribe({
+          next: () => {
+            this.toastr.success('Usuario eliminado correctamente');
+            if (this.usuarioSeleccionado?.id === u.id) this.usuarioSeleccionado = null;
+            this.obtenerUsuarios();
+          },
+          error: () => this.toastr.error('Error al eliminar el usuario')
+        });
+      }
+    });
+  }
+
+  prepararEdicionUsuario(u: any): void {
+    this.editandoUsuario = { ...u };
+  }
+
+  guardarEdicionUsuario(): void {
+    if (!this.editandoUsuario) return;
+    
+    if (!this.editandoUsuario.nombre.trim() || !this.editandoUsuario.correo.trim()) {
+      this.toastr.warning('Nombre y correo son obligatorios');
+      return;
+    }
+
+    this.cargando = true;
+    this.authService.actualizarUsuario(this.editandoUsuario.id, this.usuario.id, {
+      nombre: this.editandoUsuario.nombre,
+      correo: this.editandoUsuario.correo,
+      es_admin: this.editandoUsuario.es_admin
+    }).subscribe({
+      next: (res) => {
+        this.toastr.success('Usuario actualizado correctamente');
+        this.editandoUsuario = null;
+        if (this.usuarioSeleccionado?.id === res.usuario.id) {
+          this.usuarioSeleccionado = res.usuario;
+        }
+        this.obtenerUsuarios();
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.toastr.error(err.error?.error || 'Error al actualizar usuario');
+        this.cargando = false;
       }
     });
   }

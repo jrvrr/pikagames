@@ -197,88 +197,81 @@
             </div>
           </div>
           
-          <div class="rifas-cards-container">
-            <div *ngFor="let rifa of rifasFiltradas" class="rifa-modern-card shadow-sm">
-              <div class="card-status-indicator" [class]="'status-'+rifa.estado"></div>
-              
-              <div class="card-content">
-                <div class="card-top">
-                  <div class="rifa-info">
-                    <h4>{{ rifa.nombre }}</h4>
-                    <p class="rifa-desc">{{ rifa.descripcion | slice:0:120 }}{{ rifa.descripcion.length > 120 ? '...' : '' }}</p>
-                  </div>
-                  <div class="rifa-badges">
+          <div class="table-responsive">
+            <table class="admin-table rifas-management-table">
+              <thead>
+                <tr>
+                  <th>Sorteo</th>
+                  <th>Estado</th>
+                  <th>Progreso de Ventas</th>
+                  <th>Precio</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let rifa of rifasFiltradas">
+                  <td>
+                    <div class="rifa-info-cell">
+                      <div class="rifa-icon-box" [class]="'status-'+rifa.estado">
+                        <span class="material-icons">confirmation_number</span>
+                      </div>
+                      <div class="rifa-details">
+                        <span class="rifa-name-text">{{ rifa.nombre }}</span>
+                        <span class="rifa-date-sub">Lanzamiento: {{ rifa.created_at | date:'dd/MM/yy' }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
                     <span class="badge-status-pro" [class]="'status-'+rifa.estado">
                       {{ rifa.estado | uppercase }}
                     </span>
-                  </div>
-                </div>
-
-                <div class="card-stats-row">
-                  <div class="mini-stat">
-                    <span class="label">PRECIO</span>
-                    <span class="val highlight">${{rifa.precio}}</span>
-                  </div>
-                  <div class="mini-stat">
-                    <span class="label">BOLETOS</span>
-                    <span class="val">{{rifa.cantidad_boletos}}</span>
-                  </div>
-                  <div class="mini-stat">
-                    <span class="label">VENDIDOS</span>
-                    <span class="val">{{ rifa.boletos_ocupados?.length || 0 }}</span>
-                  </div>
-                </div>
-
-                <!-- PROGRESS BAR -->
-                <div class="sales-progress-container" *ngIf="rifa.cantidad_boletos > 0">
-                  <div class="progress-info">
-                    <span>Progreso de ventas</span>
-                    <span>{{ ((rifa.boletos_ocupados?.length || 0) / rifa.cantidad_boletos * 100).toFixed(1) }}%</span>
-                  </div>
-                  <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" [style.width]="((rifa.boletos_ocupados?.length || 0) / rifa.cantidad_boletos * 100) + '%'"></div>
-                  </div>
-                </div>
-
-                <div class="card-footer-actions">
-                  <div class="dates-stack">
-                    <div class="date-info">
-                      <span class="material-icons">rocket_launch</span>
-                      <small>Lanzamiento:</small> {{ rifa.created_at | date:'dd/MM/yy' }}
+                  </td>
+                  <td>
+                    <div class="sales-progress-list" *ngIf="rifa.cantidad_boletos > 0">
+                      <div class="progress-bar-container-mini">
+                        <div class="progress-bar-fill-mini" 
+                             [style.width]="((rifa.boletos_ocupados?.length || 0) / rifa.cantidad_boletos * 100) + '%'"
+                             [class]="'status-'+rifa.estado"></div>
+                      </div>
+                      <div class="progress-stats-mini">
+                        <span class="percent">{{ ((rifa.boletos_ocupados?.length || 0) / rifa.cantidad_boletos * 100).toFixed(1) }}%</span>
+                        <span class="fraction">{{ rifa.boletos_ocupados?.length || 0 }} / {{ rifa.cantidad_boletos }}</span>
+                      </div>
                     </div>
-                    <div class="date-info" *ngIf="rifa.fecha_fin">
-                      <span class="material-icons">event_busy</span>
-                      <small>Cierre:</small> {{ rifa.fecha_fin | date:'dd/MM/yy' }}
+                  </td>
+                  <td>
+                    <span class="price-text-list">${{ rifa.precio }}</span>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-group-list">
+                      <button class="btn-action-pro btn-info" (click)="verDetalles(rifa.id)" title="Ver Detalles">
+                        <span class="material-icons">visibility</span>
+                      </button>
+                      <button class="btn-action-pro btn-edit" (click)="editar(rifa)" title="Editar">
+                        <span class="material-icons">edit</span>
+                      </button>
+                      
+                      <!-- Botones de Estado -->
+                      <button class="btn-action-pro btn-pause" (click)="suspenderRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Suspender">
+                        <span class="material-icons">pause_circle</span>
+                      </button>
+                      <button class="btn-action-pro btn-play" (click)="activarRifa(rifa.id)" *ngIf="rifa.estado === 'suspendida'" title="Reactivar">
+                        <span class="material-icons">play_circle</span>
+                      </button>
+                      
+                      <button class="btn-action-pro btn-winner" (click)="terminarRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Finalizar y Elegir Ganador">
+                        <span class="material-icons">emoji_events</span>
+                      </button>
+                      
+                      <button class="btn-action-pro btn-delete" (click)="eliminarRifaConfirm(rifa.id)" *ngIf="rifa.estado === 'finalizada' || rifa.estado === 'suspendida' || rifa.estado === 'cerrada'" title="Eliminar">
+                        <span class="material-icons">delete</span>
+                      </button>
                     </div>
-                    <div class="date-info countdown" *ngIf="rifa.estado === 'activa' && rifa.fecha_fin">
-                      <span class="material-icons">timer</span>
-                      <small>Faltan:</small> {{ calcularDiasRestantes(rifa.fecha_fin) }} d
-                    </div>
-                  </div>
-                  <div class="actions-group">
-                    <button class="btn-action-pro btn-info" (click)="verDetalles(rifa.id)" title="Detalles">
-                      <span class="material-icons">visibility</span>
-                    </button>
-                    <button class="btn-action-pro btn-edit" (click)="editar(rifa)" title="Editar">
-                      <span class="material-icons">edit</span>
-                    </button>
-                    <button class="btn-action-pro btn-pause" (click)="suspenderRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Suspender">
-                      <span class="material-icons">pause_circle</span>
-                    </button>
-                    <button class="btn-action-pro btn-play" (click)="activarRifa(rifa.id)" *ngIf="rifa.estado === 'suspendida'" title="Reactivar">
-                      <span class="material-icons">play_circle</span>
-                    </button>
-                    <button class="btn-action-pro btn-delete" (click)="eliminarRifaConfirm(rifa.id)" *ngIf="rifa.estado === 'finalizada' || rifa.estado === 'suspendida' || rifa.estado === 'cerrada'" title="Eliminar">
-                      <span class="material-icons">delete</span>
-                    </button>
-                    <button class="btn-action-pro btn-winner" (click)="terminarRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Elegir Ganadores">
-                      <span class="material-icons">emoji_events</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
             <!-- EMPTY STATE -->
             <div *ngIf="rifasFiltradas.length === 0" class="empty-state-rifas">
               <span class="material-icons">history_toggle_off</span>
@@ -289,100 +282,85 @@
         </div>
       </ng-container>
 
-      <!-- PANTALLA: CREAR RIFA -->
+      <!-- PANTALLA: CREAR RIFA (MINIMALISTA) -->
       <ng-container *ngIf="currentTab === 'crear' && !cargando">
-        <div class="management-box">
-          <div class="section-header">
-            <div class="title-group">
-              <h3>Configurar Nueva Rifa</h3>
-              <p>Completa los detalles para lanzar tu sorteo al público</p>
-            </div>
+        <div class="management-box compact-creation">
+          <div class="section-header-compact">
+            <h3>Nueva Rifa</h3>
+            <p>Configuración directa del sorteo</p>
           </div>
 
-          <div class="content-wrapper-card">
-            <form (ngSubmit)="crearRifa()" #rifaForm="ngForm" class="professional-form">
+          <div class="content-wrapper-compact">
+            <form (ngSubmit)="crearRifa()" #rifaForm="ngForm" class="minimalist-form">
               
-              <!-- SECCIÓN 1: INFORMACIÓN GENERAL -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <span class="material-icons">info</span>
-                  <h4>Información General</h4>
-                </div>
-                <div class="form-grid-pro">
-                  <div class="field-group full">
+              <div class="form-main-layout">
+                <!-- COLUMNA IZQUIERDA: BASICS -->
+                <div class="form-col">
+                  <div class="field-group">
                     <label>Nombre del Sorteo</label>
-                    <input type="text" [(ngModel)]="nuevaRifa.nombre" name="nombre" placeholder="Ej. Gran Sorteo de Verano - iPhone 15 Pro" class="pro-input" required>
+                    <input type="text" [(ngModel)]="nuevaRifa.nombre" name="nombre" placeholder="Nombre descriptivo" class="pro-input-compact" required>
                   </div>
-                  <div class="field-group full">
+                  <div class="field-group">
                     <label>Descripción y Reglas</label>
-                    <textarea rows="4" [(ngModel)]="nuevaRifa.descripcion" name="descripcion" placeholder="Explica los detalles del premio, condiciones y cómo participar..." class="pro-textarea" required></textarea>
+                    <textarea rows="3" [(ngModel)]="nuevaRifa.descripcion" name="descripcion" placeholder="Detalles y condiciones..." class="pro-textarea-compact" required></textarea>
+                  </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: TECH -->
+                <div class="form-col">
+                  <div class="form-grid-mini">
+                    <div class="field-group">
+                      <label>Precio ($)</label>
+                      <input type="number" [(ngModel)]="nuevaRifa.precio" name="precio" min="1" class="pro-input-compact" required>
+                    </div>
+                    <div class="field-group">
+                      <label>Boletos</label>
+                      <input type="number" [(ngModel)]="nuevaRifa.cantidad_boletos" name="cantidad_boletos" class="pro-input-compact" required>
+                    </div>
+                    <div class="field-group">
+                      <label>Ganadores</label>
+                      <input type="number" [(ngModel)]="nuevaRifa.cantidad_ganadores" name="cantidad_ganadores" class="pro-input-compact" required>
+                    </div>
+                  </div>
+                  
+                  <div class="form-grid-mini">
+                    <div class="field-group">
+                      <label>Finalización</label>
+                      <select [(ngModel)]="nuevaRifa.modo_finalizacion" name="modo_finalizacion" class="pro-select-compact">
+                        <option value="manual">Manual</option>
+                        <option value="fecha">Automática</option>
+                      </select>
+                    </div>
+                    <div class="field-group" *ngIf="nuevaRifa.modo_finalizacion === 'fecha'">
+                      <label>Fecha Límite</label>
+                      <input type="date" [(ngModel)]="nuevaRifa.fecha_fin" name="fecha_fin" class="pro-input-compact">
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- SECCIÓN 2: CONFIGURACIÓN TÉCNICA -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <span class="material-icons">settings</span>
-                  <h4>Configuración del Sorteo</h4>
+              <!-- PREMIOS (COMPACTO) -->
+              <div class="premios-section-compact mt-4">
+                <div class="section-divider">
+                  <span>Premios</span>
                 </div>
-                <div class="form-grid-pro">
-                  <div class="field-group">
-                    <label>Precio por Boleto (MXN)</label>
-                    <input type="number" [(ngModel)]="nuevaRifa.precio" name="precio" placeholder="0.00" min="1" class="pro-input" required>
-                  </div>
-                  <div class="field-group">
-                    <label>Cantidad de Boletos</label>
-                    <input type="number" [(ngModel)]="nuevaRifa.cantidad_boletos" name="cantidad_boletos" placeholder="Ej. 100" class="pro-input" required>
-                  </div>
-                  <div class="field-group">
-                    <label>Número de Ganadores</label>
-                    <input type="number" [(ngModel)]="nuevaRifa.cantidad_ganadores" name="cantidad_ganadores" placeholder="1" class="pro-input" required>
-                  </div>
-                  <div class="field-group">
-                    <label>Método de Finalización</label>
-                    <select [(ngModel)]="nuevaRifa.modo_finalizacion" name="modo_finalizacion" class="pro-select">
-                      <option value="manual">Manual (Tú eliges cuándo cerrar)</option>
-                      <option value="fecha">Automático (Por Fecha Límite)</option>
-                    </select>
-                  </div>
-                  <div class="field-group" *ngIf="nuevaRifa.modo_finalizacion === 'fecha'">
-                    <label>Fecha Límite de Venta</label>
-                    <input type="date" [(ngModel)]="nuevaRifa.fecha_fin" name="fecha_fin" class="pro-input">
-                  </div>
-                </div>
-              </div>
-
-              <!-- SECCIÓN 3: PREMIOS -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <span class="material-icons">emoji_events</span>
-                  <h4>Premios y Recompensas</h4>
-                </div>
-                <div class="premios-list-pro">
-                  <div *ngFor="let p of nuevaRifa.premios; let i = index" class="premio-card-row">
-                    <div class="field-group flex-grow">
-                      <label>Descripción del Premio #{{i+1}}</label>
-                      <input type="text" [(ngModel)]="p.titulo" name="p_t_{{i}}" placeholder="Ej. iPhone 15 Pro Max 256GB" class="pro-input">
-                    </div>
-                    <div class="field-group" style="width: 120px;">
-                      <label>Cantidad</label>
-                      <input type="number" [(ngModel)]="p.cantidad" name="p_c_{{i}}" class="pro-input">
-                    </div>
-                    <button type="button" class="btn-action-pro btn-delete" (click)="eliminarPremio(i)" *ngIf="nuevaRifa.premios.length > 1" style="margin-top: 1.5rem;">
-                      <span class="material-icons">delete</span>
+                <div class="premios-grid-compact">
+                  <div *ngFor="let p of nuevaRifa.premios; let i = index" class="premio-row-compact">
+                    <input type="text" [(ngModel)]="p.titulo" name="p_t_{{i}}" placeholder="Premio #{{i+1}}" class="pro-input-compact flex-grow">
+                    <input type="number" [(ngModel)]="p.cantidad" name="p_c_{{i}}" style="width: 80px;" class="pro-input-compact">
+                    <button type="button" class="btn-del-mini" (click)="eliminarPremio(i)" *ngIf="nuevaRifa.premios.length > 1">
+                      <span class="material-icons">close</span>
                     </button>
                   </div>
-                  <button type="button" class="btn-add-premio" (click)="agregarPremio()">
-                    <span class="material-icons">add_circle_outline</span>
-                    Agregar otro premio
-                  </button>
                 </div>
+                <button type="button" class="btn-add-text" (click)="agregarPremio()">
+                  <span class="material-icons">add</span> Agregar Premio
+                </button>
               </div>
 
-              <div class="form-footer-pro">
-                <button type="submit" class="btn-submit-pro">
-                  LANZAR SORTEO AHORA
+              <div class="form-actions-compact">
+                <button type="submit" class="btn-launch-compact">
+                  Lanzar Sorteo
                 </button>
               </div>
             </form>
@@ -478,7 +456,7 @@
                   <th>Contacto</th>
                   <th>Rol / Acceso</th>
                   <th>Fecha Registro</th>
-                  <th class="text-right">Perfil</th>
+                  <th class="text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -512,9 +490,17 @@
                     </div>
                   </td>
                   <td class="text-right">
-                    <button class="btn-action-pro" title="Ver Perfil (Próximamente)">
-                      <span class="material-icons">chevron_right</span>
-                    </button>
+                    <div class="action-btn-group-end">
+                      <button class="btn-action-pro btn-info" (click)="verDetallesUsuario(u)" title="Ver Perfil">
+                        <span class="material-icons">account_circle</span>
+                      </button>
+                      <button class="btn-action-pro btn-edit" (click)="prepararEdicionUsuario(u)" title="Editar Cliente">
+                        <span class="material-icons">edit</span>
+                      </button>
+                      <button class="btn-action-pro btn-delete" (click)="eliminarUsuarioConfirm(u)" title="Eliminar Cliente" *ngIf="!u.es_admin">
+                        <span class="material-icons">delete_forever</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 
@@ -539,35 +525,200 @@
         </div>
       </ng-container>
 
-      <!-- MODO EDICIÓN (OVERLAY/SEPARADO) -->
-      <ng-container *ngIf="editando">
-        <div class="form-card shadow-sm edit-mode">
-          <h3>Editando: {{ editando.nombre }}</h3>
-          <!-- Form similar al de creación pero con datos de edición y callback guardarEdicion -->
-          <div class="form-grid">
-            <div class="form-group full">
-              <label>Nombre</label>
-              <input type="text" [(ngModel)]="editando.nombre">
+    <!-- MODAL DE PERFIL DE USUARIO -->
+    <div class="edit-modal-overlay" *ngIf="usuarioSeleccionado" (click)="usuarioSeleccionado = null">
+      <div class="profile-modal-card animate-slide-up" (click)="$event.stopPropagation()">
+        <div class="profile-detail-header">
+          <div class="profile-main-info">
+            <div class="profile-avatar-large">
+              <img [src]="'https://ui-avatars.com/api/?name=' + usuarioSeleccionado.nombre + '&background=6366f1&color=fff&size=128&bold=true'" alt="Avatar">
             </div>
-            <div class="form-group full">
-              <label>Descripción</label>
-              <textarea rows="3" [(ngModel)]="editando.descripcion"></textarea>
-            </div>
-            <div class="form-group">
-              <label>Precio</label>
-              <input type="number" [(ngModel)]="editando.precio">
-            </div>
-            <div class="form-group">
-              <label>Boletos</label>
-              <input type="number" [(ngModel)]="editando.cantidad_boletos">
+            <div class="profile-text-info">
+              <h3>{{ usuarioSeleccionado.nombre }}</h3>
+              <span class="profile-role-tag" [class.admin]="usuarioSeleccionado.es_admin">
+                {{ usuarioSeleccionado.es_admin ? 'Administrador del Sistema' : 'Cliente Registrado' }}
+              </span>
             </div>
           </div>
-          <div class="form-actions space-between">
-            <button class="btn-secondary" (click)="editando = null">CANCELAR</button>
-            <button class="btn-primary-pro" (click)="guardarEdicion()">GUARDAR CAMBIOS</button>
+          <button class="btn-close-modal" (click)="usuarioSeleccionado = null">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <div class="profile-detail-body">
+          <div class="profile-info-grid">
+            <div class="info-item">
+              <label>Correo Electrónico</label>
+              <div class="value-box">
+                <span class="material-icons">email</span>
+                <span>{{ usuarioSeleccionado.correo }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <label>ID Único de Usuario</label>
+              <div class="value-box">
+                <span class="material-icons">fingerprint</span>
+                <span class="mono">#{{ usuarioSeleccionado.id }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <label>Fecha de Registro</label>
+              <div class="value-box">
+                <span class="material-icons">event_available</span>
+                <span>{{ usuarioSeleccionado.created_at | date:'fullDate' }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <label>Estado de Cuenta</label>
+              <div class="value-box">
+                <span class="material-icons status-active">check_circle</span>
+                <span>Cuenta Activa</span>
+              </div>
+            </div>
           </div>
         </div>
-      </ng-container>
+
+        <div class="profile-detail-footer">
+          <button class="btn-secondary-pro" (click)="usuarioSeleccionado = null">Cerrar Detalle</button>
+          <button class="btn-edit-pro" (click)="prepararEdicionUsuario(usuarioSeleccionado); usuarioSeleccionado = null">
+            <span class="material-icons">edit</span> Editar Perfil
+          </button>
+          <button class="btn-delete-pro" (click)="eliminarUsuarioConfirm(usuarioSeleccionado)" *ngIf="!usuarioSeleccionado.es_admin">
+            <span class="material-icons">delete</span> Eliminar Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE EDICIÓN DE USUARIO -->
+    <div class="edit-modal-overlay" *ngIf="editandoUsuario" (click)="editandoUsuario = null">
+      <div class="edit-modal-card animate-slide-up" (click)="$event.stopPropagation()">
+        <div class="edit-modal-header-compact">
+          <div class="header-title-comp">
+            <h3>Editar Usuario</h3>
+            <p>ID: #{{ editandoUsuario.id.toString().substring(0,8) }}</p>
+          </div>
+          <button class="btn-close-modal" (click)="editandoUsuario = null">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <div class="edit-modal-body-compact">
+          <form (ngSubmit)="guardarEdicionUsuario()" class="minimalist-form-edit">
+            <div class="field-group">
+              <label>Nombre Completo</label>
+              <input type="text" [(ngModel)]="editandoUsuario.nombre" name="u_nombre" class="pro-input-compact" required>
+            </div>
+            
+            <div class="field-group mt-3">
+              <label>Correo Electrónico</label>
+              <input type="email" [(ngModel)]="editandoUsuario.correo" name="u_correo" class="pro-input-compact" required>
+            </div>
+
+            <div class="field-group mt-3">
+              <label class="d-flex align-items-center gap-2">
+                <input type="checkbox" [(ngModel)]="editandoUsuario.es_admin" name="u_admin" class="pro-checkbox">
+                Privilegios de Administrador
+              </label>
+            </div>
+
+            <div class="edit-modal-footer-compact mt-4">
+              <button type="button" class="btn-secondary-pro" (click)="editandoUsuario = null">Cancelar</button>
+              <button type="submit" class="btn-save-pro">
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE EDICIÓN MINIMALISTA (UNIFICADO) -->
+    <div class="edit-modal-overlay" *ngIf="editando" (click)="editando = null">
+      <div class="edit-modal-card animate-slide-up" (click)="$event.stopPropagation()">
+        <div class="edit-modal-header-compact">
+          <div class="header-title-comp">
+            <h3>Editar Sorteo</h3>
+            <p>ID: #{{ editando.id.toString().substring(0,8) }}</p>
+          </div>
+          <button class="btn-close-modal" (click)="editando = null">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <div class="edit-modal-body-compact">
+          <form (ngSubmit)="guardarEdicion()" class="minimalist-form-edit">
+            
+            <div class="form-main-layout">
+              <!-- COLUMNA IZQUIERDA: BASICS -->
+              <div class="form-col">
+                <div class="field-group">
+                  <label>Nombre del Sorteo</label>
+                  <input type="text" [(ngModel)]="editando.nombre" name="edit_nombre" class="pro-input-compact" required>
+                </div>
+                <div class="field-group">
+                  <label>Descripción Completa</label>
+                  <textarea rows="4" [(ngModel)]="editando.descripcion" name="edit_descripcion" class="pro-textarea-compact" required></textarea>
+                </div>
+              </div>
+
+              <!-- COLUMNA DERECHA: PARAMETERS -->
+              <div class="form-col">
+                <div class="form-grid-mini">
+                  <div class="field-group">
+                    <label>Precio ($)</label>
+                    <input type="number" [(ngModel)]="editando.precio" name="edit_precio" class="pro-input-compact">
+                  </div>
+                  <div class="field-group">
+                    <label>Boletos</label>
+                    <input type="number" [(ngModel)]="editando.cantidad_boletos" name="edit_boletos" class="pro-input-compact">
+                  </div>
+                  <div class="field-group">
+                    <label>Finalización</label>
+                    <select [(ngModel)]="editando.modo_finalizacion" name="edit_modo" class="pro-select-compact">
+                      <option value="manual">Manual</option>
+                      <option value="fecha">Por Fecha</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field-group" *ngIf="editando.modo_finalizacion === 'fecha'">
+                  <label>Nueva Fecha Límite</label>
+                  <input type="date" [(ngModel)]="editando.fecha_fin" name="edit_fecha" class="pro-input-compact">
+                </div>
+              </div>
+            </div>
+
+            <!-- PREMIOS (COMPACTO) -->
+            <div class="premios-section-compact mt-4">
+              <div class="section-divider">
+                <span>Premios Vinculados</span>
+              </div>
+              <div class="premios-grid-compact">
+                <div *ngFor="let p of editando.premios; let i = index" class="premio-row-compact">
+                  <div class="premio-index-mini">{{i+1}}</div>
+                  <input type="text" [(ngModel)]="p.titulo" name="p_t_{{i}}" placeholder="Premio" class="pro-input-compact flex-grow">
+                  <input type="number" [(ngModel)]="p.cantidad" name="p_c_{{i}}" style="width: 80px;" class="pro-input-compact">
+                  <button type="button" class="btn-del-mini" (click)="eliminarPremioEdicion(i)" *ngIf="editando.premios.length > 1">
+                    <span class="material-icons">close</span>
+                  </button>
+                </div>
+              </div>
+              <button type="button" class="btn-add-text" (click)="agregarPremioEdicion()">
+                <span class="material-icons">add</span> Agregar Premio
+              </button>
+            </div>
+
+            <div class="edit-modal-footer-compact">
+              <button type="button" class="btn-secondary-pro" (click)="editando = null">Descartar</button>
+              <button type="submit" class="btn-save-pro">
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     </div>
   </main>

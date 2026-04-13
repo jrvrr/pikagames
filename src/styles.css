@@ -23,7 +23,6 @@ html, body {
   height: 100%;
   scroll-behavior: smooth;
   scroll-margin-top: 86px;
-  overflow: hidden; 
 }
 
 *, *::before, *::after {

@@ -48,4 +48,12 @@ export class AuthService {
   getUsuarios(): Observable<any> {
     return this.http.get(`${this.apiUrl}/listar`);
   }
+
+  eliminarUsuario(id: string, adminId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}?adminId=${adminId}`);
+  }
+
+  actualizarUsuario(id: string, adminId: string, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, { ...data, adminId });
+  }
 }

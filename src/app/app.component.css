@@ -153,9 +153,8 @@
 }
 
 .main-content {
-  height: calc(100vh - 80px); /* 80px es el height del nintendo-nav */
+  min-height: calc(100vh - 80px); /* Usamos min-height en lugar de height fixed */
   margin-top: 80px;
-  overflow: hidden;
   position: relative;
 }
 
