@@ -19,10 +19,12 @@ export class AdminComponent implements OnInit {
   historialRifas: any[] = [];
   participantesPendientes: any[] = [];
   usuarios: any[] = [];
+  searchTerm: string = '';
   currentTab: 'dashboard' | 'crear' | 'rifas' | 'pendientes' | 'clientes' = 'dashboard';
   today = new Date();
   isSidebarCollapsed = false;
   isSidebarVisible = true;
+  subTabRifas: 'activas' | 'terminadas' | 'suspendidas' | 'todas' = 'activas';
 
   stats = {
     boletosVendidos: 0,
@@ -132,7 +134,9 @@ export class AdminComponent implements OnInit {
     this.cargando = true;
     this.rifasService.getRifas().subscribe({
       next: (res: any) => {
-        this.rifas = res.rifas || [];
+        this.rifas = (res.rifas || []).sort((a: any, b: any) => {
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        });
         this.rifasActivas = this.rifas.filter(r => r.estado === 'activa');
         this.historialRifas = this.rifas.filter(r => r.estado !== 'activa');
         this.calcularEstadisticas();
@@ -145,6 +149,27 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  get rifasFiltradas() {
+    if (this.subTabRifas === 'todas') return this.rifas;
+    if (this.subTabRifas === 'activas') return this.rifas.filter(r => r.estado === 'activa');
+    if (this.subTabRifas === 'terminadas') return this.rifas.filter(r => r.estado === 'finalizada' || r.estado === 'cerrada');
+    if (this.subTabRifas === 'suspendidas') return this.rifas.filter(r => r.estado === 'suspendida');
+    return this.rifas;
+  }
+
+  cambiarSubTab(sub: any) {
+    this.subTabRifas = sub;
+  }
+
+  calcularDiasRestantes(fecha: any): number {
+    if (!fecha) return 0;
+    const fin = new Date(fecha).getTime();
+    const hoy = new Date().getTime();
+    const dif = fin - hoy;
+    if (dif <= 0) return 0;
+    return Math.ceil(dif / (1000 * 60 * 60 * 24));
+  }
+
   obtenerUsuarios(): void {
     this.authService.getUsuarios().subscribe({
       next: (res: any) => {
@@ -153,6 +178,15 @@ export class AdminComponent implements OnInit {
       },
       error: () => this.toastr.error('Error al cargar usuarios')
     });
+  }
+
+  get usuariosFiltrados() {
+    if (!this.searchTerm.trim()) return this.usuarios;
+    const term = this.searchTerm.toLowerCase();
+    return this.usuarios.filter(u => 
+      u.nombre.toLowerCase().includes(term) || 
+      u.correo.toLowerCase().includes(term)
+    );
   }
 
   calcularEstadisticas(): void {

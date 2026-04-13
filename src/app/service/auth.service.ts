@@ -46,6 +46,6 @@ export class AuthService {
   }
 
   getUsuarios(): Observable<any> {
-    return this.http.get(this.apiUrl);
+    return this.http.get(`${this.apiUrl}/listar`);
   }
 }

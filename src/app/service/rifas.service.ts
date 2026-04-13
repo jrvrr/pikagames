@@ -17,7 +17,7 @@ export class RifasService {
 
   // Obtener todos los boletos reservados (Pendientes de confirmar)
   getParticipantesPendientes(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/participantes/pendientes`);
+    return this.http.get(`${this.apiUrl}/pendientes`);
   }
 
   // Obtener una rifa por ID

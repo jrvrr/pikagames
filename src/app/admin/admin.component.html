@@ -7,8 +7,13 @@
   <aside class="admin-sidebar shadow-brutal" [class.collapsed]="isSidebarCollapsed" [class.visible]="isSidebarVisible">
     <div class="sidebar-header">
       <div class="brand-container">
+        <!-- Logo Text (Expanded) -->
         <h2 class="brand-text" *ngIf="!isSidebarCollapsed">PIKA<span>RIFA</span></h2>
-        <span class="material-icons brand-icon" *ngIf="isSidebarCollapsed">sports_esports</span>
+        
+        <!-- Menu Toggle Icon (Hamburger) -->
+        <button class="sidebar-toggle-btn" (click)="toggleSidebar()" [title]="isSidebarCollapsed ? 'Expandir' : 'Contraer'">
+          <span class="material-icons">menu</span>
+        </button>
       </div>
       <p class="admin-badge" *ngIf="!isSidebarCollapsed">ADMIN PANEL</p>
     </div>
@@ -54,20 +59,19 @@
         <span class="material-icons">group</span> 
         <span class="nav-label" *ngIf="!isSidebarCollapsed">Clientes</span>
       </button>
+
+      <div class="nav-separator"></div>
+
+      <button 
+        class="nav-item logout-nav" 
+        (click)="logout()">
+        <span class="material-icons">logout</span> 
+        <span class="nav-label" *ngIf="!isSidebarCollapsed">Cerrar Sesión</span>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-mini-info" *ngIf="!isSidebarCollapsed">
-        <img src="https://ui-avatars.com/api/?name={{usuario?.nombre}}&background=333&color=fff" alt="Avatar" class="avatar-sm">
-        <div class="user-meta">
-          <span class="user-name">{{ usuario?.nombre }}</span>
-          <span class="user-role">Super Admin</span>
-        </div>
-      </div>
-      <button class="logout-btn" (click)="logout()">
-        <span class="material-icons">logout</span> 
-        <span *ngIf="!isSidebarCollapsed">Cerrar Sesión</span>
-      </button>
+      <!-- Footer cleaned of duplicate profile info -->
     </div>
   </aside>
 
@@ -75,13 +79,24 @@
   <main class="admin-main">
     <header class="main-header">
       <div class="header-left">
-        <button class="menu-toggle" (click)="toggleSidebar()">
-          <span class="material-icons">menu</span>
-        </button>
-        <h1 class="page-title">{{ currentTab | uppercase }}</h1>
+        <h1 class="page-title">{{ currentTab | titlecase }}</h1>
       </div>
       <div class="header-right">
-        <span class="date-now">{{ today | date:'medium' }}</span>
+        <div class="date-now-container">
+          <span class="material-icons">calendar_today</span>
+          <span class="date-now">{{ today | date:'mediumDate' }}</span>
+        </div>
+
+        <div class="header-profile-box">
+          <div class="user-info-h">
+            <span class="user-name-h">{{ usuario?.nombre || 'Administrador' }}</span>
+            <span class="user-role-h">Super Admin</span>
+          </div>
+          <div class="avatar-h-container">
+            <img src="https://ui-avatars.com/api/?name={{usuario?.nombre}}&background=008CBA&color=fff&bold=true" alt="Avatar" class="avatar-h">
+            <div class="status-online-h"></div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -96,32 +111,35 @@
       <ng-container *ngIf="currentTab === 'dashboard' && !cargando">
         <div class="dashboard-grid">
           <!-- STATS CARDS -->
-          <div class="stat-card card-blue">
-            <div class="stat-icon"><span class="material-icons">local_activity</span></div>
+          <div class="stat-card">
+            <div class="stat-icon"><span class="material-icons">confirmation_number</span></div>
             <div class="stat-data">
               <h3>{{ stats.boletosVendidos }}</h3>
               <p>Boletos Vendidos</p>
             </div>
           </div>
-          <div class="stat-card card-green">
-            <div class="stat-icon"><span class="material-icons">play_circle</span></div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><span class="material-icons">local_play</span></div>
             <div class="stat-data">
-              <h3>{{ stats.rifasActivas }}</h3>
-              <p>Rifas Activas</p>
+              <h3>{{ rifas.length }}</h3>
+              <p>Rifas Totales</p>
             </div>
           </div>
-          <div class="stat-card card-yellow">
+
+          <div class="stat-card">
             <div class="stat-icon"><span class="material-icons">group</span></div>
             <div class="stat-data">
-              <h3>{{ stats.clientesTotales }}</h3>
+              <h3>{{ usuarios.length }}</h3>
               <p>Clientes Registrados</p>
             </div>
           </div>
-          <div class="stat-card card-red">
-            <div class="stat-icon"><span class="material-icons">pending_actions</span></div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><span class="material-icons">payments</span></div>
             <div class="stat-data">
               <h3>{{ participantesPendientes.length }}</h3>
-              <p>Pagos por Validar</p>
+              <p>Validaciones Pendientes</p>
             </div>
           </div>
         </div>
@@ -155,39 +173,117 @@
 
       <!-- PANTALLA: GESTIÓN DE RIFAS -->
       <ng-container *ngIf="currentTab === 'rifas' && !cargando && !editando">
-        <div class="management-box">
-          <div class="section-header">
-            <h3>Listado Maestro de Rifas</h3>
+        <div class="management-box no-bg-mobile">
+          <div class="section-header-rifas">
+            <div class="title-group">
+              <h3>Gestión de Rifas</h3>
+              <p>Administra y monitorea el estado de tus sorteos</p>
+            </div>
+            
+            <!-- SUB-TABS NAV -->
+            <div class="sub-tabs-nav">
+              <button [class.active]="subTabRifas === 'activas'" (click)="cambiarSubTab('activas')">
+                Activas
+              </button>
+              <button [class.active]="subTabRifas === 'terminadas'" (click)="cambiarSubTab('terminadas')">
+                Terminadas
+              </button>
+              <button [class.active]="subTabRifas === 'suspendidas'" (click)="cambiarSubTab('suspendidas')">
+                Pausa
+              </button>
+              <button [class.active]="subTabRifas === 'todas'" (click)="cambiarSubTab('todas')">
+                Historial
+              </button>
+            </div>
           </div>
           
-          <div class="rifas-list-container">
-            <div *ngFor="let rifa of rifas" class="rifa-row shadow-sm">
-              <div class="rifa-main-info">
-                <span class="rifa-id">ID: {{rifa.id}}</span>
-                <h4>{{ rifa.nombre }}</h4>
-                <p class="rifa-desc">{{ rifa.descripcion | slice:0:80 }}...</p>
-              </div>
-              <div class="rifa-metrics">
-                <div class="metric">
-                  <span class="label">Precio</span>
-                  <span class="value">${{rifa.precio}}</span>
+          <div class="rifas-cards-container">
+            <div *ngFor="let rifa of rifasFiltradas" class="rifa-modern-card shadow-sm">
+              <div class="card-status-indicator" [class]="'status-'+rifa.estado"></div>
+              
+              <div class="card-content">
+                <div class="card-top">
+                  <div class="rifa-info">
+                    <h4>{{ rifa.nombre }}</h4>
+                    <p class="rifa-desc">{{ rifa.descripcion | slice:0:120 }}{{ rifa.descripcion.length > 120 ? '...' : '' }}</p>
+                  </div>
+                  <div class="rifa-badges">
+                    <span class="badge-status-pro" [class]="'status-'+rifa.estado">
+                      {{ rifa.estado | uppercase }}
+                    </span>
+                  </div>
                 </div>
-                <div class="metric">
-                  <span class="label">Boletos</span>
-                  <span class="value">{{rifa.cantidad_boletos}}</span>
+
+                <div class="card-stats-row">
+                  <div class="mini-stat">
+                    <span class="label">PRECIO</span>
+                    <span class="val highlight">${{rifa.precio}}</span>
+                  </div>
+                  <div class="mini-stat">
+                    <span class="label">BOLETOS</span>
+                    <span class="val">{{rifa.cantidad_boletos}}</span>
+                  </div>
+                  <div class="mini-stat">
+                    <span class="label">VENDIDOS</span>
+                    <span class="val">{{ rifa.boletos_ocupados?.length || 0 }}</span>
+                  </div>
+                </div>
+
+                <!-- PROGRESS BAR -->
+                <div class="sales-progress-container" *ngIf="rifa.cantidad_boletos > 0">
+                  <div class="progress-info">
+                    <span>Progreso de ventas</span>
+                    <span>{{ ((rifa.boletos_ocupados?.length || 0) / rifa.cantidad_boletos * 100).toFixed(1) }}%</span>
+                  </div>
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" [style.width]="((rifa.boletos_ocupados?.length || 0) / rifa.cantidad_boletos * 100) + '%'"></div>
+                  </div>
+                </div>
+
+                <div class="card-footer-actions">
+                  <div class="dates-stack">
+                    <div class="date-info">
+                      <span class="material-icons">rocket_launch</span>
+                      <small>Lanzamiento:</small> {{ rifa.created_at | date:'dd/MM/yy' }}
+                    </div>
+                    <div class="date-info" *ngIf="rifa.fecha_fin">
+                      <span class="material-icons">event_busy</span>
+                      <small>Cierre:</small> {{ rifa.fecha_fin | date:'dd/MM/yy' }}
+                    </div>
+                    <div class="date-info countdown" *ngIf="rifa.estado === 'activa' && rifa.fecha_fin">
+                      <span class="material-icons">timer</span>
+                      <small>Faltan:</small> {{ calcularDiasRestantes(rifa.fecha_fin) }} d
+                    </div>
+                  </div>
+                  <div class="actions-group">
+                    <button class="btn-action-pro btn-info" (click)="verDetalles(rifa.id)" title="Detalles">
+                      <span class="material-icons">visibility</span>
+                    </button>
+                    <button class="btn-action-pro btn-edit" (click)="editar(rifa)" title="Editar">
+                      <span class="material-icons">edit</span>
+                    </button>
+                    <button class="btn-action-pro btn-pause" (click)="suspenderRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Suspender">
+                      <span class="material-icons">pause_circle</span>
+                    </button>
+                    <button class="btn-action-pro btn-play" (click)="activarRifa(rifa.id)" *ngIf="rifa.estado === 'suspendida'" title="Reactivar">
+                      <span class="material-icons">play_circle</span>
+                    </button>
+                    <button class="btn-action-pro btn-delete" (click)="eliminarRifaConfirm(rifa.id)" *ngIf="rifa.estado === 'finalizada' || rifa.estado === 'suspendida' || rifa.estado === 'cerrada'" title="Eliminar">
+                      <span class="material-icons">delete</span>
+                    </button>
+                    <button class="btn-action-pro btn-winner" (click)="terminarRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Elegir Ganadores">
+                      <span class="material-icons">emoji_events</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div class="rifa-status-box">
-                <span class="badge-status" [class]="'status-'+rifa.estado">{{ rifa.estado | uppercase }}</span>
-              </div>
-              <div class="rifa-actions">
-                <button class="btn-icon" (click)="verDetalles(rifa.id)" title="Detalles"><span class="material-icons">visibility</span></button>
-                <button class="btn-icon" (click)="editar(rifa)" title="Editar"><span class="material-icons">edit</span></button>
-                <button class="btn-icon" (click)="suspenderRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Suspender"><span class="material-icons">pause</span></button>
-                <button class="btn-icon btn-confirm" (click)="activarRifa(rifa.id)" *ngIf="rifa.estado === 'suspendida'" title="Reactivar"><span class="material-icons">play_arrow</span></button>
-                <button class="btn-icon btn-danger" (click)="eliminarRifaConfirm(rifa.id)" *ngIf="rifa.estado === 'finalizada'" title="Eliminar"><span class="material-icons">delete</span></button>
-                <button class="btn-icon btn-special" (click)="terminarRifa(rifa.id)" *ngIf="rifa.estado === 'activa'" title="Elegir Ganadores"><span class="material-icons">emoji_events</span></button>
-              </div>
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div *ngIf="rifasFiltradas.length === 0" class="empty-state-rifas">
+              <span class="material-icons">history_toggle_off</span>
+              <h4>No hay rifas en esta categoría</h4>
+              <p>Cuando crees rifas o cambies su estado aparecerán aquí.</p>
             </div>
           </div>
         </div>
@@ -195,59 +291,102 @@
 
       <!-- PANTALLA: CREAR RIFA -->
       <ng-container *ngIf="currentTab === 'crear' && !cargando">
-        <div class="form-card shadow-sm">
-          <form (ngSubmit)="crearRifa()" #rifaForm="ngForm" class="professional-form">
-            <h3>Nueva Rifa</h3>
-            <div class="form-grid">
-              <div class="form-group full">
-                <label>Nombre de la Rifa</label>
-                <input type="text" [(ngModel)]="nuevaRifa.nombre" name="nombre" placeholder="Ej. iPhone 15 Pro Max" required>
-              </div>
-              <div class="form-group full">
-                <label>Descripción detallada</label>
-                <textarea rows="3" [(ngModel)]="nuevaRifa.descripcion" name="descripcion" placeholder="Detalles, reglas, etc." required></textarea>
-              </div>
-              <div class="form-group">
-                <label>Precio por Boleto (MXN)</label>
-                <input type="number" [(ngModel)]="nuevaRifa.precio" name="precio" placeholder="Precio" min="1" required>
-              </div>
-              <div class="form-group">
-                <label>Cantidad de Boletos</label>
-                <input type="number" [(ngModel)]="nuevaRifa.cantidad_boletos" name="cantidad_boletos" required>
-              </div>
-              <div class="form-group">
-                <label>Ganadores</label>
-                <input type="number" [(ngModel)]="nuevaRifa.cantidad_ganadores" name="cantidad_ganadores" required>
-              </div>
-              <div class="form-group">
-                <label>Modo Fin</label>
-                <select [(ngModel)]="nuevaRifa.modo_finalizacion" name="modo_finalizacion">
-                  <option value="manual">Manual</option>
-                  <option value="fecha">Por Fecha</option>
-                </select>
-              </div>
-              <div class="form-group" *ngIf="nuevaRifa.modo_finalizacion === 'fecha'">
-                <label>Fecha Límite</label>
-                <input type="date" [(ngModel)]="nuevaRifa.fecha_fin" name="fecha_fin">
-              </div>
+        <div class="management-box">
+          <div class="section-header">
+            <div class="title-group">
+              <h3>Configurar Nueva Rifa</h3>
+              <p>Completa los detalles para lanzar tu sorteo al público</p>
             </div>
+          </div>
 
-            <div class="premios-section">
-              <h4>Premios</h4>
-              <div *ngFor="let p of nuevaRifa.premios; let i = index" class="premio-row">
-                <input type="text" [(ngModel)]="p.titulo" name="p_t_{{i}}" placeholder="Título" class="flex-grow">
-                <input type="number" [(ngModel)]="p.cantidad" name="p_c_{{i}}" placeholder="Cant" class="w-20">
-                <button type="button" class="btn-remove" (click)="eliminarPremio(i)" *ngIf="nuevaRifa.premios.length > 1">
-                  <span class="material-icons">close</span>
+          <div class="content-wrapper-card">
+            <form (ngSubmit)="crearRifa()" #rifaForm="ngForm" class="professional-form">
+              
+              <!-- SECCIÓN 1: INFORMACIÓN GENERAL -->
+              <div class="form-section">
+                <div class="form-section-header">
+                  <span class="material-icons">info</span>
+                  <h4>Información General</h4>
+                </div>
+                <div class="form-grid-pro">
+                  <div class="field-group full">
+                    <label>Nombre del Sorteo</label>
+                    <input type="text" [(ngModel)]="nuevaRifa.nombre" name="nombre" placeholder="Ej. Gran Sorteo de Verano - iPhone 15 Pro" class="pro-input" required>
+                  </div>
+                  <div class="field-group full">
+                    <label>Descripción y Reglas</label>
+                    <textarea rows="4" [(ngModel)]="nuevaRifa.descripcion" name="descripcion" placeholder="Explica los detalles del premio, condiciones y cómo participar..." class="pro-textarea" required></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECCIÓN 2: CONFIGURACIÓN TÉCNICA -->
+              <div class="form-section">
+                <div class="form-section-header">
+                  <span class="material-icons">settings</span>
+                  <h4>Configuración del Sorteo</h4>
+                </div>
+                <div class="form-grid-pro">
+                  <div class="field-group">
+                    <label>Precio por Boleto (MXN)</label>
+                    <input type="number" [(ngModel)]="nuevaRifa.precio" name="precio" placeholder="0.00" min="1" class="pro-input" required>
+                  </div>
+                  <div class="field-group">
+                    <label>Cantidad de Boletos</label>
+                    <input type="number" [(ngModel)]="nuevaRifa.cantidad_boletos" name="cantidad_boletos" placeholder="Ej. 100" class="pro-input" required>
+                  </div>
+                  <div class="field-group">
+                    <label>Número de Ganadores</label>
+                    <input type="number" [(ngModel)]="nuevaRifa.cantidad_ganadores" name="cantidad_ganadores" placeholder="1" class="pro-input" required>
+                  </div>
+                  <div class="field-group">
+                    <label>Método de Finalización</label>
+                    <select [(ngModel)]="nuevaRifa.modo_finalizacion" name="modo_finalizacion" class="pro-select">
+                      <option value="manual">Manual (Tú eliges cuándo cerrar)</option>
+                      <option value="fecha">Automático (Por Fecha Límite)</option>
+                    </select>
+                  </div>
+                  <div class="field-group" *ngIf="nuevaRifa.modo_finalizacion === 'fecha'">
+                    <label>Fecha Límite de Venta</label>
+                    <input type="date" [(ngModel)]="nuevaRifa.fecha_fin" name="fecha_fin" class="pro-input">
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECCIÓN 3: PREMIOS -->
+              <div class="form-section">
+                <div class="form-section-header">
+                  <span class="material-icons">emoji_events</span>
+                  <h4>Premios y Recompensas</h4>
+                </div>
+                <div class="premios-list-pro">
+                  <div *ngFor="let p of nuevaRifa.premios; let i = index" class="premio-card-row">
+                    <div class="field-group flex-grow">
+                      <label>Descripción del Premio #{{i+1}}</label>
+                      <input type="text" [(ngModel)]="p.titulo" name="p_t_{{i}}" placeholder="Ej. iPhone 15 Pro Max 256GB" class="pro-input">
+                    </div>
+                    <div class="field-group" style="width: 120px;">
+                      <label>Cantidad</label>
+                      <input type="number" [(ngModel)]="p.cantidad" name="p_c_{{i}}" class="pro-input">
+                    </div>
+                    <button type="button" class="btn-action-pro btn-delete" (click)="eliminarPremio(i)" *ngIf="nuevaRifa.premios.length > 1" style="margin-top: 1.5rem;">
+                      <span class="material-icons">delete</span>
+                    </button>
+                  </div>
+                  <button type="button" class="btn-add-premio" (click)="agregarPremio()">
+                    <span class="material-icons">add_circle_outline</span>
+                    Agregar otro premio
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-footer-pro">
+                <button type="submit" class="btn-submit-pro">
+                  LANZAR SORTEO AHORA
                 </button>
               </div>
-              <button type="button" class="btn-outline" (click)="agregarPremio()">+ Agregar Premio</button>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn-primary-pro">CREAR RIFA</button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </ng-container>
 
@@ -255,73 +394,148 @@
       <ng-container *ngIf="currentTab === 'pendientes' && !cargando">
         <div class="management-box">
           <div class="section-header">
-            <h3>Validación de Pagos OXXO / SPEI</h3>
+            <div class="title-group">
+              <h3>Validación de Pagos</h3>
+              <p>OXXO / SPEI / Transferencias Bancarias Directas</p>
+            </div>
           </div>
           
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Ticket</th>
-                <th>Rifa</th>
-                <th>Cliente</th>
-                <th>Fecha Reserva</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let p of participantesPendientes">
-                <td><span class="ticket-tag">#{{p.numero}}</span></td>
-                <td>{{p.rifa_nombre}}</td>
-                <td>
-                  <div class="cell-user">
-                    <strong>{{p.usuario_nombre}}</strong>
-                    <span>{{p.usuario_correo}}</span>
-                  </div>
-                </td>
-                <td>{{p.reservado_at | date:'short'}}</td>
-                <td>
-                  <div class="action-btn-group">
-                    <button class="btn-table-confirm" (click)="confirmarPagoManual(p.rifa_id, p.numero)">Confirmar</button>
-                    <button class="btn-table-cancel" (click)="eliminarParticipante(p.rifa_id, p.numero)">Liberar</button>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="participantesPendientes.length === 0">
-                <td colspan="5" class="empty-cell">No hay pagos pendientes por validar.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Boleto</th>
+                  <th>Rifa</th>
+                  <th>Cliente</th>
+                  <th>Fecha Reserva</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of participantesPendientes">
+                  <td><span class="ticket-tag">#{{p.numero}}</span></td>
+                  <td class="rifa-name-cell">{{p.rifa_nombre}}</td>
+                  <td>
+                    <div class="cell-user">
+                      <strong>{{p.usuario_nombre}}</strong>
+                      <span class="email-sub">{{p.usuario_correo}}</span>
+                    </div>
+                  </td>
+                  <td><span class="date-badge">{{p.reservado_at | date:'short'}}</span></td>
+                  <td>
+                    <div class="action-btn-group-end">
+                      <button class="btn-table-confirm" (click)="confirmarPagoManual(p.rifa_id, p.numero)">
+                        <span class="material-icons">check_circle</span> Confirmar
+                      </button>
+                      <button class="btn-table-cancel" (click)="eliminarParticipante(p.rifa_id, p.numero)">
+                        <span class="material-icons">cancel</span> Liberar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="participantesPendientes.length === 0">
+                  <td colspan="5" class="empty-cell-v">
+                    <span class="material-icons">payments</span>
+                    <p>No hay boletos pendientes por validar vía OXXO o Transferencia.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </ng-container>
 
       <!-- PANTALLA: CLIENTES -->
       <ng-container *ngIf="currentTab === 'clientes' && !cargando">
         <div class="management-box">
-          <div class="section-header">
-            <h3>Base de Datos de Clientes</h3>
+          <div class="section-header-customers">
+            <div class="title-group">
+              <h3>Base de Datos de Clientes</h3>
+              <p>Visualiza y busca en el historial de usuarios registrados</p>
+            </div>
+            
+            <div class="header-actions">
+              <div class="search-pro-container">
+                <span class="material-icons">search</span>
+                <input 
+                  type="text" 
+                  [(ngModel)]="searchTerm" 
+                  placeholder="Buscar por nombre o correo..." 
+                  class="search-pro-input">
+              </div>
+              <div class="total-badge">
+                <span class="count">{{ usuariosFiltrados.length }}</span>
+                <span class="label">Usuarios</span>
+              </div>
+            </div>
           </div>
           
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Fecha Registro</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let u of usuarios">
-                <td><strong>{{u.nombre}}</strong></td>
-                <td>{{u.correo}}</td>
-                <td><span class="role-badge" [class.admin]="u.es_admin">{{u.es_admin ? 'ADMIN' : 'USER'}}</span></td>
-                <td>{{u.created_at | date:'mediumDate'}}</td>
-              </tr>
-              <tr *ngIf="usuarios.length === 0">
-                <td colspan="4" class="empty-cell">Cargando clientes...</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Contacto</th>
+                  <th>Rol / Acceso</th>
+                  <th>Fecha Registro</th>
+                  <th class="text-right">Perfil</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let u of usuariosFiltrados">
+                  <td>
+                    <div class="user-profile-cell">
+                      <div class="avatar-table">
+                        <img [src]="'https://ui-avatars.com/api/?name=' + u.nombre + '&background=f1f5f9&color=64748b&bold=true'" alt="Avatar">
+                      </div>
+                      <div class="user-info">
+                        <span class="user-name-text">{{ u.nombre }}</span>
+                        <span class="user-id-sub">ID: #{{ u.id.toString().substring(0,8) }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="contact-cell">
+                      <span class="email-text">{{ u.correo }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-badge-premium" [class.admin]="u.es_admin">
+                      <span class="material-icons">{{ u.es_admin ? 'admin_panel_settings' : 'person' }}</span>
+                      {{ u.es_admin ? 'Administrador' : 'Cliente' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="date-cell">
+                      <span class="material-icons">calendar_today</span>
+                      {{ u.created_at | date:'mediumDate' }}
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <button class="btn-action-pro" title="Ver Perfil (Próximamente)">
+                      <span class="material-icons">chevron_right</span>
+                    </button>
+                  </td>
+                </tr>
+                
+                <!-- EMPTY STATE SEARCH -->
+                <tr *ngIf="usuariosFiltrados.length === 0 && searchTerm">
+                  <td colspan="5" class="empty-search-cell">
+                    <span class="material-icons">search_off</span>
+                    <h4>No encontramos resultados</h4>
+                    <p>Intenta con otro nombre o correo electrónico</p>
+                  </td>
+                </tr>
+
+                <tr *ngIf="usuarios.length === 0 && !cargando">
+                  <td colspan="5" class="empty-cell-v">
+                    <span class="material-icons">group</span>
+                    <p>No hay clientes registrados en la plataforma.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </ng-container>
 
