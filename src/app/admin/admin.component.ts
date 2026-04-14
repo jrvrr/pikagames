@@ -221,7 +221,8 @@ export class AdminComponent implements OnInit {
   }
 
   obtenerUsuarios(): void {
-    this.authService.getUsuarios().subscribe({
+    if (!this.usuario?.id) return;
+    this.authService.getUsuarios(this.usuario.id).subscribe({
       next: (res: any) => {
         this.usuarios = res.usuarios || [];
         this.stats.clientesTotales = this.usuarios.length;

@@ -45,8 +45,8 @@ export class AuthService {
     return !!this.getUsuarioActual();
   }
 
-  getUsuarios(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/listar`);
+  getUsuarios(adminId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/listar?adminId=${adminId}`);
   }
 
   getUsuarioById(id: string): Observable<any> {
