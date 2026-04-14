@@ -107,66 +107,140 @@
         <p>Sincronizando datos con el servidor...</p>
       </div>
 
-      <!-- PANTALLA: DASHBOARD -->
+      <!-- PANTALLA: DASHBOARD (PREMIUM REDESIGN) -->
       <ng-container *ngIf="currentTab === 'dashboard' && !cargando">
-        <div class="dashboard-grid">
-          <!-- STATS CARDS -->
-          <div class="stat-card">
-            <div class="stat-icon"><span class="material-icons">confirmation_number</span></div>
-            <div class="stat-data">
-              <h3>{{ stats.boletosVendidos }}</h3>
-              <p>Boletos Vendidos</p>
+        <!-- TOP METRICS ROW -->
+        <div class="stats-premium-grid animate-fade-in">
+          <div class="stat-premium-card revenue">
+            <div class="card-bg-glow"></div>
+            <div class="stat-main">
+              <div class="stat-icon-wrapper">
+                <span class="material-icons">payments</span>
+              </div>
+              <div class="stat-content">
+                <p class="stat-label">Ingresos Totales</p>
+                <h2 class="stat-value">${{ stats.revenues | number:'1.0-0' }}</h2>
+                <span class="stat-trend positive">
+                  <span class="material-icons">trending_up</span> Confirmados
+                </span>
+              </div>
             </div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon"><span class="material-icons">local_play</span></div>
-            <div class="stat-data">
-              <h3>{{ rifas.length }}</h3>
-              <p>Rifas Totales</p>
+
+          <div class="stat-premium-card tickets">
+            <div class="card-bg-glow"></div>
+            <div class="stat-main">
+              <div class="stat-icon-wrapper">
+                <span class="material-icons">local_activity</span>
+              </div>
+              <div class="stat-content">
+                <p class="stat-label">Boletos Ocupados</p>
+                <h2 class="stat-value">{{ stats.boletosVendidos }}</h2>
+                <span class="stat-trend info">
+                  {{ stats.rifasActivas }} Rifas Activas
+                </span>
+              </div>
             </div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon"><span class="material-icons">group</span></div>
-            <div class="stat-data">
-              <h3>{{ usuarios.length }}</h3>
-              <p>Clientes Registrados</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon"><span class="material-icons">payments</span></div>
-            <div class="stat-data">
-              <h3>{{ participantesPendientes.length }}</h3>
-              <p>Validaciones Pendientes</p>
+          <div class="stat-premium-card users">
+            <div class="card-bg-glow"></div>
+            <div class="stat-main">
+              <div class="stat-icon-wrapper">
+                <span class="material-icons">people</span>
+              </div>
+              <div class="stat-content">
+                <p class="stat-label">Comunidad</p>
+                <h2 class="stat-value">{{ stats.clientesTotales }}</h2>
+                <span class="stat-trend positive">
+                  Usuarios registrados
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="dashboard-bottom">
-          <div class="recent-rifas-box shadow-sm">
-            <h3>Rifas Recientes</h3>
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Precio</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let r of stats.rifasRecientes">
-                  <td>{{ r.nombre }}</td>
-                  <td>${{ r.precio }}</td>
-                  <td><span class="badge-status" [class]="'status-'+r.estado">{{ r.estado | uppercase }}</span></td>
-                  <td>
-                    <button class="action-link" (click)="verDetalles(r.id)">Ver</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <!-- MAIN DASHBOARD GRID (Redistributed) -->
+        <div class="dashboard-main-grid animate-slide-up">
+          
+          <!-- LEFT COLUMN: RECENT RAFFLES (Full Height) -->
+          <div class="recent-box glass-card no-padding">
+            <div class="recent-header">
+              <h3>Sorteos Recientes</h3>
+              <button (click)="cambiarTab('rifas')" class="btn-text-link">Ver todos <span class="material-icons">arrow_forward</span></button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Sorteo</th>
+                    <th>Progreso</th>
+                    <th>Estado</th>
+                    <th class="text-right">Ver</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let r of stats.rifasRecientes">
+                    <td>
+                      <div class="mini-rifa-info">
+                        <span class="rifa-symbol">🎟️</span>
+                        <span>{{ r.nombre }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="mini-progress-wrapper">
+                        <div class="mini-bar">
+                          <div class="mini-fill" [style.width]="(((r.boletos_vendidos?.length || 0) + (r.boletos_reservados?.length || 0)) / r.cantidad_boletos * 100) + '%'"></div>
+                        </div>
+                        <span class="mini-percent">{{ (r.cantidad_boletos > 0 ? (((r.boletos_vendidos?.length || 0) + (r.boletos_reservados?.length || 0)) / r.cantidad_boletos * 100) : 0) | number:'1.0-0' }}%</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge-status-pro sm" [class]="'status-'+r.estado">{{ r.estado }}</span>
+                    </td>
+                    <td class="text-right">
+                      <button class="btn-icon-sm" (click)="verDetalles(r.id)">
+                        <span class="material-icons">chevron_right</span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: STACKED CHARTS -->
+          <div class="chart-side-grid">
+            <div class="chart-secondary-box glass-card">
+              <div class="chart-header">
+                <h3>Distribución</h3>
+              </div>
+              <apx-chart
+                *ngIf="distributionChartOptions"
+                [series]="distributionChartOptions.series"
+                [chart]="distributionChartOptions.chart"
+                [labels]="distributionChartOptions.labels"
+                [colors]="distributionChartOptions.colors"
+                [legend]="distributionChartOptions.legend"
+                [plotOptions]="distributionChartOptions.plotOptions">
+              </apx-chart>
+            </div>
+
+            <div class="chart-secondary-box glass-card">
+              <div class="chart-header">
+                <h3>Top Rendimiento</h3>
+              </div>
+              <apx-chart
+                *ngIf="rafflePerformanceOptions"
+                [series]="rafflePerformanceOptions.series"
+                [chart]="rafflePerformanceOptions.chart"
+                [plotOptions]="rafflePerformanceOptions.plotOptions"
+                [xaxis]="rafflePerformanceOptions.xaxis"
+                [colors]="rafflePerformanceOptions.colors"
+                [legend]="rafflePerformanceOptions.legend">
+              </apx-chart>
+            </div>
           </div>
         </div>
       </ng-container>

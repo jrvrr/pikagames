@@ -5,13 +5,52 @@ import { RifasService } from '../service/rifas.service';
 import { AuthService } from '../service/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import {
+  NgApexchartsModule,
+  ChartComponent,
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexXAxis,
+  ApexDataLabels,
+  ApexTitleSubtitle,
+  ApexStroke,
+  ApexGrid,
+  ApexFill,
+  ApexMarkers,
+  ApexYAxis,
+  ApexTheme,
+  ApexLegend,
+  ApexPlotOptions,
+  ApexTooltip,
+  ApexResponsive
+} from "ng-apexcharts";
+
+export type ChartOptions = {
+  series: ApexAxisChartSeries | any;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  dataLabels: ApexDataLabels;
+  grid: ApexGrid;
+  fill: ApexFill;
+  markers: ApexMarkers;
+  yaxis: ApexYAxis | ApexYAxis[];
+  stroke: ApexStroke;
+  title: ApexTitleSubtitle;
+  theme: ApexTheme;
+  legend: ApexLegend;
+  plotOptions: ApexPlotOptions;
+  tooltip: ApexTooltip;
+  responsive: ApexResponsive[];
+  labels: any;
+  colors: any;
+};
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgApexchartsModule],
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.css']
+  styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnInit {
   rifas: any[] = [];
@@ -25,13 +64,25 @@ export class AdminComponent implements OnInit {
   isSidebarCollapsed = false;
   isSidebarVisible = true;
   subTabRifas: 'activas' | 'terminadas' | 'suspendidas' | 'todas' = 'activas';
+  usuario: any = null;
+  cargando: boolean = false;
+  editando: any = null;
+  editandoUsuario: any = null;
+  usuarioSeleccionado: any = null;
 
   stats = {
     boletosVendidos: 0,
+    boletosReservados: 0,
     rifasActivas: 0,
     clientesTotales: 0,
+    revenues: 0,
+    potentialRevenue: 0,
     rifasRecientes: [] as any[]
   };
+
+  public salesChartOptions: Partial<ChartOptions> | any;
+  public distributionChartOptions: Partial<ChartOptions> | any;
+  public rafflePerformanceOptions: Partial<ChartOptions> | any;
 
   nuevaRifa: {
     nombre: string;
@@ -53,11 +104,7 @@ export class AdminComponent implements OnInit {
     premios: [{ titulo: '', cantidad: 1 }]
   };
 
-  usuario: any = null;
-  cargando = false;
-  editando: any = null;
-  usuarioSeleccionado: any = null;
-  editandoUsuario: any = null;
+
 
   constructor(
     private rifasService: RifasService,
@@ -71,6 +118,7 @@ export class AdminComponent implements OnInit {
     if (!this.usuario?.es_admin) {
       this.toastr.error('Solo los administradores pueden acceder aquí.');
       window.location.href = '/';
+      return;
     }
     this.cargarTodo();
     
@@ -185,9 +233,9 @@ export class AdminComponent implements OnInit {
   get usuariosFiltrados() {
     if (!this.searchTerm.trim()) return this.usuarios;
     const term = this.searchTerm.toLowerCase();
-    return this.usuarios.filter(u => 
-      u.nombre.toLowerCase().includes(term) || 
-      u.correo.toLowerCase().includes(term)
+    return (this.usuarios || []).filter(u => 
+      (u.nombre || '').toLowerCase().includes(term) || 
+      (u.correo || '').toLowerCase().includes(term)
     );
   }
 
@@ -195,13 +243,109 @@ export class AdminComponent implements OnInit {
     this.stats.rifasActivas = this.rifasActivas.length;
     this.stats.rifasRecientes = this.rifas.slice(0, 5);
     
-    let totalVendidos = 0;
+    let totalVendidosCount = 0;
+    let totalReservadosCount = 0;
+    let totalRevenue = 0;
+    let potentialRevenue = 0;
+
     this.rifas.forEach(r => {
-      if (r.boletos_ocupados && Array.isArray(r.boletos_ocupados)) {
-        totalVendidos += r.boletos_ocupados.length;
+      // Tickets VENDIDOS (Ingresos reales)
+      if (r.boletos_vendidos && Array.isArray(r.boletos_vendidos)) {
+        totalVendidosCount += r.boletos_vendidos.length;
+        totalRevenue += (r.boletos_vendidos.length * (r.precio || 0));
+      }
+      // Tickets RESERVADOS (Potencial)
+      if (r.boletos_reservados && Array.isArray(r.boletos_reservados)) {
+        totalReservadosCount += r.boletos_reservados.length;
+        potentialRevenue += (r.boletos_reservados.length * (r.precio || 0));
       }
     });
-    this.stats.boletosVendidos = totalVendidos;
+
+    this.stats.boletosVendidos = totalVendidosCount;
+    this.stats.boletosReservados = totalReservadosCount;
+    this.stats.revenues = totalRevenue;
+    this.stats.potentialRevenue = potentialRevenue;
+
+    this.initCharts();
+  }
+
+  initCharts() {
+    // 1. Chart de Distribución (Donut con 3 Categorías: Vendido, Reservado, Libre)
+    const totalCapacidad = this.rifas.reduce((acc, r) => acc + (r.cantidad_boletos || 0), 0);
+    const totalVendidos = this.stats.boletosVendidos;
+    const totalReservados = this.stats.boletosReservados;
+    const totalLibres = Math.max(0, totalCapacidad - totalVendidos - totalReservados);
+
+    this.distributionChartOptions = {
+      series: [totalVendidos, totalReservados, totalLibres],
+      chart: {
+        type: "donut",
+        height: 185,
+        animations: { enabled: true, easing: 'easeinout', speed: 800 }
+      },
+      labels: ["Vendidos", "Reservados", "Disponibles"],
+      colors: ["#10B981", "#F59E0B", "#E2E8F0"],
+      legend: { position: "bottom", fontWeight: 700 },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: "75%",
+            labels: {
+              show: true,
+              total: {
+                show: true,
+                label: "Total Boletos",
+                formatter: () => totalCapacidad.toString()
+              }
+            }
+          }
+        }
+      },
+      responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: "bottom" } } }]
+    };
+
+    // 2. Chart de Desempeño por Rifa (Bar)
+    const topRifas = this.rifas.slice(0, 6);
+    this.rafflePerformanceOptions = {
+      series: [{
+        name: "Ventas Reales ($)",
+        data: topRifas.map(r => (r.boletos_vendidos?.length || 0) * Number(r.precio || 0))
+      }],
+      chart: { type: "bar", height: 220, toolbar: { show: false } },
+      plotOptions: {
+        bar: { borderRadius: 8, columnWidth: "45%", distributed: true }
+      },
+      colors: ["#6366F1", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899"],
+      xaxis: {
+        categories: topRifas.map(r => r.nombre.substring(0, 12) + (r.nombre.length > 12 ? '...' : '')),
+        labels: { style: { fontWeight: 600 } }
+      },
+      legend: { show: false }
+    };
+
+    // 3. Chart de Tendencia (Area)
+    this.salesChartOptions = {
+      series: [{
+        name: "Ingresos Confirmados",
+        data: [...this.rifas].reverse().map((r, i) => {
+          const dateLabel = r.created_at ? new Date(r.created_at).toLocaleDateString() : 'N/A';
+          return {
+            x: dateLabel,
+            y: (r.boletos_vendidos?.length || 0) * Number(r.precio || 0)
+          };
+        })
+      }],
+      chart: { type: "area", height: 220, toolbar: { show: false }, zoom: { enabled: false } },
+      dataLabels: { enabled: false },
+      stroke: { curve: "smooth", width: 4 },
+      fill: {
+        type: "gradient",
+        gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [20, 100, 100, 100] }
+      },
+      colors: ["#008CBA"],
+      xaxis: { type: "category", labels: { rotate: -45, style: { fontWeight: 600 } } },
+      yaxis: { labels: { formatter: (val: number) => `$${val.toFixed(0)}` } }
+    };
   }
 
   suspenderRifa(id: string): void {
