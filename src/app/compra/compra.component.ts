@@ -5,6 +5,9 @@ import { CommonModule } from '@angular/common';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
+
+import { FormsModule } from '@angular/forms';
 
 declare var paypal: any;
 
@@ -12,7 +15,8 @@ declare var paypal: any;
   selector: 'app-compra',
   templateUrl: './compra.component.html',
   styleUrls: ['./compra.component.css'],
-  imports: [CommonModule, AuthModalComponent]
+  standalone: true,
+  imports: [CommonModule, AuthModalComponent, FormsModule]
 })
 export class CompraComponent implements OnInit {
   rifas: any[] = [];
@@ -26,6 +30,7 @@ export class CompraComponent implements OnInit {
   reservando = false;
   apartadoExitoso = false;
   metodoPagoSeleccionado: 'paypal' | 'oxxo' | 'spei' = 'paypal';
+  editandoRifa: any = null;
 
   constructor(
     private rifasService: RifasService,
@@ -175,7 +180,7 @@ export class CompraComponent implements OnInit {
       boletos: [num] // El backend espera un arreglo de números
     };
 
-    this.rifasService.comprarBoletos(rifa.id, payload).subscribe({
+    this.rifasService.apartarBoleto(rifa.id, payload).subscribe({
       next: (res) => {
         this.reservando = false;
         if (res.success) {
@@ -219,7 +224,7 @@ export class CompraComponent implements OnInit {
       createOrder: async (data: any, actions: any) => {
         try {
           const payload = {
-            rifaId: rifa.id,
+            rifa_id: rifa.id,
             numero: boleto,
             monto: rifa.precio || "50.00",
             usuario_id: this.usuario.id
@@ -266,6 +271,61 @@ export class CompraComponent implements OnInit {
   }
 
 
+
+  editarRifa(rifa: any): void {
+    this.editandoRifa = { ...rifa };
+  }
+
+  guardarEdicionRapida(): void {
+    if (!this.editandoRifa) return;
+    
+    this.cargando = true;
+    const updateData = {
+      nombre: this.editandoRifa.nombre,
+      descripcion: this.editandoRifa.descripcion,
+      precio: Number(this.editandoRifa.precio)
+    };
+
+    this.rifasService.editarRifa(this.editandoRifa.id, updateData).subscribe({
+      next: () => {
+        this.toastr.success('Rifa actualizada correctamente');
+        this.editandoRifa = null;
+        this.obtenerRifas();
+      },
+      error: () => {
+        this.toastr.error('Error al actualizar la rifa');
+        this.cargando = false;
+      }
+    });
+  }
+
+  eliminarRifaConfirm(id: string): void {
+    Swal.fire({
+      title: '¿Eliminar Rifa?',
+      text: 'Esta acción borrará permanentemente la rifa y toda su información. ¡No se puede deshacer!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar permanentemente',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cargando = true;
+        this.rifasService.eliminarRifa(id).subscribe({
+          next: () => {
+            this.toastr.success('Rifa eliminada');
+            this.obtenerRifas();
+          },
+          error: (err) => {
+            const msg = err.error?.error || 'Error al eliminar';
+            Swal.fire('Error', msg, 'error');
+            this.cargando = false;
+          }
+        });
+      }
+    });
+  }
 
   logout(): void {
     this.authService.logout();

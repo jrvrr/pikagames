@@ -24,10 +24,10 @@
 
 .admin-layout {
   display: flex;
-  height: 100vh;
+  min-height: calc(100vh - 80px); /* Adjust to fit below the global toolbar */
   width: 100%;
   background-color: var(--bg-main);
-  overflow: hidden; 
+  overflow: visible; 
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   box-sizing: border-box;
 }
@@ -378,9 +378,8 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  height: 100%;
+  overflow: visible;
+  height: auto;
 }
 
 .main-header {
@@ -2014,4 +2013,198 @@
   background: #EF4444;
   color: white;
   border-color: #EF4444;
+}
+/* --- PREMIUM REDESIGN: EDIT MODALS --- */
+.premium-edit-card {
+  background: white;
+  width: 100%;
+  max-width: 650px;
+  border-radius: 28px;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.premium-header {
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.premium-header-main {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.avatar-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 900;
+  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  border: 3px solid white;
+}
+
+.avatar-circle.raffle-icon {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.4);
+}
+
+.header-meta h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #0F172A;
+  letter-spacing: -0.5px;
+}
+
+.meta-tags {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.tag-premium {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tag-premium.blue { background: #EEF2FF; color: #4338CA; }
+.tag-premium.amber { background: #FFFBEB; color: #92400E; }
+.tag-premium.gray { background: #F1F5F9; color: #475569; }
+
+.premium-body {
+  padding: 2.5rem;
+  background: white;
+}
+
+.info-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.info-card-grid.full {
+  grid-template-columns: 1fr;
+}
+
+.info-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-input-group label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-left: 4px;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon .material-icons {
+  position: absolute;
+  left: 14px;
+  font-size: 1.2rem;
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+.pro-input-premium {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.8rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1E293B;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pro-input-premium:focus {
+  outline: none;
+  background: white;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.pro-textarea-premium {
+  min-height: 100px;
+  padding: 1rem;
+  resize: vertical;
+}
+
+.premium-footer {
+  padding: 1.5rem 2.5rem;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-premium-cancel {
+  background: white;
+  color: #64748B;
+  border: 1px solid #E2E8F0;
+  padding: 0.85rem 1.5rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-premium-cancel:hover {
+  background: #F1F5F9;
+  color: #1E293B;
+}
+
+.btn-premium-save {
+  background: #1E293B;
+  color: white;
+  border: none;
+  padding: 0.85rem 2.5rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-premium-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  background: #0F172A;
+}
+
+@media (max-width: 640px) {
+  .info-card-grid {
+    grid-template-columns: 1fr;
+  }
 }

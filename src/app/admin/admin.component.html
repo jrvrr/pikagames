@@ -590,41 +590,63 @@
       </div>
     </div>
 
-    <!-- MODAL DE EDICIÓN DE USUARIO -->
+    <!-- MODAL DE EDICIÓN DE USUARIO (PREMIUM) -->
     <div class="edit-modal-overlay" *ngIf="editandoUsuario" (click)="editandoUsuario = null">
-      <div class="edit-modal-card animate-slide-up" (click)="$event.stopPropagation()">
-        <div class="edit-modal-header-compact">
-          <div class="header-title-comp">
-            <h3>Editar Usuario</h3>
-            <p>ID: #{{ editandoUsuario.id.toString().substring(0,8) }}</p>
+      <div class="premium-edit-card animate-slide-up" (click)="$event.stopPropagation()">
+        <div class="premium-header">
+          <div class="premium-header-main">
+            <div class="avatar-circle">
+              {{ editandoUsuario.nombre.substring(0, 1).toUpperCase() }}{{ editandoUsuario.nombre.split(' ')[1]?.substring(0, 1).toUpperCase() || '' }}
+            </div>
+            <div class="header-meta">
+              <h2>Editar Perfil</h2>
+              <div class="meta-tags">
+                <span class="tag-premium" [class.blue]="editandoUsuario.es_admin" [class.gray]="!editandoUsuario.es_admin">
+                  {{ editandoUsuario.es_admin ? 'ADMINISTRADOR' : 'CLIENTE' }}
+                </span>
+                <span class="tag-premium gray">ID: #{{ editandoUsuario.id.substring(0,8) }}</span>
+              </div>
+            </div>
           </div>
           <button class="btn-close-modal" (click)="editandoUsuario = null">
             <span class="material-icons">close</span>
           </button>
         </div>
 
-        <div class="edit-modal-body-compact">
-          <form (ngSubmit)="guardarEdicionUsuario()" class="minimalist-form-edit">
-            <div class="field-group">
-              <label>Nombre Completo</label>
-              <input type="text" [(ngModel)]="editandoUsuario.nombre" name="u_nombre" class="pro-input-compact" required>
-            </div>
-            
-            <div class="field-group mt-3">
-              <label>Correo Electrónico</label>
-              <input type="email" [(ngModel)]="editandoUsuario.correo" name="u_correo" class="pro-input-compact" required>
+        <div class="premium-body">
+          <form (ngSubmit)="guardarEdicionUsuario()">
+            <div class="info-card-grid">
+              <div class="info-input-group">
+                <label>Nombre Completo</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">person</span>
+                  <input type="text" [(ngModel)]="editandoUsuario.nombre" name="u_nombre" class="pro-input-premium" required>
+                </div>
+              </div>
+              
+              <div class="info-input-group">
+                <label>Correo Electrónico</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">email</span>
+                  <input type="email" [(ngModel)]="editandoUsuario.correo" name="u_correo" class="pro-input-premium" required>
+                </div>
+              </div>
+
+              <div class="info-input-group">
+                <label>Configuración de Cuenta</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">admin_panel_settings</span>
+                  <label class="d-flex align-items-center gap-2 mb-0 ms-2" style="cursor: pointer;">
+                    <input type="checkbox" [(ngModel)]="editandoUsuario.es_admin" name="u_admin" class="pro-checkbox">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #1E293B;">Privilegios de Admin</span>
+                  </label>
+                </div>
+              </div>
             </div>
 
-            <div class="field-group mt-3">
-              <label class="d-flex align-items-center gap-2">
-                <input type="checkbox" [(ngModel)]="editandoUsuario.es_admin" name="u_admin" class="pro-checkbox">
-                Privilegios de Administrador
-              </label>
-            </div>
-
-            <div class="edit-modal-footer-compact mt-4">
-              <button type="button" class="btn-secondary-pro" (click)="editandoUsuario = null">Cancelar</button>
-              <button type="submit" class="btn-save-pro">
+            <div class="premium-footer mt-5">
+              <button type="button" class="btn-premium-cancel" (click)="editandoUsuario = null">Cancelar</button>
+              <button type="submit" class="btn-premium-save">
                 Guardar Cambios
               </button>
             </div>
@@ -633,71 +655,90 @@
       </div>
     </div>
 
-    <!-- MODAL DE EDICIÓN MINIMALISTA (UNIFICADO) -->
+    <!-- MODAL DE EDICIÓN DE SORTEO (PREMIUM) -->
     <div class="edit-modal-overlay" *ngIf="editando" (click)="editando = null">
-      <div class="edit-modal-card animate-slide-up" (click)="$event.stopPropagation()">
-        <div class="edit-modal-header-compact">
-          <div class="header-title-comp">
-            <h3>Editar Sorteo</h3>
-            <p>ID: #{{ editando.id.toString().substring(0,8) }}</p>
+      <div class="premium-edit-card animate-slide-up" style="max-width: 800px;" (click)="$event.stopPropagation()">
+        <div class="premium-header">
+          <div class="premium-header-main">
+            <div class="avatar-circle raffle-icon">
+              <span class="material-icons" style="font-size: 2rem;">confirmation_number</span>
+            </div>
+            <div class="header-meta">
+              <h2>Editar Sorteo</h2>
+              <div class="meta-tags">
+                <span class="tag-premium amber">RIFA ACTIVA</span>
+                <span class="tag-premium gray">ID: #{{ editando.id.substring(0,8) }}</span>
+              </div>
+            </div>
           </div>
           <button class="btn-close-modal" (click)="editando = null">
             <span class="material-icons">close</span>
           </button>
         </div>
 
-        <div class="edit-modal-body-compact">
-          <form (ngSubmit)="guardarEdicion()" class="minimalist-form-edit">
-            
-            <div class="form-main-layout">
-              <!-- COLUMNA IZQUIERDA: BASICS -->
-              <div class="form-col">
-                <div class="field-group">
-                  <label>Nombre del Sorteo</label>
-                  <input type="text" [(ngModel)]="editando.nombre" name="edit_nombre" class="pro-input-compact" required>
+        <div class="premium-body">
+          <form (ngSubmit)="guardarEdicion()">
+            <div class="info-card-grid">
+              <div class="info-input-group">
+                <label>Nombre del Sorteo</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">campaign</span>
+                  <input type="text" [(ngModel)]="editando.nombre" name="edit_nombre" class="pro-input-premium" required>
                 </div>
-                <div class="field-group">
-                  <label>Descripción Completa</label>
-                  <textarea rows="4" [(ngModel)]="editando.descripcion" name="edit_descripcion" class="pro-textarea-compact" required></textarea>
+              </div>
+              <div class="info-input-group">
+                <label>Precio por Boleto ($)</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">payments</span>
+                  <input type="number" [(ngModel)]="editando.precio" name="edit_precio" class="pro-input-premium">
                 </div>
               </div>
 
-              <!-- COLUMNA DERECHA: PARAMETERS -->
-              <div class="form-col">
-                <div class="form-grid-mini">
-                  <div class="field-group">
-                    <label>Precio ($)</label>
-                    <input type="number" [(ngModel)]="editando.precio" name="edit_precio" class="pro-input-compact">
-                  </div>
-                  <div class="field-group">
-                    <label>Boletos</label>
-                    <input type="number" [(ngModel)]="editando.cantidad_boletos" name="edit_boletos" class="pro-input-compact">
-                  </div>
-                  <div class="field-group">
-                    <label>Finalización</label>
-                    <select [(ngModel)]="editando.modo_finalizacion" name="edit_modo" class="pro-select-compact">
-                      <option value="manual">Manual</option>
-                      <option value="fecha">Por Fecha</option>
-                    </select>
-                  </div>
+              <div class="info-input-group">
+                <label>Cantidad de Boletos</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">pin</span>
+                  <input type="number" [(ngModel)]="editando.cantidad_boletos" name="edit_boletos" class="pro-input-premium">
                 </div>
+              </div>
 
-                <div class="field-group" *ngIf="editando.modo_finalizacion === 'fecha'">
-                  <label>Nueva Fecha Límite</label>
-                  <input type="date" [(ngModel)]="editando.fecha_fin" name="edit_fecha" class="pro-input-compact">
+              <div class="info-input-group">
+                <label>Modo de Finalización</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">timer</span>
+                  <select [(ngModel)]="editando.modo_finalizacion" name="edit_modo" class="pro-input-premium" style="appearance: none;">
+                    <option value="manual">Manual</option>
+                    <option value="fecha">Por Fecha</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="info-input-group" *ngIf="editando.modo_finalizacion === 'fecha'">
+                <label>Nueva Fecha Límite</label>
+                <div class="input-with-icon">
+                  <span class="material-icons">event</span>
+                  <input type="date" [(ngModel)]="editando.fecha_fin" name="edit_fecha" class="pro-input-premium">
                 </div>
               </div>
             </div>
 
-            <!-- PREMIOS (COMPACTO) -->
-            <div class="premios-section-compact mt-4">
+            <div class="info-input-group mt-4">
+              <label>Descripción del Sorteo</label>
+              <div class="input-with-icon">
+                <span class="material-icons" style="top: 14px;">description</span>
+                <textarea rows="3" [(ngModel)]="editando.descripcion" name="edit_descripcion" class="pro-input-premium pro-textarea-premium" required></textarea>
+              </div>
+            </div>
+
+            <!-- PREMIOS (UNIFICADO) -->
+            <div class="premios-section-compact mt-5">
               <div class="section-divider">
-                <span>Premios Vinculados</span>
+                <span>GESTIÓN DE PREMIOS</span>
               </div>
               <div class="premios-grid-compact">
                 <div *ngFor="let p of editando.premios; let i = index" class="premio-row-compact">
                   <div class="premio-index-mini">{{i+1}}</div>
-                  <input type="text" [(ngModel)]="p.titulo" name="p_t_{{i}}" placeholder="Premio" class="pro-input-compact flex-grow">
+                  <input type="text" [(ngModel)]="p.titulo" name="p_t_{{i}}" placeholder="Título del Premio" class="pro-input-compact flex-grow">
                   <input type="number" [(ngModel)]="p.cantidad" name="p_c_{{i}}" style="width: 80px;" class="pro-input-compact">
                   <button type="button" class="btn-del-mini" (click)="eliminarPremioEdicion(i)" *ngIf="editando.premios.length > 1">
                     <span class="material-icons">close</span>
@@ -705,13 +746,13 @@
                 </div>
               </div>
               <button type="button" class="btn-add-text" (click)="agregarPremioEdicion()">
-                <span class="material-icons">add</span> Agregar Premio
+                <span class="material-icons">add</span> AGREGAR PREMIO
               </button>
             </div>
 
-            <div class="edit-modal-footer-compact">
-              <button type="button" class="btn-secondary-pro" (click)="editando = null">Descartar</button>
-              <button type="submit" class="btn-save-pro">
+            <div class="premium-footer mt-5">
+              <button type="button" class="btn-premium-cancel" (click)="editando = null">Descartar</button>
+              <button type="submit" class="btn-premium-save">
                 Guardar Cambios
               </button>
             </div>

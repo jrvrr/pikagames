@@ -371,16 +371,39 @@ export class AdminComponent implements OnInit {
             let statusIcon = isVendido ? '💰' : '⏳';
             let actions = '';
             
+            // Botones de acción del boleto
+            let ticketActions = '';
             if (!isVendido) {
-              actions = `
+              ticketActions = `
                 <div style="margin-top:8px; display:flex; gap:8px;">
                   <button onclick="window.adminComponent.confirmarPagoManual('${data.id}', ${p.numero})" 
                           style="background:#10b981; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
-                    CONFIRMAR
+                    CONFIRMAR PAGO
                   </button>
                   <button onclick="window.adminComponent.eliminarParticipante('${data.id}', ${p.numero})" 
                           style="background:#ef4444; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
-                    LIBERAR
+                    LIBERAR BOLETO
+                  </button>
+                </div>
+              `;
+            }
+
+            // Botones de gestión del usuario
+            const userData = { id: p.user_id, nombre: p.nombre, correo: p.email, es_admin: p.es_admin };
+            const userJson = JSON.stringify(userData).replace(/"/g, '&quot;');
+            
+            let userActions = '';
+            if (p.user_id) {
+              userActions = `
+                <div style="margin-top:8px; display:flex; gap:8px; border-top:1px dashed #e5e7eb; padding-top:8px;">
+                  <button onclick="Swal.close(); window.adminComponent.prepararEdicionUsuario(${userJson})" 
+                          style="background:#6366f1; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
+                    👤 EDITAR USUARIO
+                  </button>
+                  <button onclick="Swal.close(); window.adminComponent.eliminarUsuarioConfirm(${userJson})" 
+                          style="background:#64748b; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;"
+                          ${p.es_admin ? 'disabled' : ''}>
+                    🗑️ ELIMINAR CUENTA
                   </button>
                 </div>
               `;
@@ -391,7 +414,8 @@ export class AdminComponent implements OnInit {
                           <span style="font-weight:600;">${statusIcon} #${p.numero} - ${p.nombre}</span>
                         </div>
                         <div style="color:#6b7280; font-size:0.8rem; margin-top:2px;">${p.email}</div>
-                        ${actions}
+                        ${ticketActions}
+                        ${userActions}
                      </li>`;
           });
           html += '</ul></div>';

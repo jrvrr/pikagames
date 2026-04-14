@@ -77,9 +77,17 @@
           </div>
         </div>
 
-        <!-- Administrador view warning -->
-        <div class="admin-warning" *ngIf="usuario?.es_admin">
-          Eres admin: no puedes comprar boletos en esta vista.
+        <!-- Administrador view actions -->
+        <div class="admin-actions-compra" *ngIf="usuario?.es_admin">
+          <p class="admin-warning-text">PANEL DE CONTROL RÁPIDO</p>
+          <div class="admin-btn-group-compra">
+            <button class="brutal-btn blue-flat" (click)="editarRifa(rifa)">
+              EDITAR RIFA
+            </button>
+            <button class="brutal-btn black-flat" (click)="eliminarRifaConfirm(rifa.id)">
+              ELIMINAR
+            </button>
+          </div>
         </div>
 
         <!-- Mostrar boletos solo a usuarios normales -->
@@ -198,6 +206,65 @@
         <p>Vuelve más tarde para participar.</p>
       </div>
     </ng-template>
+  </div>
+
+  <!-- MODAL DE EDICIÓN DE SORTEO (PREMIUM) - VISTA COMPRA -->
+  <div class="edit-modal-overlay" *ngIf="editandoRifa" (click)="editandoRifa = null">
+    <div class="premium-edit-card animate-slide-up" style="max-width: 800px;" (click)="$event.stopPropagation()">
+      <div class="premium-header">
+        <div class="premium-header-main">
+          <div class="avatar-circle raffle-icon">
+            <span class="material-icons" style="font-size: 2rem;">confirmation_number</span>
+          </div>
+          <div class="header-meta">
+            <h2>Gestión Rápida</h2>
+            <div class="meta-tags">
+              <span class="tag-premium amber">EDITANDO EN VIVO</span>
+              <span class="tag-premium gray">ID: #{{ editandoRifa.id.substring(0,8) }}</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="editandoRifa = null">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="premium-body">
+        <form (ngSubmit)="guardarEdicionRapida()">
+          <div class="info-card-grid">
+            <div class="info-input-group">
+              <label>Nombre del Sorteo</label>
+              <div class="input-with-icon">
+                <span class="material-icons">campaign</span>
+                <input type="text" [(ngModel)]="editandoRifa.nombre" name="edit_nombre" class="pro-input-premium" required>
+              </div>
+            </div>
+            <div class="info-input-group">
+              <label>Precio por Boleto ($)</label>
+              <div class="input-with-icon">
+                <span class="material-icons">payments</span>
+                <input type="number" [(ngModel)]="editandoRifa.precio" name="edit_precio" class="pro-input-premium">
+              </div>
+            </div>
+          </div>
+
+          <div class="info-input-group mt-4">
+            <label>Descripción del Sorteo</label>
+            <div class="input-with-icon">
+              <span class="material-icons" style="top: 14px;">description</span>
+              <textarea rows="3" [(ngModel)]="editandoRifa.descripcion" name="edit_descripcion" class="pro-input-premium pro-textarea-premium" required></textarea>
+            </div>
+          </div>
+
+          <div class="premium-footer mt-5">
+            <button type="button" class="btn-premium-cancel" (click)="editandoRifa = null">Descartar</button>
+            <button type="submit" class="btn-premium-save">
+              Aplicar Cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 

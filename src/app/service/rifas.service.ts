@@ -17,7 +17,7 @@ export class RifasService {
 
   // Obtener todos los boletos reservados (Pendientes de confirmar)
   getParticipantesPendientes(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/pendientes`);
+    return this.http.get(`${this.apiUrl}/participantes/pendientes`);
   }
 
   // Obtener una rifa por ID
@@ -51,13 +51,13 @@ export class RifasService {
   }
 
   // Apartar un boleto (Reserva manual para OXXO/Transferencia)
-  comprarBoletos(rifaId: string, payload: any): Observable<any> {
+  apartarBoleto(rifaId: string, payload: any): Observable<any> {
     // Sincronizado con backend POST /boletos/:rifa_id/apartar
     return this.http.post(`https://apipikagames.vercel.app/boletos/${rifaId}/apartar`, payload);
   }
 
   // PayPal - Crear orden segura
-  crearOrdenPaypal(data: { rifaId: number, numero: number, monto: string | number, usuario_id: string }): Observable<any> {
+  crearOrdenPaypal(data: { rifa_id: string | number, numero: number, monto: string | number, usuario_id: string }): Observable<any> {
     return this.http.post('https://apipikagames.vercel.app/paypal/crear-orden', data);
   }
 
