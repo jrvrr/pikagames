@@ -229,6 +229,7 @@ export class CompraComponent implements OnInit {
             monto: rifa.precio || "50.00",
             usuario_id: this.usuario.id
           };
+          console.log('Payload enviado a crear-orden:', payload);
           const res = await firstValueFrom(this.rifasService.crearOrdenPaypal(payload));
           return res.orderId;
         } catch (error) {
