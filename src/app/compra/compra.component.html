@@ -138,11 +138,18 @@
 
             <div class="pago-botones" *ngIf="!apartadoExitoso">
               <!-- PayPal -->
-              <div *ngIf="metodoPagoSeleccionado === 'paypal'" id="paypal-button-container-{{ rifa.id }}" class="paypal-container"></div>
+              <div *ngIf="metodoPagoSeleccionado === 'paypal'" class="metodo-info-card text-center">
+                <p class="instruccion-pro" style="margin-bottom: 15px;">Procesa tu pago de forma segura con PayPal. <br/><span style="color:#ef4444; font-size: 0.85rem; font-weight: bold;">⏱ Dispone de 15 minutos para completar el pago aquí, de lo contrario se liberará el boleto.</span></p>
+                <div id="paypal-button-container-{{ rifa.id }}" class="paypal-container"></div>
+              </div>
               
               <!-- OXXO -->
               <div *ngIf="metodoPagoSeleccionado === 'oxxo'" class="metodo-info-card">
                 <p class="instruccion-pro">Para completar tu pedido, realiza el pago correspondiente mediante los datos que a continuación se detallan.</p>
+                
+                <div class="alert-tiempo-limite" style="background-color: #fffbeb; color: #b45309; padding: 10px; border-radius: 6px; margin: 15px 0; font-size: 0.9rem; font-weight: 600; border-left: 4px solid #f59e0b;">
+                  ⚠️ Tienes un máximo de 4 horas para realizar tu pago y mandar el comprobante por WhatsApp. De lo contrario, tu boleto será cancelado.
+                </div>
                 <div class="resumen-datos">
                   <span class="dato-label">OXXO O 7ELEVEN</span>
                   <p>Dirígete a tu lugar cercano con la siguiente información:</p>
@@ -163,6 +170,10 @@
               <!-- SPEI -->
               <div *ngIf="metodoPagoSeleccionado === 'spei'" class="metodo-info-card">
                 <p class="instruccion-pro">Para completar tu pedido, realiza el pago correspondiente mediante los datos que a continuación se detallan.</p>
+                
+                <div class="alert-tiempo-limite" style="background-color: #fffbeb; color: #b45309; padding: 10px; border-radius: 6px; margin: 15px 0; font-size: 0.9rem; font-weight: 600; border-left: 4px solid #f59e0b;">
+                  ⚠️ Tienes un máximo de 4 horas para realizar tu transferencia y mandar el comprobante por WhatsApp. De lo contrario, tu boleto será cancelado.
+                </div>
                 <div class="resumen-datos">
                   <span class="dato-label">SPEI (Transferencia)</span>
                   <p>Dirígete a tu aplicación de banco e ingresa la siguiente información:</p>
