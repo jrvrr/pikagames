@@ -229,11 +229,19 @@ export class CompraComponent implements OnInit {
             monto: rifa.precio || "50.00",
             usuario_id: this.usuario.id
           };
-          console.log('Payload enviado a crear-orden:', payload);
+          console.log('=== CREAR ORDEN PAYPAL ===');
+          console.log('Rifa:', rifa);
+          console.log('Usuario:', this.usuario);
+          console.log('Payload enviado:', JSON.stringify(payload, null, 2));
+          
           const res = await firstValueFrom(this.rifasService.crearOrdenPaypal(payload));
+          console.log('Respuesta de crear-orden:', res);
           return res.orderId;
-        } catch (error) {
-          console.error("Error al crear la orden", error);
+        } catch (error: any) {
+          console.error("❌ Error al crear la orden:", error);
+          console.error("Status:", error.status);
+          console.error("Body:", error.error);
+          console.error("Mensaje completo:", error.message);
           this.toastr.error('No se pudo iniciar el pago porque el boleto no está disponible.', 'Boleto ocupado');
           throw error;
         }
