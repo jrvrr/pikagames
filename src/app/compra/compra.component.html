@@ -96,7 +96,7 @@
           
           <div class="boletos-lista">
             <button 
-              *ngFor="let num of (generarBoletos(rifa.cantidad_boletos || 0) | slice:0:(rifa.boletosVisibles || 20))"
+              *ngFor="let num of (generarBoletos(rifa.cantidad_boletos || 0) | slice:(((rifa.paginaActual || 1) - 1) * (rifa.boletosPorPagina || 10)) : ((rifa.paginaActual || 1) * (rifa.boletosPorPagina || 10)))"
               class="boleto-btn"
               [class.ocupado]="rifa.boletos_ocupados?.includes(num)"
               [class.seleccionado]="boletoSeleccionado === num && rifaSeleccionada?.id === rifa.id"
@@ -112,11 +112,15 @@
             </button>
           </div>
 
-          <button *ngIf="(rifa.cantidad_boletos || 0) > (rifa.boletosVisibles || 20)" 
-                  class="brutal-btn ver-mas-btn" 
-                  (click)="verMasBoletos(rifa)">
-            VER MÁS BOLETOS ↓
-          </button>
+          <div class="pagination-controls" *ngIf="(rifa.cantidad_boletos || 0) > 0">
+            <button class="btn-pag" [disabled]="(rifa.paginaActual || 1) === 1" (click)="cambiarPagina(rifa, -1)">
+              ◀ ANT
+            </button>
+            <span class="page-info">{{ rifa.paginaActual || 1 }} / {{ getTotalPaginas(rifa) }}</span>
+            <button class="btn-pag" [disabled]="(rifa.paginaActual || 1) >= getTotalPaginas(rifa)" (click)="cambiarPagina(rifa, 1)">
+              SIG ▶
+            </button>
+          </div>
           
           <div *ngIf="boletoSeleccionado && rifaSeleccionada?.id === rifa.id" class="pago-opciones">
             <h5 class="pago-title">Boleto #{{ boletoSeleccionado }} seleccionado</h5>
@@ -148,7 +152,7 @@
                 <p class="instruccion-pro">Para completar tu pedido, realiza el pago correspondiente mediante los datos que a continuación se detallan.</p>
                 
                 <div class="alert-tiempo-limite" style="background-color: #fffbeb; color: #b45309; padding: 10px; border-radius: 6px; margin: 15px 0; font-size: 0.9rem; font-weight: 600; border-left: 4px solid #f59e0b;">
-                  ⚠️ Tienes un máximo de 4 horas para realizar tu pago y mandar el comprobante por WhatsApp. De lo contrario, tu boleto será cancelado.
+                  Tienes un máximo de 4 horas para realizar tu pago y mandar el comprobante por WhatsApp. De lo contrario, tu boleto será cancelado.
                 </div>
                 <div class="resumen-datos">
                   <span class="dato-label">OXXO O 7ELEVEN</span>
@@ -196,16 +200,7 @@
               </div>
             </div>
 
-            <div class="whatsapp-success" *ngIf="apartadoExitoso">
-              <div class="success-banner">¡RESERVADO!</div>
-              <p class="num-exito">Has apartado el boleto #{{boletoSeleccionado}}</p>
-              <p class="instruccion-final">
-                Para finalizar, envía tu comprobante de pago por WhatsApp al <span class="phone-highlight">81 3697 5457</span>
-              </p>
-              <a [href]="generarLinkWhatsapp(rifa, boletoSeleccionado)" target="_blank" class="brutal-btn whatsapp-btn">
-              ENVIAR COMPROBANTE AHORA
-              </a>
-            </div>
+            <!-- Eliminated inline whatsapp-success message, moved to modal -->
           </div>
         </div>
       </div>
@@ -277,6 +272,41 @@
       </div>
     </div>
   </div>
-</div>
+  <app-auth-modal *ngIf="mostrarModal" (cerrar)="cerrarAuth()"></app-auth-modal>
 
-<app-auth-modal *ngIf="mostrarModal" (cerrar)="cerrarAuth()"></app-auth-modal>
+  <!-- MODAL DE ÉXITO AL APARTAR (WHATSAPP) -->
+  <div class="modal-exito-overlay" *ngIf="mostrarModalExito" (click)="cerrarModalExito()">
+    <div class="modal-exito-content animate-slide-up" (click)="$event.stopPropagation()">
+      <button class="btn-close-modal-exito" (click)="cerrarModalExito()">
+        <span class="material-icons">close</span>
+      </button>
+      
+      <div class="success-banner-modal">¡BOLETO RESERVADO!</div>
+      
+      <div class="modal-exito-body">
+        <div class="icon-check-container">
+          <span class="material-icons check-icon">check_circle</span>
+        </div>
+        
+        <p class="num-exito-modal">Has apartado el boleto <strong>#{{boletoSeleccionado}}</strong><br> de la rifa <strong>{{rifaSeleccionada?.nombre}}</strong></p>
+        
+        <div class="info-pasos-modal">
+          <h4>Siguientes Pasos para confirmar:</h4>
+          <ul>
+            <li><span class="paso-num">1</span> Realiza tu pago mediante <strong>{{metodoPagoSeleccionado === 'spei' ? 'Transferencia Bancaria' : (metodoPagoSeleccionado === 'oxxo' ? 'OXXO/7Eleven' : 'PayPal/Tarjeta')}}</strong></li>
+            <li><span class="paso-num">2</span> Toma captura o foto al ticket comprobante</li>
+            <li><span class="paso-num">3</span> Envíanos el comprobante por WhatsApp dentro del tiempo límite</li>
+          </ul>
+        </div>
+        
+        <p class="instruccion-final-modal">
+          Confirma tu participación enviando tu comprobante por WhatsApp:
+        </p>
+        
+        <a *ngIf="rifaSeleccionada && boletoSeleccionado" [href]="generarLinkWhatsapp(rifaSeleccionada, boletoSeleccionado)" target="_blank" class="brutal-btn whatsapp-btn-modal" (click)="cerrarModalExito()">
+          ENVIAR COMPROBANTE AHORA
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

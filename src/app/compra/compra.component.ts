@@ -29,6 +29,7 @@ export class CompraComponent implements OnInit {
   rifaSeleccionada: any = null;
   reservando = false;
   apartadoExitoso = false;
+  mostrarModalExito = false;
   metodoPagoSeleccionado: 'paypal' | 'oxxo' | 'spei' = 'paypal';
   editandoRifa: any = null;
 
@@ -43,14 +44,24 @@ export class CompraComponent implements OnInit {
     this.obtenerRifas();
   }
 
-  obtenerRifas(): void {
-    this.cargando = true;
+  obtenerRifas(silent: boolean = false): void {
+    if (!silent) {
+      this.cargando = true;
+    }
+
+    // Guardar estado actual de las paginaciones
+    const paginasGuardadas: { [key: number]: number } = {};
+    this.rifas.forEach(r => {
+      paginasGuardadas[r.id] = r.paginaActual || 1;
+    });
+
     this.rifasService.getRifas().subscribe({
       next: (res: any) => {
         const rawRifas = res.rifas || [];
         this.rifas = rawRifas.filter((r: any) => r.estado === 'activa').map((r: any) => ({
           ...r,
-          boletosVisibles: 20
+          paginaActual: paginasGuardadas[r.id] || 1,
+          boletosPorPagina: 10
         }));
 
         // Buscar última rifa finalizada (ordenando por ID o fecha si es posible, o simplemente revirtiendo)
@@ -75,12 +86,16 @@ export class CompraComponent implements OnInit {
           });
         }
 
-        this.cargando = false;
+        if (!silent) {
+          this.cargando = false;
+        }
       },
       error: (err: any) => {
         console.error('Error al cargar rifas:', err);
         this.toastr.error('No se pudieron cargar las rifas', 'Error');
-        this.cargando = false;
+        if (!silent) {
+          this.cargando = false;
+        }
       }
     });
   }
@@ -119,11 +134,18 @@ export class CompraComponent implements OnInit {
     });
   }
 
-  verMasBoletos(rifa: any): void {
-    if (!rifa.boletosVisibles) {
-      rifa.boletosVisibles = 20;
+  getTotalPaginas(rifa: any): number {
+    return Math.ceil((rifa.cantidad_boletos || 0) / (rifa.boletosPorPagina || 10));
+  }
+
+  cambiarPagina(rifa: any, delta: number): void {
+    if (!rifa.paginaActual) {
+      rifa.paginaActual = 1;
     }
-    rifa.boletosVisibles += 20;
+    const nuevaPagina = rifa.paginaActual + delta;
+    if (nuevaPagina >= 1 && nuevaPagina <= this.getTotalPaginas(rifa)) {
+      rifa.paginaActual = nuevaPagina;
+    }
   }
 
   generarBoletos(cantidad: number): number[] {
@@ -186,8 +208,9 @@ export class CompraComponent implements OnInit {
         if (res.success) {
           this.toastr.success(`Boleto #${num} apartado. Envía el comprobante por WhatsApp.`, '¡Boleto Apartado!');
           this.apartadoExitoso = true;
-          // Actualizamos la lista para que el boleto aparezca ocupado para otros
-          this.obtenerRifas();
+          this.mostrarModalExito = true;
+          // Actualizamos la lista silenciosamente para que el boleto aparezca ocupado para otros
+          this.obtenerRifas(true);
         } else {
           this.toastr.error(res.error || 'No se pudo apartar el boleto', 'Error');
         }
@@ -261,7 +284,7 @@ export class CompraComponent implements OnInit {
             this.toastr.success(`Boleto #${boleto} comprado con éxito`, '¡Compra Exitosa!');
             this.boletoSeleccionado = null;
             this.rifaSeleccionada = null;
-            this.obtenerRifas();
+            this.obtenerRifas(true);
           } else {
             this.toastr.error('No se pudo completar el pago', 'Error');
           }
@@ -339,5 +362,12 @@ export class CompraComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.usuario = null;
+  }
+
+  cerrarModalExito(): void {
+    this.mostrarModalExito = false;
+    this.apartadoExitoso = false;
+    this.boletoSeleccionado = null;
+    this.rifaSeleccionada = null;
   }
 }
