@@ -25,7 +25,7 @@ export class CompraComponent implements OnInit {
   cargando = false;
   ultimaRifaFinalizada: any = null;
 
-  boletoSeleccionado: number | null = null;
+  boletosSeleccionados: number[] = [];
   rifaSeleccionada: any = null;
   reservando = false;
   apartadoExitoso = false;
@@ -168,48 +168,73 @@ export class CompraComponent implements OnInit {
       return;
     }
 
-    this.boletoSeleccionado = num;
+    // Si cambiamos de rifa, limpiamos la selección anterior
+    if (this.rifaSeleccionada && this.rifaSeleccionada.id !== rifa.id) {
+      this.boletosSeleccionados = [];
+    }
+
     this.rifaSeleccionada = rifa;
     this.apartadoExitoso = false;
-    
-    // NO renderizar PayPal automáticamente aquí para evitar errores prematuros
-    // Solo se renderizará si el usuario lo elige explícitamente o es el default
-    if (this.metodoPagoSeleccionado === 'paypal') {
-      setTimeout(() => this.renderizarPayPal(rifa, num), 100);
+
+    // Toggle: agregar o quitar del arreglo
+    const idx = this.boletosSeleccionados.indexOf(num);
+    if (idx > -1) {
+      this.boletosSeleccionados.splice(idx, 1);
+    } else {
+      this.boletosSeleccionados.push(num);
     }
+
+    // Re-renderizar PayPal si hay boletos seleccionados y el método es PayPal
+    if (this.boletosSeleccionados.length > 0 && this.metodoPagoSeleccionado === 'paypal') {
+      setTimeout(() => this.renderizarPayPal(rifa, this.boletosSeleccionados), 100);
+    }
+  }
+
+  esBoletoSeleccionado(rifa: any, num: number): boolean {
+    return this.rifaSeleccionada?.id === rifa.id && this.boletosSeleccionados.includes(num);
+  }
+
+  getTotalSeleccionado(): number {
+    if (!this.rifaSeleccionada) return 0;
+    return this.boletosSeleccionados.length * (this.rifaSeleccionada.precio || 0);
   }
 
   seleccionarMetodo(metodo: 'paypal' | 'oxxo' | 'spei'): void {
     this.metodoPagoSeleccionado = metodo;
-    this.apartadoExitoso = false; // Resetear éxito si cambia de método
+    this.apartadoExitoso = false;
     
-    if (metodo === 'paypal' && this.boletoSeleccionado) {
+    if (metodo === 'paypal' && this.boletosSeleccionados.length > 0) {
       setTimeout(() => {
-        this.renderizarPayPal(this.rifaSeleccionada, this.boletoSeleccionado!);
+        this.renderizarPayPal(this.rifaSeleccionada, this.boletosSeleccionados);
       }, 100);
     }
   }
 
-  apartarPorTransferencia(rifa: any, num: number): void {
+  apartarPorTransferencia(rifa: any): void {
     if (!this.usuario) {
       this.abrirAuth();
+      return;
+    }
+
+    if (this.boletosSeleccionados.length === 0) {
+      this.toastr.warning('Selecciona al menos un boleto', 'Aviso');
       return;
     }
 
     this.reservando = true;
     const payload = {
       user_id: this.usuario.id,
-      boletos: [num] // El backend espera un arreglo de números
+      boletos: this.boletosSeleccionados
     };
 
     this.rifasService.apartarBoleto(rifa.id, payload).subscribe({
       next: (res) => {
         this.reservando = false;
         if (res.success) {
-          this.toastr.success(`Boleto #${num} apartado. Envía el comprobante por WhatsApp.`, '¡Boleto Apartado!');
+          const nums = this.boletosSeleccionados.map(n => `#${n}`).join(', ');
+          this.toastr.success(`Boleto(s) ${nums} apartado(s). Envía el comprobante por WhatsApp.`, '¡Boleto(s) Apartado(s)!');
           this.apartadoExitoso = true;
           this.mostrarModalExito = true;
-          // Actualizamos la lista silenciosamente para que el boleto aparezca ocupado para otros
           this.obtenerRifas(true);
         } else {
           this.toastr.error(res.error || 'No se pudo apartar el boleto', 'Error');
@@ -224,17 +249,23 @@ export class CompraComponent implements OnInit {
     });
   }
 
-  generarLinkWhatsapp(rifa: any, num: number): string {
+  generarLinkWhatsapp(rifa: any): string {
     const phone = '525620980834';
-    const text = `Hola Pika Games! 👋 He apartado el boleto #${num} para la rifa de "${rifa.nombre}" mediante ${this.metodoPagoSeleccionado.toUpperCase()}. Aquí adjunto mi comprobante de pago.`;
+    const nums = this.boletosSeleccionados.map(n => `#${n}`).join(', ');
+    const text = `Hola Pika Games! 👋 He apartado el/los boleto(s) ${nums} para la rifa de "${rifa.nombre}" mediante ${this.metodoPagoSeleccionado.toUpperCase()}. Aquí adjunto mi comprobante de pago.`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   }
 
-  renderizarPayPal(rifa: any, boleto: number): void {
+  renderizarPayPal(rifa: any, boletos: number[]): void {
     const containerId = `#paypal-button-container-${rifa.id}`;
 
     const contenedor = document.querySelector(containerId);
     if (contenedor) contenedor.innerHTML = "";
+
+    // Por ahora PayPal maneja un boleto a la vez; tomamos el primero si hay varios
+    // TODO: Si el backend soporta orden multi-boleto, actualizar aquí
+    const primerBoleto = boletos[0];
+    const montoTotal = ((rifa.precio || 50) * boletos.length).toFixed(2);
 
     paypal.Buttons({
       style: {
@@ -248,13 +279,14 @@ export class CompraComponent implements OnInit {
         try {
           const payload = {
             rifa_id: rifa.id,
-            numero: boleto,
-            monto: rifa.precio || "50.00",
+            numero: primerBoleto,
+            monto: montoTotal,
             usuario_id: this.usuario.id
           };
           console.log('=== CREAR ORDEN PAYPAL ===');
           console.log('Rifa:', rifa);
           console.log('Usuario:', this.usuario);
+          console.log('Boletos seleccionados:', boletos);
           console.log('Payload enviado:', JSON.stringify(payload, null, 2));
           
           const res = await firstValueFrom(this.rifasService.crearOrdenPaypal(payload));
@@ -276,13 +308,14 @@ export class CompraComponent implements OnInit {
             orderID: data.orderID,
             usuario_id: this.usuario.id,
             rifa_id: rifa.id,
-            numero: boleto
+            numero: primerBoleto
           };
           const res = await firstValueFrom(this.rifasService.capturarPagoPaypal(payload));
           
           if (res.success) {
-            this.toastr.success(`Boleto #${boleto} comprado con éxito`, '¡Compra Exitosa!');
-            this.boletoSeleccionado = null;
+            const nums = boletos.map(n => `#${n}`).join(', ');
+            this.toastr.success(`Boleto(s) ${nums} comprado(s) con éxito`, '¡Compra Exitosa!');
+            this.boletosSeleccionados = [];
             this.rifaSeleccionada = null;
             this.obtenerRifas(true);
           } else {
@@ -367,7 +400,7 @@ export class CompraComponent implements OnInit {
   cerrarModalExito(): void {
     this.mostrarModalExito = false;
     this.apartadoExitoso = false;
-    this.boletoSeleccionado = null;
+    this.boletosSeleccionados = [];
     this.rifaSeleccionada = null;
   }
 }

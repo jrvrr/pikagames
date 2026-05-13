@@ -1,4 +1,4 @@
-﻿/* Container y Layout General */
+/* Container y Layout General */
 .compra-wrapper {
   padding: 20px 5% 60px 5%;
   min-height: 85vh;
@@ -568,6 +568,113 @@
   font-weight: 950;
   text-transform: uppercase;
   color: var(--nin-red);
+}
+
+/* --- Multi-select: Selection Summary --- */
+.seleccion-resumen {
+  background: #fdfdfd;
+  border: 3px solid #000;
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  box-shadow: 4px 4px 0px var(--nin-blue);
+}
+
+.boletos-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.boleto-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--nin-red);
+  color: white;
+  font-weight: 900;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border: 3px solid #000;
+  border-radius: 50px;
+  box-shadow: 2px 2px 0px #000;
+  animation: chipIn 0.2s ease-out;
+}
+
+@keyframes chipIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.chip-remove {
+  background: rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.chip-remove:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.15);
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 3px dashed #ccc;
+}
+
+.total-label {
+  font-weight: 950;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: #555;
+  letter-spacing: 0.5px;
+}
+
+.total-amount {
+  font-weight: 950;
+  font-size: 1.5rem;
+  color: var(--nin-red);
+  background: var(--nin-yellow);
+  padding: 4px 14px;
+  border: 3px solid #000;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px #000;
+}
+
+/* Modal chips for showing selected tickets */
+.boletos-lista-modal {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.boleto-chip-modal {
+  display: inline-block;
+  background: var(--nin-red);
+  color: white;
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border: 2px solid #000;
+  border-radius: 50px;
+  box-shadow: 2px 2px 0px #000;
 }
 
 .transfer-btn {

@@ -779,9 +779,16 @@ export class AdminComponent implements OnInit {
       if (p.cantidad <= 0) { this.toastr.warning("Cantidad inválida."); return; }
     }
 
+    // Auto-calcular cantidad_ganadores desde los premios
+    const totalPremios = this.editando.premios.reduce(
+      (acc: number, p: any) => acc + (Number(p.cantidad) || 0), 0
+    );
+    this.editando.cantidad_ganadores = totalPremios;
+
     const dataActualizada = {
       ...this.editando,
       precio: Number(this.editando.precio),
+      cantidad_ganadores: totalPremios,
       fecha_fin:
         this.editando.modo_finalizacion === 'fecha'
           ? `${this.editando.fecha_fin}T23:59:59`

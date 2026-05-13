@@ -92,21 +92,21 @@
 
         <!-- Mostrar boletos solo a usuarios normales -->
         <div class="boletos-container" *ngIf="!usuario?.es_admin">
-          <h4>Selecciona un boleto:</h4>
+          <h4>Selecciona tus boletos:</h4>
           
           <div class="boletos-lista">
             <button 
               *ngFor="let num of (generarBoletos(rifa.cantidad_boletos || 0) | slice:(((rifa.paginaActual || 1) - 1) * (rifa.boletosPorPagina || 10)) : ((rifa.paginaActual || 1) * (rifa.boletosPorPagina || 10)))"
               class="boleto-btn"
               [class.ocupado]="rifa.boletos_ocupados?.includes(num)"
-              [class.seleccionado]="boletoSeleccionado === num && rifaSeleccionada?.id === rifa.id"
+              [class.seleccionado]="esBoletoSeleccionado(rifa, num)"
               [disabled]="rifa.boletos_ocupados?.includes(num)"
               (click)="seleccionarBoleto(rifa, num)"
             >
               <div class="casilla-check">
                 <span *ngIf="rifa.boletos_ocupados?.includes(num)">✕</span>
-                <span *ngIf="!rifa.boletos_ocupados?.includes(num) && !(boletoSeleccionado === num && rifaSeleccionada?.id === rifa.id)"></span>
-                <span *ngIf="boletoSeleccionado === num && rifaSeleccionada?.id === rifa.id">✓</span>
+                <span *ngIf="!rifa.boletos_ocupados?.includes(num) && !esBoletoSeleccionado(rifa, num)"></span>
+                <span *ngIf="esBoletoSeleccionado(rifa, num)">✓</span>
               </div>
               <span class="num-text">{{ num }}</span>
             </button>
@@ -122,8 +122,21 @@
             </button>
           </div>
           
-          <div *ngIf="boletoSeleccionado && rifaSeleccionada?.id === rifa.id" class="pago-opciones">
-            <h5 class="pago-title">Boleto #{{ boletoSeleccionado }} seleccionado</h5>
+          <div *ngIf="boletosSeleccionados.length > 0 && rifaSeleccionada?.id === rifa.id" class="pago-opciones">
+            <h5 class="pago-title">{{ boletosSeleccionados.length }} boleto(s) seleccionado(s)</h5>
+            
+            <div class="seleccion-resumen">
+              <div class="boletos-chips">
+                <span class="boleto-chip" *ngFor="let num of boletosSeleccionados">
+                  #{{ num }}
+                  <button class="chip-remove" (click)="seleccionarBoleto(rifa, num); $event.stopPropagation()">✕</button>
+                </span>
+              </div>
+              <div class="total-row">
+                <span class="total-label">TOTAL A PAGAR:</span>
+                <span class="total-amount">${{ getTotalSeleccionado() | number:'1.2-2' }}</span>
+              </div>
+            </div>
             
             <div class="metodo-selector">
               <label class="metodo-option" [class.active]="metodoPagoSeleccionado === 'paypal'">
@@ -163,11 +176,15 @@
                   </div>
                   <div class="dato-box">
                     <small>Banco:</small>
-                    <strong>BANCOPPEL</strong>
+                    <strong>BANCOPEL</strong>
+                  </div>
+                  <div class="dato-box">
+                    <small>Monto a depositar:</small>
+                    <strong>${{ getTotalSeleccionado() | number:'1.2-2' }}</strong>
                   </div>
                 </div>
-                <button class="brutal-btn green transfer-btn" (click)="apartarPorTransferencia(rifa, boletoSeleccionado)" [disabled]="reservando">
-                  {{ reservando ? 'APARTANDO...' : 'RESERVAR Y OBTENER TICKET' }}
+                <button class="brutal-btn green transfer-btn" (click)="apartarPorTransferencia(rifa)" [disabled]="reservando">
+                  {{ reservando ? 'APARTANDO...' : 'RESERVAR ' + boletosSeleccionados.length + ' BOLETO(S)' }}
                 </button>
               </div>
 
@@ -187,15 +204,19 @@
                   </div>
                   <div class="dato-box">
                     <small>Banco:</small>
-                    <strong>BANCOPPEL</strong>
+                    <strong>BANCOPEL</strong>
                   </div>
                   <div class="dato-box">
                     <small>Nombre:</small>
                     <strong>Pika Games</strong>
                   </div>
+                  <div class="dato-box">
+                    <small>Monto a transferir:</small>
+                    <strong>${{ getTotalSeleccionado() | number:'1.2-2' }}</strong>
+                  </div>
                 </div>
-                <button class="brutal-btn green transfer-btn" (click)="apartarPorTransferencia(rifa, boletoSeleccionado)" [disabled]="reservando">
-                  {{ reservando ? 'APARTANDO...' : 'RESERVAR Y OBTENER TICKET' }}
+                <button class="brutal-btn green transfer-btn" (click)="apartarPorTransferencia(rifa)" [disabled]="reservando">
+                  {{ reservando ? 'APARTANDO...' : 'RESERVAR ' + boletosSeleccionados.length + ' BOLETO(S)' }}
                 </button>
               </div>
             </div>
@@ -281,19 +302,24 @@
         <span class="material-icons">close</span>
       </button>
       
-      <div class="success-banner-modal">¡BOLETO RESERVADO!</div>
+      <div class="success-banner-modal">¡BOLETO(S) RESERVADO(S)!</div>
       
       <div class="modal-exito-body">
         <div class="icon-check-container">
           <span class="material-icons check-icon">check_circle</span>
         </div>
         
-        <p class="num-exito-modal">Has apartado el boleto <strong>#{{boletoSeleccionado}}</strong><br> de la rifa <strong>{{rifaSeleccionada?.nombre}}</strong></p>
+        <p class="num-exito-modal">Has apartado <strong>{{ boletosSeleccionados.length }}</strong> boleto(s):<br>
+          <span class="boletos-lista-modal">
+            <span *ngFor="let num of boletosSeleccionados" class="boleto-chip-modal">#{{ num }}</span>
+          </span>
+          <br> de la rifa <strong>{{rifaSeleccionada?.nombre}}</strong>
+        </p>
         
         <div class="info-pasos-modal">
           <h4>Siguientes Pasos para confirmar:</h4>
           <ul>
-            <li><span class="paso-num">1</span> Realiza tu pago mediante <strong>{{metodoPagoSeleccionado === 'spei' ? 'Transferencia Bancaria' : (metodoPagoSeleccionado === 'oxxo' ? 'OXXO/7Eleven' : 'PayPal/Tarjeta')}}</strong></li>
+            <li><span class="paso-num">1</span> Realiza tu pago de <strong>${{ getTotalSeleccionado() | number:'1.2-2' }}</strong> mediante <strong>{{metodoPagoSeleccionado === 'spei' ? 'Transferencia Bancaria' : (metodoPagoSeleccionado === 'oxxo' ? 'OXXO/7Eleven' : 'PayPal/Tarjeta')}}</strong></li>
             <li><span class="paso-num">2</span> Toma captura o foto al ticket comprobante</li>
             <li><span class="paso-num">3</span> Envíanos el comprobante por WhatsApp dentro del tiempo límite</li>
           </ul>
@@ -303,7 +329,7 @@
           Confirma tu participación enviando tu comprobante por WhatsApp:
         </p>
         
-        <a *ngIf="rifaSeleccionada && boletoSeleccionado" [href]="generarLinkWhatsapp(rifaSeleccionada, boletoSeleccionado)" target="_blank" class="brutal-btn whatsapp-btn-modal" (click)="cerrarModalExito()">
+        <a *ngIf="rifaSeleccionada && boletosSeleccionados.length > 0" [href]="generarLinkWhatsapp(rifaSeleccionada)" target="_blank" class="brutal-btn whatsapp-btn-modal" (click)="cerrarModalExito()">
           ENVIAR COMPROBANTE AHORA
         </a>
       </div>
