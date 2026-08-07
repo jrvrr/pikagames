@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-reset-password',
@@ -15,14 +16,14 @@ export class ResetPasswordComponent implements OnInit {
   token: string = '';
   password: string = '';
   confirmPassword: string = '';
-  mensaje: string = '';
   error: string = '';
   isLoading: boolean = false;
 
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -52,16 +53,13 @@ export class ResetPasswordComponent implements OnInit {
 
     this.isLoading = true;
     this.error = '';
-    this.mensaje = '';
 
     this.authService.resetPassword(this.token, this.password).subscribe({
       next: (res) => {
         this.isLoading = false;
         if (res.success) {
-          this.mensaje = res.mensaje || 'Contraseña actualizada exitosamente.';
-          setTimeout(() => {
-            this.router.navigate(['/']); // redirect to login or home
-          }, 3000);
+          this.toastr.success(res.mensaje || 'Contraseña actualizada exitosamente.', '¡Éxito!');
+          this.router.navigate(['/']); // Redirigir al inicio/login
         } else {
           this.error = res.error || 'Ocurrió un error al intentar cambiar la contraseña.';
         }
