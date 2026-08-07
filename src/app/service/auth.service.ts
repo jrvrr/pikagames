@@ -60,4 +60,12 @@ export class AuthService {
   actualizarUsuario(id: string, adminId: string, data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, { ...data, adminId });
   }
+
+  forgotPassword(correo: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { correo });
+  }
+
+  resetPassword(token: string, password: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, password });
+  }
 }

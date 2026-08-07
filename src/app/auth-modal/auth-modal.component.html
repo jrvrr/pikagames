@@ -55,6 +55,12 @@
       </button>
     </form>
 
+    <div *ngIf="modo === 'login'" class="forgot-password-container">
+      <a href="javascript:void(0)" (click)="irARecuperar()" class="toggle-link forgot-link">
+        ¿Olvidaste tu contraseña?
+      </a>
+    </div>
+
     <p class="toggle">
       {{ modo === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?' }}
       <a href="#" class="toggle-link" (click)="alternarModo(); $event.preventDefault()">

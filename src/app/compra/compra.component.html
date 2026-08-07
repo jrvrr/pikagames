@@ -98,13 +98,15 @@
             <button 
               *ngFor="let num of (generarBoletos(rifa.cantidad_boletos || 0) | slice:(((rifa.paginaActual || 1) - 1) * (rifa.boletosPorPagina || 10)) : ((rifa.paginaActual || 1) * (rifa.boletosPorPagina || 10)))"
               class="boleto-btn"
-              [class.ocupado]="rifa.boletos_ocupados?.includes(num)"
+              [class.ocupado]="rifa.boletos_ocupados?.includes(num) && !esBoletoMio(rifa, num)"
+              [class.mio]="esBoletoMio(rifa, num)"
               [class.seleccionado]="esBoletoSeleccionado(rifa, num)"
               [disabled]="rifa.boletos_ocupados?.includes(num)"
               (click)="seleccionarBoleto(rifa, num)"
             >
               <div class="casilla-check">
-                <span *ngIf="rifa.boletos_ocupados?.includes(num)">✕</span>
+                <span *ngIf="rifa.boletos_ocupados?.includes(num) && !esBoletoMio(rifa, num)">✕</span>
+                <span *ngIf="esBoletoMio(rifa, num)">✓</span>
                 <span *ngIf="!rifa.boletos_ocupados?.includes(num) && !esBoletoSeleccionado(rifa, num)"></span>
                 <span *ngIf="esBoletoSeleccionado(rifa, num)">✓</span>
               </div>

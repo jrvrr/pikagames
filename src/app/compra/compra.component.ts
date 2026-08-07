@@ -194,6 +194,12 @@ export class CompraComponent implements OnInit {
     return this.rifaSeleccionada?.id === rifa.id && this.boletosSeleccionados.includes(num);
   }
 
+  esBoletoMio(rifa: any, num: number): boolean {
+    if (!this.usuario || !rifa.boletos_detalles) return false;
+    const boleto = rifa.boletos_detalles.find((b: any) => b.numero === num);
+    return boleto && boleto.user_id === this.usuario.id;
+  }
+
   getTotalSeleccionado(): number {
     if (!this.rifaSeleccionada) return 0;
     return this.boletosSeleccionados.length * (this.rifaSeleccionada.precio || 0);
@@ -279,7 +285,7 @@ export class CompraComponent implements OnInit {
         try {
           const payload = {
             rifa_id: rifa.id,
-            numero: primerBoleto,
+            boletos: boletos,
             monto: montoTotal,
             usuario_id: this.usuario.id
           };
@@ -308,7 +314,7 @@ export class CompraComponent implements OnInit {
             orderID: data.orderID,
             usuario_id: this.usuario.id,
             rifa_id: rifa.id,
-            numero: primerBoleto
+            boletos: boletos
           };
           const res = await firstValueFrom(this.rifasService.capturarPagoPaypal(payload));
           

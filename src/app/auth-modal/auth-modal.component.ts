@@ -5,6 +5,8 @@ import { AuthService } from '../service/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { MatIconModule } from '@angular/material/icon';
 
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-auth-modal',
   standalone: true,
@@ -36,12 +38,17 @@ export class AuthModalComponent {
     return this.contrasena.length >= 8;
   }
 
-  constructor(private authService: AuthService, private toastr: ToastrService) {}
+  constructor(private authService: AuthService, private toastr: ToastrService, private router: Router) {}
 
   // 🔁 Cambiar entre login / registro
   alternarModo() {
     this.modo = this.modo === 'login' ? 'register' : 'login';
     this.mostrarContrasena = false; // Resetear visibilidad al cambiar
+  }
+
+  irARecuperar() {
+    this.cerrarModal();
+    this.router.navigate(['/forgot-password']);
   }
 
   // 🛡️ Validaciones inmediatas (para eventos blur)

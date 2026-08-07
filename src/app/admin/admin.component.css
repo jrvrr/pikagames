@@ -2446,3 +2446,1138 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   ESTILOS PARA TABLA Y MODAL DE BOLETOS POR CLIENTE / USUARIO
+   ========================================================================== */
+
+/* Botón de boletos en la tabla de clientes y en modal perfil */
+.btn-action-pro.btn-tickets {
+  background: #ECFDF5;
+  color: #059669;
+  border-color: #A7F3D0;
+}
+
+.btn-action-pro.btn-tickets:hover {
+  background: #10B981;
+  color: white;
+  border-color: #10B981;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-tickets-pro {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.btn-tickets-pro:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* Modal Card de Boletos */
+.tickets-modal-card {
+  background: white;
+  width: 95%;
+  max-width: 960px;
+  max-height: 90vh;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid #E2E8F0;
+}
+
+/* Header */
+.tickets-modal-header {
+  padding: 1.5rem 2rem;
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-tickets-info {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.avatar-tickets-large img {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.user-tickets-title h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 0.2rem 0;
+}
+
+.user-tickets-title p {
+  color: #64748B;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.user-tickets-title p .material-icons {
+  font-size: 1rem;
+  color: #94A3B8;
+}
+
+/* Stat Quick Bar */
+.user-tickets-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: #F1F5F9;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.stat-chip {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.stat-chip .label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stat-chip .val {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.stat-chip.success {
+  border-left: 4px solid #10B981;
+}
+
+.stat-chip.success .val {
+  color: #059669;
+}
+
+.stat-chip.warning {
+  border-left: 4px solid #F59E0B;
+}
+
+.stat-chip.warning .val {
+  color: #D97706;
+}
+
+.stat-chip.info {
+  border-left: 4px solid #6366F1;
+}
+
+.stat-chip.info .val {
+  color: #4F46E5;
+}
+
+.stat-chip.winner {
+  background: #FEF2F2;
+  border: 1px solid #FECDD3;
+  border-left: 4px solid #EF4444;
+}
+
+.stat-chip.winner .val {
+  color: #DC2626;
+}
+
+/* Toolbar & Filters */
+.assign-ticket-panel {
+  padding: 1rem 2rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  background: #FEFCF8;
+  box-shadow: inset 0 0 0 1px rgba(253, 230, 138, 0.18);
+}
+
+.assign-ticket-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.assign-ticket-header .material-icons {
+  font-size: 2rem;
+  color: #F97316;
+}
+
+.assign-ticket-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.assign-ticket-header p {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.assign-ticket-form {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr auto;
+  align-items: flex-end;
+  gap: 0.85rem;
+}
+
+.assign-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.assign-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.assign-ticket-form .pro-select-compact,
+.assign-ticket-form .pro-input-compact {
+  width: 100%;
+}
+
+.btn-action-pro.btn-add-ticket {
+  min-height: 42px;
+  align-self: stretch;
+  background: #F97316;
+  color: white;
+  border-color: transparent;
+}
+
+.btn-action-pro.btn-add-ticket:hover {
+  background: #EA580C;
+}
+
+.tickets-modal-toolbar {
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #F1F5F9;
+  background: white;
+}
+
+.tickets-filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.filter-tab {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  color: #64748B;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-tab:hover {
+  background: #F1F5F9;
+  color: #1E293B;
+}
+
+.filter-tab.active {
+  background: #0F172A;
+  color: white;
+  border-color: #0F172A;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+}
+
+.filter-tab.success.active {
+  background: #059669;
+  border-color: #059669;
+}
+
+.filter-tab.warning.active {
+  background: #D97706;
+  border-color: #D97706;
+}
+
+.filter-tab.winner.active {
+  background: #DC2626;
+  border-color: #DC2626;
+}
+
+.tickets-search-input {
+  position: relative;
+  width: 240px;
+}
+
+.tickets-search-input .material-icons {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94A3B8;
+  font-size: 1.1rem;
+}
+
+.tickets-search-input input {
+  width: 100%;
+  padding: 0.5rem 0.85rem 0.5rem 2.2rem;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.tickets-search-input input:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Modal Body & Table */
+.tickets-modal-body {
+  padding: 1rem 2rem;
+  overflow-y: auto;
+  max-height: 55vh;
+  flex: 1;
+}
+
+.tickets-loader {
+  text-align: center;
+  padding: 3rem;
+  color: #64748B;
+}
+
+.tickets-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+}
+
+.tickets-table th {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #64748B;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #F1F5F9;
+  text-align: left;
+}
+
+.tickets-table td {
+  padding: 0.9rem 1rem;
+  background: #F8FAFC;
+  border-top: 1px solid #F1F5F9;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: middle;
+}
+
+.tickets-table td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  border-left: 1px solid #F1F5F9;
+}
+
+.tickets-table td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-right: 1px solid #F1F5F9;
+}
+
+.tickets-table tr:hover td {
+  background: #F1F5F9;
+}
+
+/* Winner Row Highlight */
+.tickets-table tr.winner-row td {
+  background: #FEF2F2 !important;
+  border-color: #FECDD3 !important;
+}
+
+.ticket-badge-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #EEF2FF;
+  color: #4F46E5;
+  padding: 0.4rem 0.85rem;
+  border-radius: 10px;
+  font-weight: 800;
+  border: 1px solid #C7D2FE;
+}
+
+.ticket-badge-cell .material-icons {
+  font-size: 1.1rem;
+}
+
+.ticket-num {
+  font-family: monospace;
+  font-size: 0.95rem;
+}
+
+.raffle-info-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.raffle-name {
+  font-weight: 700;
+  color: #0F172A;
+  font-size: 0.9rem;
+}
+
+.raffle-status-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #94A3B8;
+}
+
+.raffle-status-sub.active {
+  color: #10B981;
+}
+
+.price-text {
+  font-weight: 800;
+  color: #0F172A;
+  font-size: 0.9rem;
+}
+
+/* Status Pills */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.status-pill .material-icons {
+  font-size: 0.95rem;
+}
+
+.status-pill.vendido {
+  background: #D1FAE5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.status-pill.reservado {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+/* Winners Cell */
+.winner-badge-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #FEE2E2;
+  color: #991B1B;
+  padding: 0.4rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border: 1px solid #FCA5A5;
+}
+
+.winner-badge-cell .glow {
+  color: #DC2626;
+  font-size: 1.1rem;
+}
+
+.in-play-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0284C7;
+  background: #E0F2FE;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+}
+
+.no-prize-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #94A3B8;
+}
+
+/* Actions Group */
+.ticket-actions-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.btn-ticket-act {
+  border: none;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s;
+}
+
+.btn-ticket-act .material-icons {
+  font-size: 0.95rem;
+}
+
+.btn-ticket-act.btn-confirm {
+  background: #10B981;
+  color: white;
+}
+
+.btn-ticket-act.btn-confirm:hover {
+  background: #059669;
+  transform: scale(1.03);
+}
+
+.btn-ticket-act.btn-release {
+  background: #EF4444;
+  color: white;
+}
+
+.btn-ticket-act.btn-release:hover {
+  background: #DC2626;
+  transform: scale(1.03);
+}
+
+.btn-ticket-act.btn-view-raffle {
+  background: #E2E8F0;
+  color: #475569;
+}
+
+.btn-ticket-act.btn-view-raffle:hover {
+  background: #CBD5E1;
+  color: #0F172A;
+}
+
+.empty-tickets-cell {
+  text-align: center;
+  padding: 3rem 1rem !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.empty-tickets-cell .material-icons {
+  font-size: 3rem;
+  color: #CBD5E1;
+  margin-bottom: 0.5rem;
+}
+
+.empty-tickets-cell h4 {
+  font-weight: 800;
+  color: #475569;
+  margin: 0 0 0.25rem 0;
+}
+
+.empty-tickets-cell p {
+  color: #94A3B8;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Footer Modal */
+.tickets-modal-footer {
+  padding: 1.25rem 2rem;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .tickets-modal-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .tickets-modal-toolbar {
+    padding: 0.75rem 1.25rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tickets-search-input {
+    width: 100%;
+  }
+
+  .user-tickets-stats-bar {
+    padding: 0.75rem 1.25rem;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tickets-modal-body {
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/* ==========================================================================
+   ESTILOS PARA DETALLES DE RIFA / SORTEO (NATIVO ACOMODADO)
+   ========================================================================== */
+
+.raffle-detail-card {
+  background: white;
+  width: 95%;
+  max-width: 980px;
+  max-height: 90vh;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid #E2E8F0;
+}
+
+.raffle-detail-header {
+  padding: 1.5rem 2rem;
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.raffle-header-main {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.raffle-icon-large {
+  font-size: 2.2rem;
+  background: #EFF6FF;
+  padding: 0.5rem;
+  border-radius: 16px;
+  border: 1px solid #BFDBFE;
+}
+
+.raffle-title-box h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 0.35rem 0;
+}
+
+.raffle-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.status-pill-pro {
+  background: #F1F5F9;
+  color: #64748B;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.status-pill-pro.active {
+  background: #D1FAE5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.free-tickets-badge {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #F59E0B;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.price-tag-badge {
+  background: #EEF2FF;
+  color: #4F46E5;
+  border: 1px solid #C7D2FE;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.raffle-detail-body {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+  max-height: 65vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Section Titles */
+.section-title-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.section-title-badge.red {
+  color: #DC2626;
+}
+
+.section-title-badge.indigo {
+  color: #4F46E5;
+}
+
+/* Winners Grid */
+.winners-section-box {
+  background: #FEF2F2;
+  border: 1px solid #FECDD3;
+  padding: 1.25rem;
+  border-radius: 16px;
+}
+
+.winners-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+
+.winner-card-item {
+  background: white;
+  border: 1px solid #FCA5A5;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.08);
+}
+
+.winner-trophy-icon {
+  font-size: 1.8rem;
+}
+
+.winner-prize-title {
+  font-weight: 800;
+  color: #991B1B;
+  font-size: 0.92rem;
+  display: block;
+}
+
+.winner-ticket-num {
+  font-weight: 700;
+  color: #475569;
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+.winner-user-name {
+  font-weight: 700;
+  color: #0F172A;
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.winner-user-email {
+  color: #64748B;
+  font-size: 0.78rem;
+}
+
+/* Participants Section */
+.participants-section-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 1.25rem;
+  border-radius: 16px;
+}
+
+.participants-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.participants-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-pills-mini {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.pill-btn {
+  background: white;
+  border: 1px solid #CBD5E1;
+  color: #64748B;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pill-btn:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+.pill-btn.active {
+  background: #0F172A;
+  color: white;
+  border-color: #0F172A;
+}
+
+.pill-btn.green.active {
+  background: #059669;
+  border-color: #059669;
+}
+
+.pill-btn.amber.active {
+  background: #D97706;
+  border-color: #D97706;
+}
+
+.part-search-input {
+  position: relative;
+  width: 220px;
+}
+
+.part-search-input .material-icons {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94A3B8;
+  font-size: 1rem;
+}
+
+.part-search-input input {
+  width: 100%;
+  padding: 0.4rem 0.75rem 0.4rem 2.1rem;
+  border-radius: 8px;
+  border: 1px solid #CBD5E1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.part-search-input input:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* Participant List Items Grid (ACOMODADO) */
+.participants-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.participant-card-item {
+  background: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s;
+}
+
+.participant-card-item:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.part-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.part-badge-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.part-ticket-num {
+  font-weight: 800;
+  font-family: monospace;
+  color: #4F46E5;
+  background: #EEF2FF;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.part-name {
+  font-weight: 700;
+  color: #0F172A;
+  font-size: 0.88rem;
+}
+
+.part-status-chip {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.part-status-chip.vendido {
+  background: #D1FAE5;
+  color: #047857;
+}
+
+.part-email {
+  font-size: 0.78rem;
+  color: #64748B;
+  word-break: break-all;
+}
+
+.part-actions-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #E2E8F0;
+}
+
+.btn-part-act {
+  border: none;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.btn-part-act .material-icons {
+  font-size: 0.85rem;
+}
+
+.btn-part-act.btn-confirm {
+  background: #10B981;
+  color: white;
+}
+
+.btn-part-act.btn-confirm:hover {
+  background: #059669;
+}
+
+.btn-part-act.btn-release {
+  background: #EF4444;
+  color: white;
+}
+
+.btn-part-act.btn-release:hover {
+  background: #DC2626;
+}
+
+.btn-part-act.btn-user-edit {
+  background: #6366F1;
+  color: white;
+}
+
+.btn-part-act.btn-user-edit:hover {
+  background: #4F46E5;
+}
+
+.btn-part-act.btn-user-delete {
+  background: #64748B;
+  color: white;
+}
+
+.btn-part-act.btn-user-delete:hover {
+  background: #475569;
+}
+
+.empty-participants-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #94A3B8;
+}
+
+.empty-participants-box .material-icons {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-participants-box p {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.raffle-detail-footer {
+  padding: 1.25rem 2rem;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ==========================================================================
+   BADGES Y DESTACADOS PARA MULTI-COMPRADORES (>1 BOLETO)
+   ========================================================================== */
+
+.badge-multi-buyer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, #FEF2F2 0%, #FFF7ED 100%);
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
+}
+
+.badge-multi-buyer.glow {
+  animation: pulseFlame 2s infinite;
+}
+
+@keyframes pulseFlame {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.badge-single-buyer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.badge-zero-buyer {
+  color: #94A3B8;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pill-btn.flame {
+  border-color: #FCA5A5;
+  color: #DC2626;
+}
+
+.pill-btn.flame:hover {
+  background: #FEF2F2;
+}
+
+.pill-btn.flame.active {
+  background: #DC2626;
+  color: white;
+  border-color: #DC2626;
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+}
+
+.part-status-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.multi-raffle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  transition: transform 0.2s;
+}
+
+.multi-raffle-badge.glow {
+  animation: pulseFlame 2.2s infinite;
+}
+
+.participant-card-item.is-multi-buyer {
+  border-color: #F97316 !important;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFF1F2 100%) !important;
+  box-shadow: 0 10px 22px rgba(251, 146, 60, 0.16) !important;
+  transform: translateY(-1px);
+}
+
+
+

@@ -507,6 +507,15 @@
             </div>
             
             <div class="header-actions">
+              <div class="filter-pills-mini">
+                <button class="pill-btn" [class.active]="filtroClientesBoletos === 'todos'" (click)="filtroClientesBoletos = 'todos'">
+                  Todos los Clientes
+                </button>
+                <button class="pill-btn flame" [class.active]="filtroClientesBoletos === 'multi'" (click)="filtroClientesBoletos = 'multi'" title="Mostrar solo clientes con más de 1 boleto">
+                  🔥 Multi-compradores (>1)
+                </button>
+              </div>
+              
               <div class="search-pro-container">
                 <span class="material-icons">search</span>
                 <input 
@@ -528,6 +537,7 @@
                 <tr>
                   <th>Usuario</th>
                   <th>Contacto</th>
+                  <th>Boletos Comprados</th>
                   <th>Rol / Acceso</th>
                   <th>Fecha Registro</th>
                   <th class="text-right">Acciones</th>
@@ -552,6 +562,19 @@
                     </div>
                   </td>
                   <td>
+                    <div class="user-tickets-badge-cell">
+                      <span class="badge-multi-buyer glow" *ngIf="esMultiComprador(u)" title="¡Cliente frecuente con más de 1 boleto!">
+                        🔥 {{ obtenerCantidadBoletosUsuario(u) }} Boletos
+                      </span>
+                      <span class="badge-single-buyer" *ngIf="!esMultiComprador(u) && obtenerCantidadBoletosUsuario(u) > 0">
+                        🎟️ 1 Boleto
+                      </span>
+                      <span class="badge-zero-buyer" *ngIf="obtenerCantidadBoletosUsuario(u) === 0">
+                        0 Boletos
+                      </span>
+                    </div>
+                  </td>
+                  <td>
                     <span class="role-badge-premium" [class.admin]="u.es_admin">
                       <span class="material-icons">{{ u.es_admin ? 'admin_panel_settings' : 'person' }}</span>
                       {{ u.es_admin ? 'Administrador' : 'Cliente' }}
@@ -565,6 +588,9 @@
                   </td>
                   <td class="text-right">
                     <div class="action-btn-group-end">
+                      <button class="btn-action-pro btn-tickets" (click)="abrirModalBoletosUsuario(u)" title="Ver Boletos Comprados">
+                        <span class="material-icons">confirmation_number</span>
+                      </button>
                       <button class="btn-action-pro btn-info" (click)="verDetallesUsuario(u)" title="Ver Perfil">
                         <span class="material-icons">account_circle</span>
                       </button>
@@ -653,6 +679,9 @@
         </div>
 
         <div class="profile-detail-footer">
+          <button class="btn-tickets-pro" (click)="abrirModalBoletosUsuario(usuarioSeleccionado); usuarioSeleccionado = null">
+            <span class="material-icons">confirmation_number</span> Ver Boletos
+          </button>
           <button class="btn-secondary-pro" (click)="usuarioSeleccionado = null">Cerrar Detalle</button>
           <button class="btn-edit-pro" (click)="prepararEdicionUsuario(usuarioSeleccionado); usuarioSeleccionado = null">
             <span class="material-icons">edit</span> Editar Perfil
@@ -835,6 +864,341 @@
       </div>
     </div>
 
+    <!-- MODAL DE TABLA DE BOLETOS DE CLIENTE -->
+    <div class="edit-modal-overlay" *ngIf="usuarioBoletosSeleccionado" (click)="usuarioBoletosSeleccionado = null">
+      <div class="tickets-modal-card animate-slide-up" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="tickets-modal-header">
+          <div class="user-tickets-info">
+            <div class="avatar-tickets-large">
+              <img [src]="'https://ui-avatars.com/api/?name=' + usuarioBoletosSeleccionado.nombre + '&background=10b981&color=fff&size=128&bold=true'" alt="Avatar">
+            </div>
+            <div class="user-tickets-title">
+              <h2>Boletos de {{ usuarioBoletosSeleccionado.nombre }}</h2>
+              <p><span class="material-icons">email</span> {{ usuarioBoletosSeleccionado.correo }}</p>
+            </div>
+          </div>
+          <button class="btn-close-modal" (click)="usuarioBoletosSeleccionado = null">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <!-- Stats Quick Bar -->
+        <div class="user-tickets-stats-bar" *ngIf="!cargandoBoletosUsuario">
+          <div class="stat-chip">
+            <span class="label">Total Boletos</span>
+            <span class="val bold">{{ statsBoletosUsuario.total }}</span>
+          </div>
+          <div class="stat-chip success">
+            <span class="label">Confirmados (Vendidos)</span>
+            <span class="val">{{ statsBoletosUsuario.vendidos }}</span>
+          </div>
+          <div class="stat-chip warning">
+            <span class="label">Pendientes (Reservados)</span>
+            <span class="val">{{ statsBoletosUsuario.reservados }}</span>
+          </div>
+          <div class="stat-chip info">
+            <span class="label">Total Invertido</span>
+            <span class="val">${{ statsBoletosUsuario.invertido | number:'1.2-2' }}</span>
+          </div>
+          <div class="stat-chip winner" *ngIf="statsBoletosUsuario.premios > 0">
+            <span class="label">🏆 Premios Ganados</span>
+            <span class="val">{{ statsBoletosUsuario.premios }}</span>
+          </div>
+        </div>
+
+        <div class="assign-ticket-panel" *ngIf="!cargandoBoletosUsuario">
+          <div class="assign-ticket-header">
+            <span class="material-icons">how_to_reg</span>
+            <div>
+              <h4>Asignar boleto manualmente</h4>
+              <p>Selecciona una rifa y un número libre para agregarle un boleto a este usuario.</p>
+            </div>
+          </div>
+
+          <div class="assign-ticket-form">
+            <div class="assign-field">
+              <label>Rifa</label>
+              <select [(ngModel)]="rifaAsignarId" name="rifaAsignarId" class="pro-select-compact">
+                <option value="">Selecciona una rifa</option>
+                <option *ngFor="let rifa of rifasDisponiblesParaAsignacion" [value]="rifa.id">
+                  {{ rifa.nombre }} - {{ rifa.estado | uppercase }} (Libre: {{ (rifa.cantidad_boletos || 0) - (rifa.boletos_ocupados?.length || 0) }})
+                </option>
+              </select>
+            </div>
+            <div class="assign-field">
+              <label>Número de boleto</label>
+              <input type="number" [(ngModel)]="boletoAsignarNumero" name="boletoAsignarNumero" min="1" placeholder="Ej. 12" class="pro-input-compact">
+            </div>
+            <button class="btn-action-pro btn-add-ticket" (click)="asignarBoletoAUsuario()" [disabled]="asignarBoletoUsuarioCargando">
+              <span class="material-icons">confirmation_number</span>
+              {{ asignarBoletoUsuarioCargando ? 'Asignando...' : 'Asignar boleto' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Toolbar / Filters -->
+        <div class="tickets-modal-toolbar" *ngIf="!cargandoBoletosUsuario">
+          <div class="tickets-filter-tabs">
+            <button class="filter-tab" [class.active]="filtroBoletoEstado === 'todos'" (click)="filtroBoletoEstado = 'todos'">
+              Todos ({{ boletosDelUsuario.length }})
+            </button>
+            <button class="filter-tab success" [class.active]="filtroBoletoEstado === 'vendido'" (click)="filtroBoletoEstado = 'vendido'">
+              VENDIDOS ({{ statsBoletosUsuario.vendidos }})
+            </button>
+            <button class="filter-tab warning" [class.active]="filtroBoletoEstado === 'reservado'" (click)="filtroBoletoEstado = 'reservado'">
+              RESERVADOS ({{ statsBoletosUsuario.reservados }})
+            </button>
+            <button class="filter-tab winner" [class.active]="filtroBoletoEstado === 'ganadores'" (click)="filtroBoletoEstado = 'ganadores'">
+              🏆 GANADORES ({{ statsBoletosUsuario.premios }})
+            </button>
+          </div>
+
+          <div class="tickets-search-input">
+            <span class="material-icons">search</span>
+            <input type="text" [(ngModel)]="busquedaBoletoUsuario" placeholder="Buscar boleto # o rifa...">
+          </div>
+        </div>
+
+        <!-- Table Body -->
+        <div class="tickets-modal-body">
+          <div *ngIf="cargandoBoletosUsuario" class="tickets-loader">
+            <div class="spinner"></div>
+            <p>Cargando historial completo de boletos...</p>
+          </div>
+
+          <div class="table-responsive" *ngIf="!cargandoBoletosUsuario">
+            <table class="tickets-table">
+              <thead>
+                <tr>
+                  <th>Boleto</th>
+                  <th>Sorteo / Rifa</th>
+                  <th>Precio</th>
+                  <th>Estado</th>
+                  <th>Resultado</th>
+                  <th class="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let b of boletosUsuarioFiltrados" [class.winner-row]="b.esGanador">
+                  <td>
+                    <div class="ticket-badge-cell">
+                      <span class="material-icons">local_activity</span>
+                      <span class="ticket-num">#{{ b.numero | number:'3.0-0' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="raffle-info-cell">
+                      <span class="raffle-name">{{ b.rifaNombre }}</span>
+                      <span class="raffle-status-sub" [class.active]="b.rifaEstado === 'activa'">
+                        Sorteo {{ b.rifaEstado | uppercase }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="price-text">${{ b.rifaPrecio | number:'1.2-2' }}</span>
+                  </td>
+                  <td>
+                    <span class="status-pill" [class.vendido]="b.estadoBoleto === 'VENDIDO'" [class.reservado]="b.estadoBoleto !== 'VENDIDO'">
+                      <span class="material-icons">{{ b.estadoBoleto === 'VENDIDO' ? 'check_circle' : 'pending' }}</span>
+                      {{ b.estadoBoleto === 'VENDIDO' ? 'VENDIDO' : 'RESERVADO' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div *ngIf="b.esGanador" class="winner-badge-cell">
+                      <span class="material-icons glow">emoji_events</span>
+                      <span class="prize-title">🏆 {{ b.premioGanado }}</span>
+                    </div>
+                    <div *ngIf="!b.esGanador" class="no-winner-cell">
+                      <span *ngIf="b.rifaEstado === 'activa'" class="in-play-text">🎯 En juego</span>
+                      <span *ngIf="b.rifaEstado !== 'activa'" class="no-prize-text">Sin premio</span>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <div class="ticket-actions-group">
+                      <button class="btn-ticket-act btn-confirm" 
+                              *ngIf="b.estadoBoleto !== 'VENDIDO'" 
+                              (click)="confirmarPagoDesdeTablaUsuario(b.rifaId, b.numero)" 
+                              title="Confirmar Pago">
+                        <span class="material-icons">check</span> Confirmar
+                      </button>
+                      <button class="btn-ticket-act btn-release" 
+                              *ngIf="b.estadoBoleto !== 'VENDIDO'" 
+                              (click)="liberarBoletoDesdeTablaUsuario(b.rifaId, b.numero)" 
+                              title="Liberar Boleto">
+                        <span class="material-icons">delete</span> Liberar
+                      </button>
+                      <button class="btn-ticket-act btn-view-raffle" 
+                              (click)="verDetalles(b.rifaId)" 
+                              title="Ver Detalle de Rifa">
+                        <span class="material-icons">visibility</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr *ngIf="boletosUsuarioFiltrados.length === 0 && !cargandoBoletosUsuario">
+                  <td colspan="6" class="empty-tickets-cell">
+                    <span class="material-icons">confirmation_number</span>
+                    <h4>No se encontraron boletos</h4>
+                    <p *ngIf="busquedaBoletoUsuario || filtroBoletoEstado !== 'todos'">
+                      No hay boletos que coincidan con los filtros aplicados.
+                    </p>
+                    <p *ngIf="!busquedaBoletoUsuario && filtroBoletoEstado === 'todos'">
+                      Este usuario no ha comprado ni apartado ningún boleto todavía.
+                    </p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="tickets-modal-footer">
+          <button class="btn-secondary-pro" (click)="usuarioBoletosSeleccionado = null">Cerrar Tabla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE DETALLES DE RIFA / SORTEO (NATIVO ANGULAR ACOMODADO) -->
+    <div class="edit-modal-overlay" *ngIf="rifaDetalleSeleccionada" (click)="rifaDetalleSeleccionada = null">
+      <div class="raffle-detail-card animate-slide-up" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="raffle-detail-header">
+          <div class="raffle-header-main">
+            <div class="raffle-icon-large">🎟️</div>
+            <div class="raffle-title-box">
+              <h2>Detalles de {{ rifaDetalleSeleccionada.nombre }}</h2>
+              <div class="raffle-badges-row">
+                <span class="status-pill-pro" [class.active]="rifaDetalleSeleccionada.estado === 'activa'">
+                  SORTEO {{ rifaDetalleSeleccionada.estado | uppercase }}
+                </span>
+                <span class="free-tickets-badge">
+                  Boletos Libres: {{ boletosLibresRifaDetalle }} de {{ rifaDetalleSeleccionada.cantidad_boletos }}
+                </span>
+                <span class="price-tag-badge">
+                  ${{ rifaDetalleSeleccionada.precio | number:'1.2-2' }} / boleto
+                </span>
+              </div>
+            </div>
+          </div>
+          <button class="btn-close-modal" (click)="rifaDetalleSeleccionada = null">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+
+        <div class="raffle-detail-body">
+
+          <!-- GANADORES SECTION -->
+          <div class="winners-section-box" *ngIf="rifaDetalleSeleccionada.ganadores && rifaDetalleSeleccionada.ganadores.length > 0">
+            <div class="section-title-badge red">
+              <span class="material-icons">emoji_events</span>
+              <span>GANADORES DEL SORTEO</span>
+            </div>
+
+            <div class="winners-cards-grid">
+              <div class="winner-card-item" *ngFor="let g of rifaDetalleSeleccionada.ganadores">
+                <div class="winner-trophy-icon">🏆</div>
+                <div class="winner-card-info">
+                  <span class="winner-prize-title">🎁 {{ g.premio }}</span>
+                  <div class="winner-ticket-num">🎟️ Boleto: #{{ g.numero_boleto }}</div>
+                  <div class="winner-user-name">👤 {{ g.ganador_nombre }}</div>
+                  <div class="winner-user-email">{{ g.ganador_email }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PARTICIPANTES SECTION -->
+          <div class="participants-section-box">
+            <div class="participants-header-bar">
+              <div class="section-title-badge indigo">
+                <span class="material-icons">group</span>
+                <span>PARTICIPANTES ({{ rifaDetalleSeleccionada.participantes?.length || 0 }})</span>
+              </div>
+
+              <!-- Filtros y Buscador de Participantes -->
+              <div class="participants-controls">
+                <div class="filter-pills-mini">
+                  <button class="pill-btn" [class.active]="filtroEstadoParticipante === 'todos'" (click)="filtroEstadoParticipante = 'todos'">
+                    Todos
+                  </button>
+                  <button class="pill-btn green" [class.active]="filtroEstadoParticipante === 'vendido'" (click)="filtroEstadoParticipante = 'vendido'">
+                    Pagados
+                  </button>
+                  <button class="pill-btn amber" [class.active]="filtroEstadoParticipante === 'reservado'" (click)="filtroEstadoParticipante = 'reservado'">
+                    Pendientes ⏳
+                  </button>
+                </div>
+
+                <div class="part-search-input">
+                  <span class="material-icons">search</span>
+                  <input type="text" [(ngModel)]="busquedaParticipanteRifa" placeholder="Buscar participante o # boleto...">
+                </div>
+              </div>
+            </div>
+
+            <!-- Lista / Grid de Participantes (ACOMODADO) -->
+            <div class="participants-list-container">
+              <div class="participant-card-item" *ngFor="let p of participantesRifaFiltrados" [class.is-multi-buyer]="obtenerBoletosEnSorteoActual(p) > 1">
+                <div class="part-main-row">
+                  <div class="part-badge-info">
+                    <span class="status-icon-emoji">{{ p.estado === 'VENDIDO' ? '💰' : '⏳' }}</span>
+                    <span class="part-ticket-num">#{{ p.numero }}</span>
+                    <span class="part-name">{{ p.nombre }}</span>
+                  </div>
+                  <div class="part-status-group">
+                    <span class="multi-raffle-badge glow" *ngIf="obtenerBoletosEnSorteoActual(p) > 1" title="Esta persona compró {{ obtenerBoletosEnSorteoActual(p) }} boletos en este sorteo">
+                      🔥 {{ obtenerBoletosEnSorteoActual(p) }} Boletos
+                    </span>
+                    <span class="part-status-chip" [class.vendido]="p.estado === 'VENDIDO'">
+                      {{ p.estado }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="part-email">{{ p.email }}</div>
+
+                <!-- Botones de Acción sobre Boleto / Usuario -->
+                <div class="part-actions-wrapper">
+                  <!-- Acciones de Boleto (si pendiente) -->
+                  <button class="btn-part-act btn-confirm" *ngIf="p.estado !== 'VENDIDO'" (click)="confirmarPagoManual(rifaDetalleSeleccionada.id, p.numero)">
+                    <span class="material-icons">check</span> CONFIRMAR PAGO
+                  </button>
+                  <button class="btn-part-act btn-release" *ngIf="p.estado !== 'VENDIDO'" (click)="eliminarParticipante(rifaDetalleSeleccionada.id, p.numero)">
+                    <span class="material-icons">delete</span> LIBERAR BOLETO
+                  </button>
+
+                  <!-- Acciones de Usuario (si registrado) -->
+                  <button class="btn-part-act btn-user-edit" *ngIf="p.user_id" (click)="prepararEdicionUsuario({ id: p.user_id, nombre: p.nombre, correo: p.email, es_admin: p.es_admin }); rifaDetalleSeleccionada = null">
+                    <span class="material-icons">edit</span> EDITAR USUARIO
+                  </button>
+                  <button class="btn-part-act btn-user-delete" *ngIf="p.user_id && !p.es_admin" (click)="eliminarUsuarioConfirm({ id: p.user_id, nombre: p.nombre, correo: p.email, es_admin: p.es_admin })">
+                    <span class="material-icons">person_remove</span> ELIMINAR CUENTA
+                  </button>
+                </div>
+              </div>
+
+              <div class="empty-participants-box" *ngIf="participantesRifaFiltrados.length === 0">
+                <span class="material-icons">search_off</span>
+                <p *ngIf="busquedaParticipanteRifa || filtroEstadoParticipante !== 'todos'">No se encontraron participantes que coincidan con la búsqueda.</p>
+                <p *ngIf="!busquedaParticipanteRifa && filtroEstadoParticipante === 'todos'">Esta rifa aún no tiene participantes asignados.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="raffle-detail-footer">
+          <button class="btn-secondary-pro" (click)="rifaDetalleSeleccionada = null">Cerrar Detalle</button>
+        </div>
+      </div>
+    </div>
+
     </div>
   </main>
 </div>
+
+

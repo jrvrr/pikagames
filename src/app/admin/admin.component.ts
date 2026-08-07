@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { RifasService } from '../service/rifas.service';
 import { AuthService } from '../service/auth.service';
 import { ToastrService } from 'ngx-toastr';
@@ -69,6 +70,25 @@ export class AdminComponent implements OnInit {
   editando: any = null;
   editandoUsuario: any = null;
   usuarioSeleccionado: any = null;
+
+  // --- GESTIÓN DE BOLETOS DE USUARIO Y DETALLES DE RIFA ---
+  usuarioBoletosSeleccionado: any = null;
+  boletosDelUsuario: any[] = [];
+  cargandoBoletosUsuario: boolean = false;
+  filtroBoletoEstado: 'todos' | 'vendido' | 'reservado' | 'ganadores' = 'todos';
+  busquedaBoletoUsuario: string = '';
+  rifaAsignarId: string = '';
+  boletoAsignarNumero: number | null = null;
+  asignarBoletoUsuarioCargando: boolean = false;
+
+  rifaDetalleSeleccionada: any = null;
+  busquedaParticipanteRifa: string = '';
+  filtroEstadoParticipante: 'todos' | 'vendido' | 'reservado' = 'todos';
+
+  // --- CONTEO Y DESTACADO DE MULTI-COMPRADORES ---
+  conteoBoletosPorUsuario: { [key: string]: number } = {};
+  filtroClientesBoletos: 'todos' | 'multi' = 'todos';
+
 
   stats = {
     boletosVendidos: 0,
@@ -190,6 +210,7 @@ export class AdminComponent implements OnInit {
         this.rifasActivas = this.rifas.filter(r => r.estado === 'activa');
         this.historialRifas = this.rifas.filter(r => r.estado !== 'activa');
         this.calcularEstadisticas();
+        this.calcularConteoBoletosUsuarios();
         this.cargando = false;
       },
       error: () => {
@@ -226,15 +247,77 @@ export class AdminComponent implements OnInit {
       next: (res: any) => {
         this.usuarios = res.usuarios || [];
         this.stats.clientesTotales = this.usuarios.length;
+        this.calcularConteoBoletosUsuarios();
       },
       error: () => this.toastr.error('Error al cargar usuarios')
     });
   }
 
+  calcularConteoBoletosUsuarios(): void {
+    if (!this.rifas || this.rifas.length === 0) {
+      this.conteoBoletosPorUsuario = {};
+      return;
+    }
+
+    const map: { [key: string]: number } = {};
+    const requests = this.rifas.map((r: any) =>
+      firstValueFrom(this.rifasService.getRifaPorId(r.id)).catch(() => null)
+    );
+
+    Promise.all(requests).then((detalles: any[]) => {
+      detalles.forEach((det: any) => {
+        if (det && det.success && det.rifa && det.rifa.participantes) {
+          det.rifa.participantes.forEach((p: any) => {
+            if (p.user_id) {
+              map[p.user_id] = (map[p.user_id] || 0) + 1;
+            }
+            if (p.email) {
+              const emailKey = p.email.toLowerCase().trim();
+              map[emailKey] = (map[emailKey] || 0) + 1;
+            }
+          });
+        }
+      });
+      this.conteoBoletosPorUsuario = map;
+    }).catch(() => {
+      this.conteoBoletosPorUsuario = map;
+    });
+  }
+
+  obtenerCantidadBoletosUsuario(u: any): number {
+    if (!u) return 0;
+    const countById = u.id ? (this.conteoBoletosPorUsuario[u.id] || 0) : 0;
+    const countByEmail = u.correo ? (this.conteoBoletosPorUsuario[u.correo.toLowerCase().trim()] || 0) : 0;
+    return Math.max(countById, countByEmail);
+  }
+
+  esMultiComprador(u: any): boolean {
+    return this.obtenerCantidadBoletosUsuario(u) > 1;
+  }
+
+  obtenerBoletosEnSorteoActual(p: any): number {
+    if (!this.rifaDetalleSeleccionada || !this.rifaDetalleSeleccionada.participantes) return 1;
+    const participantes = this.rifaDetalleSeleccionada.participantes;
+    const pEmail = p.email ? p.email.toLowerCase().trim() : '';
+    const pUserId = p.user_id;
+
+    return participantes.filter((other: any) => {
+      const sameUser = pUserId && other.user_id === pUserId;
+      const sameEmail = pEmail && other.email && other.email.toLowerCase().trim() === pEmail;
+      return sameUser || sameEmail;
+    }).length;
+  }
+
   get usuariosFiltrados() {
-    if (!this.searchTerm.trim()) return this.usuarios;
+    let list = this.usuarios || [];
+
+    if (this.filtroClientesBoletos === 'multi') {
+      list = list.filter(u => this.esMultiComprador(u));
+    }
+
+    if (!this.searchTerm.trim()) return list;
     const term = this.searchTerm.toLowerCase();
-    return (this.usuarios || []).filter(u => 
+    return list.filter(u => 
       (u.nombre || '').toLowerCase().includes(term) || 
       (u.correo || '').toLowerCase().includes(term)
     );
@@ -468,6 +551,9 @@ export class AdminComponent implements OnInit {
   }
 
   verDetalles(id: string): void {
+    this.busquedaParticipanteRifa = '';
+    this.filtroEstadoParticipante = 'todos';
+
     Swal.fire({
       title: 'Cargando...',
       text: 'Buscando participantes y ganadores',
@@ -479,107 +565,47 @@ export class AdminComponent implements OnInit {
 
     this.rifasService.getRifaPorId(id).subscribe({
       next: (res) => {
+        Swal.close();
         if (!res.success) {
-          Swal.fire('Error', 'No se pudo cargar la info', 'error');
+          this.toastr.error('No se pudo cargar la información del sorteo');
           return;
         }
-
-        const data = res.rifa;
-        let html = '';
-        const disponibles = (data.cantidad_boletos || 0) - (data.participantes ? data.participantes.length : 0);
-        html += `<div style="text-align: center; margin-bottom: 20px;">
-                   <span style="font-size: 1.1rem; background: #fef3c7; color: #92400e; padding: 6px 16px; border-radius: 8px; font-weight: 700; border: 1px solid #f59e0b;">
-                     Boletos Libres: ${disponibles} de ${data.cantidad_boletos || 0}
-                   </span>
-                 </div>`;
-
-        if (data.ganadores && data.ganadores.length > 0) {
-          html += '<h3 style="color:#ef4444; font-weight:800; margin-bottom:10px;">🏆 GANADORES 🏆</h3>';
-          html += '<ul style="text-align: left; list-style: none; padding: 0;">';
-          data.ganadores.forEach((g: any) => {
-            html += `<li style="padding: 10px; background: #fff1f2; border-radius: 8px; margin-bottom: 8px; border: 1px solid #fecdd3;">
-                      🎁 <b>${g.premio}</b> <br>
-                      🎟️ Boleto: #${g.numero_boleto} <br>
-                      👤 ${g.ganador_nombre} <br>
-                      <small style="color:#666;">${g.ganador_email}</small>
-                    </li>`;
-          });
-          html += '</ul><br>';
-        }
-
-        if (data.participantes && data.participantes.length > 0) {
-          html += `<h4 style="color:#4f46e5; font-weight:800; margin-top:20px; margin-bottom:10px;">👥 PARTICIPANTES (${data.participantes.length})</h4>`;
-          html += '<div style="max-height: 350px; overflow-y: auto; border: 1px solid #e5e7eb; padding:10px; border-radius: 8px; text-align: left; background: #f9fafb;">';
-          html += '<ul style="list-style: none; padding: 0; margin: 0;">';
-          data.participantes.forEach((p: any) => {
-            const isVendido = p.estado === 'VENDIDO';
-            let statusIcon = isVendido ? '💰' : '⏳';
-            let actions = '';
-            
-            // Botones de acción del boleto
-            let ticketActions = '';
-            if (!isVendido) {
-              ticketActions = `
-                <div style="margin-top:8px; display:flex; gap:8px;">
-                  <button onclick="window.adminComponent.confirmarPagoManual('${data.id}', ${p.numero})" 
-                          style="background:#10b981; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
-                    CONFIRMAR PAGO
-                  </button>
-                  <button onclick="window.adminComponent.eliminarParticipante('${data.id}', ${p.numero})" 
-                          style="background:#ef4444; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
-                    LIBERAR BOLETO
-                  </button>
-                </div>
-              `;
-            }
-
-            // Botones de gestión del usuario
-            const userData = { id: p.user_id, nombre: p.nombre, correo: p.email, es_admin: p.es_admin };
-            const userJson = JSON.stringify(userData).replace(/"/g, '&quot;');
-            
-            let userActions = '';
-            if (p.user_id) {
-              userActions = `
-                <div style="margin-top:8px; display:flex; gap:8px; border-top:1px dashed #e5e7eb; padding-top:8px;">
-                  <button onclick="Swal.close(); window.adminComponent.prepararEdicionUsuario(${userJson})" 
-                          style="background:#6366f1; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;">
-                    👤 EDITAR USUARIO
-                  </button>
-                  <button onclick="Swal.close(); window.adminComponent.eliminarUsuarioConfirm(${userJson})" 
-                          style="background:#64748b; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:600; flex:1;"
-                          ${p.es_admin ? 'disabled' : ''}>
-                    🗑️ ELIMINAR CUENTA
-                  </button>
-                </div>
-              `;
-            }
-
-            html += `<li style="margin-bottom:12px; padding:12px; background:white; border-radius:8px; border:1px solid #e5e7eb; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                          <span style="font-weight:600;">${statusIcon} #${p.numero} - ${p.nombre}</span>
-                        </div>
-                        <div style="color:#6b7280; font-size:0.8rem; margin-top:2px;">${p.email}</div>
-                        ${ticketActions}
-                        ${userActions}
-                     </li>`;
-          });
-          html += '</ul></div>';
-        } else {
-          html += '<p>No hubo participantes.</p>';
-        }
-
-        Swal.fire({
-          title: `Detalles de ${data.nombre}`,
-          html: html,
-          width: '600px',
-          confirmButtonText: 'Cerrar',
-          confirmButtonColor: '#008CBA'
-        });
+        this.rifaDetalleSeleccionada = res.rifa;
       },
       error: () => {
-        Swal.fire('Error', 'Error al obtener detalles', 'error');
+        Swal.close();
+        this.toastr.error('Error al obtener detalles del sorteo');
       }
     });
+  }
+
+  get participantesRifaFiltrados(): any[] {
+    if (!this.rifaDetalleSeleccionada || !this.rifaDetalleSeleccionada.participantes) return [];
+    let list = [...this.rifaDetalleSeleccionada.participantes];
+
+    if (this.filtroEstadoParticipante === 'vendido') {
+      list = list.filter((p: any) => p.estado === 'VENDIDO');
+    } else if (this.filtroEstadoParticipante === 'reservado') {
+      list = list.filter((p: any) => p.estado !== 'VENDIDO');
+    }
+
+    if (this.busquedaParticipanteRifa.trim()) {
+      const term = this.busquedaParticipanteRifa.toLowerCase().trim();
+      list = list.filter((p: any) =>
+        p.numero.toString().includes(term) ||
+        (p.nombre && p.nombre.toLowerCase().includes(term)) ||
+        (p.email && p.email.toLowerCase().includes(term))
+      );
+    }
+
+    return list;
+  }
+
+  get boletosLibresRifaDetalle(): number {
+    if (!this.rifaDetalleSeleccionada) return 0;
+    const cap = this.rifaDetalleSeleccionada.cantidad_boletos || 0;
+    const count = this.rifaDetalleSeleccionada.participantes ? this.rifaDetalleSeleccionada.participantes.length : 0;
+    return Math.max(0, cap - count);
   }
 
   confirmarPagoManual(idRifa: string, numero: number): void {
@@ -872,6 +898,225 @@ export class AdminComponent implements OnInit {
       error: (err) => {
         this.toastr.error(err.error?.error || 'Error al actualizar usuario');
         this.cargando = false;
+      }
+    });
+  }
+
+  // --- MÉTODOS PARA BOLETOS POR USUARIO ---
+  abrirModalBoletosUsuario(u: any): void {
+    this.usuarioBoletosSeleccionado = u;
+    this.filtroBoletoEstado = 'todos';
+    this.busquedaBoletoUsuario = '';
+    this.rifaAsignarId = '';
+    this.boletoAsignarNumero = null;
+    this.asignarBoletoUsuarioCargando = false;
+    this.cargarBoletosDeUsuario(u);
+  }
+
+  cargarBoletosDeUsuario(u: any): void {
+    if (!u) return;
+    this.cargandoBoletosUsuario = true;
+    this.boletosDelUsuario = [];
+
+    this.rifasService.getRifas().subscribe({
+      next: (res: any) => {
+        const rawRifas = res.rifas || [];
+        if (rawRifas.length === 0) {
+          this.cargandoBoletosUsuario = false;
+          return;
+        }
+
+        const requests = rawRifas.map((r: any) => this.rifasService.getRifaPorId(r.id).toPromise().catch(() => null));
+
+        Promise.all(requests).then((detalles: any[]) => {
+          const boletosUsuario: any[] = [];
+
+          detalles.forEach((det: any) => {
+            if (!det || !det.success || !det.rifa) return;
+            const rifa = det.rifa;
+            const participantes = rifa.participantes || [];
+            const ganadores = rifa.ganadores || [];
+
+            participantes.forEach((p: any) => {
+              const esCoincidencia = 
+                (p.user_id && p.user_id === u.id) || 
+                (p.email && u.correo && p.email.toLowerCase().trim() === u.correo.toLowerCase().trim());
+
+              if (esCoincidencia) {
+                const ganadorInfo = ganadores.find((g: any) => Number(g.numero_boleto) === Number(p.numero));
+
+                boletosUsuario.push({
+                  rifaId: rifa.id,
+                  rifaNombre: rifa.nombre,
+                  rifaPrecio: Number(rifa.precio || 0),
+                  rifaEstado: rifa.estado,
+                  numero: p.numero,
+                  estadoBoleto: p.estado, // 'VENDIDO' o 'RESERVADO'
+                  user_id: p.user_id,
+                  nombre: p.nombre,
+                  email: p.email,
+                  esGanador: !!ganadorInfo,
+                  premioGanado: ganadorInfo ? ganadorInfo.premio : null,
+                  created_at: p.created_at || rifa.created_at
+                });
+              }
+            });
+          });
+
+          this.boletosDelUsuario = boletosUsuario.sort((a, b) => a.numero - b.numero);
+          this.cargandoBoletosUsuario = false;
+        }).catch((err) => {
+          console.error(err);
+          this.toastr.error('Error al procesar boletos del usuario');
+          this.cargandoBoletosUsuario = false;
+        });
+      },
+      error: () => {
+        this.toastr.error('Error al obtener rifas para boletos');
+        this.cargandoBoletosUsuario = false;
+      }
+    });
+  }
+
+  get boletosUsuarioFiltrados(): any[] {
+    let result = [...this.boletosDelUsuario];
+
+    if (this.filtroBoletoEstado === 'vendido') {
+      result = result.filter(b => b.estadoBoleto === 'VENDIDO');
+    } else if (this.filtroBoletoEstado === 'reservado') {
+      result = result.filter(b => b.estadoBoleto !== 'VENDIDO');
+    } else if (this.filtroBoletoEstado === 'ganadores') {
+      result = result.filter(b => b.esGanador);
+    }
+
+    if (this.busquedaBoletoUsuario.trim()) {
+      const term = this.busquedaBoletoUsuario.toLowerCase().trim();
+      result = result.filter(b => 
+        b.numero.toString().includes(term) || 
+        b.rifaNombre.toLowerCase().includes(term) ||
+        (b.premioGanado && b.premioGanado.toLowerCase().includes(term))
+      );
+    }
+
+    return result;
+  }
+
+  get statsBoletosUsuario() {
+    const total = this.boletosDelUsuario.length;
+    const vendidos = this.boletosDelUsuario.filter(b => b.estadoBoleto === 'VENDIDO').length;
+    const reservados = this.boletosDelUsuario.filter(b => b.estadoBoleto !== 'VENDIDO').length;
+    const invertido = this.boletosDelUsuario
+      .filter(b => b.estadoBoleto === 'VENDIDO')
+      .reduce((sum, b) => sum + (b.rifaPrecio || 0), 0);
+    const premios = this.boletosDelUsuario.filter(b => b.esGanador).length;
+
+    return { total, vendidos, reservados, invertido, premios };
+  }
+
+  confirmarPagoDesdeTablaUsuario(idRifa: string, numero: number): void {
+    Swal.fire({
+      title: '¿Confirmar Pago?',
+      text: `¿Deseas marcar el boleto #${numero} como VENDIDO?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, confirmar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.rifasService.confirmarPagoManual(idRifa, numero).subscribe({
+          next: () => {
+            this.toastr.success('Boleto confirmado exitosamente');
+            this.cargarBoletosDeUsuario(this.usuarioBoletosSeleccionado);
+          },
+          error: (err) => {
+            this.toastr.error('Error al confirmar el pago');
+            console.error(err);
+          }
+        });
+      }
+    });
+  }
+
+  liberarBoletoDesdeTablaUsuario(idRifa: string, numero: number): void {
+    Swal.fire({
+      title: '¿Liberar Boleto?',
+      text: `¿Deseas eliminar la reserva del boleto #${numero}? Volverá a estar disponible.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Sí, liberar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.rifasService.eliminarParticipante(idRifa, numero).subscribe({
+          next: () => {
+            this.toastr.success('Boleto liberado');
+            this.cargarBoletosDeUsuario(this.usuarioBoletosSeleccionado);
+          },
+          error: (err) => {
+            this.toastr.error('Error al liberar el boleto');
+            console.error(err);
+          }
+        });
+      }
+    });
+  }
+
+  get rifasDisponiblesParaAsignacion(): any[] {
+    return (this.rifas || []).filter((rifa: any) => {
+      const ocupados = rifa.boletos_ocupados?.length || 0;
+      return (rifa.cantidad_boletos || 0) > ocupados;
+    });
+  }
+
+  asignarBoletoAUsuario(): void {
+    if (!this.usuarioBoletosSeleccionado) return;
+    if (!this.rifaAsignarId || !this.boletoAsignarNumero) {
+      this.toastr.warning('Selecciona la rifa y el número de boleto a asignar.');
+      return;
+    }
+
+    const rifa = this.rifas.find((r: any) => r.id === this.rifaAsignarId);
+    if (!rifa) {
+      this.toastr.error('No se encontró la rifa seleccionada.');
+      return;
+    }
+
+    const numero = Number(this.boletoAsignarNumero);
+    if (numero < 1 || numero > (rifa.cantidad_boletos || 0)) {
+      this.toastr.warning('Número de boleto inválido.');
+      return;
+    }
+
+    const estaOcupado = (rifa.boletos_ocupados || []).includes(numero);
+    if (estaOcupado) {
+      this.toastr.warning('El boleto ya está ocupado. Elige otro número.');
+      return;
+    }
+
+    this.asignarBoletoUsuarioCargando = true;
+    this.rifasService.apartarBoleto(this.rifaAsignarId, {
+      user_id: this.usuarioBoletosSeleccionado.id,
+      boletos: [numero]
+    }).subscribe({
+      next: (res: any) => {
+        this.asignarBoletoUsuarioCargando = false;
+        if (res.success) {
+          this.toastr.success(`Boleto #${numero} asignado a ${this.usuarioBoletosSeleccionado.nombre}.`);
+          this.boletoAsignarNumero = null;
+          this.rifaAsignarId = '';
+          this.cargarBoletosDeUsuario(this.usuarioBoletosSeleccionado);
+          this.obtenerRifas();
+          this.obtenerUsuarios();
+        } else {
+          this.toastr.error(res.error || 'No se pudo asignar el boleto.');
+        }
+      },
+      error: (err) => {
+        this.asignarBoletoUsuarioCargando = false;
+        const mensajeError = err.error?.error || 'Error al asignar el boleto';
+        this.toastr.error(mensajeError);
+        console.error(err);
       }
     });
   }
