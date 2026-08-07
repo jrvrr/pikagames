@@ -48,7 +48,7 @@ export class AuthModalComponent {
 
   irARecuperar() {
     this.cerrarModal();
-    this.router.navigate(['/forgot-password']);
+    this.router.navigate(['/forgot-password'], { queryParams: { correo: this.correo } });
   }
 
   // 🛡️ Validaciones inmediatas (para eventos blur)

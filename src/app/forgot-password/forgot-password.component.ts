@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password',
@@ -11,13 +11,25 @@ import { Router } from '@angular/router';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.css']
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnInit {
   correo: string = '';
   mensaje: string = '';
   error: string = '';
   isLoading: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['correo']) {
+        this.correo = params['correo'];
+      }
+    });
+  }
 
   onSubmit() {
     if (!this.correo) {

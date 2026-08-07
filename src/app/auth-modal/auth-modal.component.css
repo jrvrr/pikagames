@@ -61,7 +61,8 @@
 }
 
 .password-wrapper .brutal-input {
-  padding-right: 50px; /* Espacio para el botón */
+  padding-right: 50px;
+  /* Espacio para el botón */
 }
 
 /* Ocultar el ojo por defecto de navegadores como Edge/IE */
@@ -97,12 +98,19 @@
 }
 
 .submit-btn {
-  margin-top: 15px;
-  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  width: 90%;
+  align-self: center;
+}
+
+.forgot-password-container {
+  text-align: center;
+  margin-top: 10px;
 }
 
 .toggle {
-  margin-top: 25px;
+  margin-top: 10px;
   text-align: center;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
@@ -151,7 +159,8 @@
 }
 
 .val-rule.valid {
-  color: #2e7d32; /* Green */
+  color: #2e7d32;
+  /* Green */
 }
 
 .val-rule.valid mat-icon {
