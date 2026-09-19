@@ -33,6 +33,11 @@ export class CompraComponent implements OnInit {
   metodoPagoSeleccionado: 'paypal' | 'oxxo' | 'spei' = 'paypal';
   editandoRifa: any = null;
 
+  // Ruleta
+  ruletaActiva = false;
+  ruletaGirando = false;
+  numerosObtenidos: number[] = [];
+
   constructor(
     private rifasService: RifasService,
     private authService: AuthService,
@@ -260,6 +265,64 @@ export class CompraComponent implements OnInit {
     const nums = this.boletosSeleccionados.map(n => `#${n}`).join(', ');
     const text = `Hola Pika Games! 👋 He apartado el/los boleto(s) ${nums} para la rifa de "${rifa.nombre}" mediante ${this.metodoPagoSeleccionado.toUpperCase()}. Aquí adjunto mi comprobante de pago.`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  }
+
+  // --- Lógica de la Ruleta ---
+  abrirRuleta(rifa: any): void {
+    if (!this.usuario) {
+      this.abrirAuth();
+      return;
+    }
+    if (this.usuario.es_admin) {
+      this.toastr.warning('Los administradores no pueden comprar boletos', 'Aviso');
+      return;
+    }
+    this.rifaSeleccionada = rifa;
+    this.ruletaActiva = true;
+    this.ruletaGirando = false;
+    this.numerosObtenidos = [];
+    this.boletosSeleccionados = [];
+  }
+
+  cerrarRuleta(): void {
+    this.ruletaActiva = false;
+    this.ruletaGirando = false;
+  }
+
+  jugarRuleta(): void {
+    if (this.ruletaGirando) return;
+    this.ruletaGirando = true;
+    this.numerosObtenidos = [];
+
+    // Llamar a la API para obtener 3 boletos
+    this.rifasService.generarBoletosAzar(this.rifaSeleccionada.id, 3).subscribe({
+      next: (res) => {
+        if (res.success && res.boletos) {
+          // Simulamos un retraso para la animación
+          setTimeout(() => {
+            this.numerosObtenidos = res.boletos;
+            this.boletosSeleccionados = [...this.numerosObtenidos];
+            this.ruletaGirando = false;
+            
+            setTimeout(() => {
+              this.cerrarRuleta();
+              this.toastr.success(`¡Has obtenido los boletos ${this.numerosObtenidos.join(', ')}!`, '¡Suerte!');
+              // Re-renderizar PayPal si es necesario
+              if (this.metodoPagoSeleccionado === 'paypal') {
+                setTimeout(() => this.renderizarPayPal(this.rifaSeleccionada, this.boletosSeleccionados), 100);
+              }
+            }, 3000); // 3 segundos para que vean sus números
+          }, 2000); // 2 segundos de animación
+        } else {
+          this.ruletaGirando = false;
+          this.toastr.error('No se pudieron obtener boletos al azar.');
+        }
+      },
+      error: (err) => {
+        this.ruletaGirando = false;
+        this.toastr.error(err.error?.error || 'Error al obtener boletos al azar.');
+      }
+    });
   }
 
   renderizarPayPal(rifa: any, boletos: number[]): void {

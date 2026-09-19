@@ -94,6 +94,10 @@
         <div class="boletos-container" *ngIf="!usuario?.es_admin">
           <h4>Selecciona tus boletos:</h4>
           
+          <div style="margin-bottom: 20px; text-align: center;">
+            <button class="brutal-btn yellow" (click)="abrirRuleta(rifa)">🎰 ¡QUIERO 3 BOLETOS AL AZAR!</button>
+          </div>
+
           <div class="boletos-lista">
             <button 
               *ngFor="let num of (generarBoletos(rifa.cantidad_boletos || 0) | slice:(((rifa.paginaActual || 1) - 1) * (rifa.boletosPorPagina || 10)) : ((rifa.paginaActual || 1) * (rifa.boletosPorPagina || 10)))"
@@ -296,6 +300,42 @@
     </div>
   </div>
   <app-auth-modal *ngIf="mostrarModal" (cerrar)="cerrarAuth()"></app-auth-modal>
+
+  <!-- MODAL RULETA -->
+  <div class="ruleta-overlay" *ngIf="ruletaActiva" (click)="cerrarRuleta()">
+    <div class="ruleta-modal animate-slide-up" (click)="$event.stopPropagation()">
+      <button class="btn-close-ruleta" (click)="cerrarRuleta()"><span class="material-icons">close</span></button>
+      
+      <h2 style="color: #fff; text-align: center; margin-bottom: 20px; font-weight: 900; font-family: 'Roboto', sans-serif;">¡SUERTE!</h2>
+      
+      <div class="slot-main">
+        <div class="slots" [class.loop]="ruletaGirando" [class.stop]="!ruletaGirando && numerosObtenidos.length > 0">
+          <div class="slot slot1">
+            <div class="slot-inner background1">
+              <span *ngIf="!ruletaGirando && numerosObtenidos.length > 0" class="slot-num">{{ numerosObtenidos[0] }}</span>
+              <span *ngIf="!ruletaGirando && numerosObtenidos.length === 0" class="slot-num">?</span>
+            </div>
+          </div>
+      
+          <div class="slot slot2">
+            <div class="slot-inner background1">
+              <span *ngIf="!ruletaGirando && numerosObtenidos.length > 0" class="slot-num">{{ numerosObtenidos[1] }}</span>
+              <span *ngIf="!ruletaGirando && numerosObtenidos.length === 0" class="slot-num">?</span>
+            </div>
+          </div>
+      
+          <div class="slot slot3">
+            <div class="slot-inner background1">
+              <span *ngIf="!ruletaGirando && numerosObtenidos.length > 0" class="slot-num">{{ numerosObtenidos[2] }}</span>
+              <span *ngIf="!ruletaGirando && numerosObtenidos.length === 0" class="slot-num">?</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-hit-it" (click)="jugarRuleta()" [disabled]="ruletaGirando || numerosObtenidos.length > 0">HIT IT!</button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- MODAL DE ÉXITO AL APARTAR (WHATSAPP) -->
   <div class="modal-exito-overlay" *ngIf="mostrarModalExito" (click)="cerrarModalExito()">

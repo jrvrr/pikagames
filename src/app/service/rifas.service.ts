@@ -56,6 +56,11 @@ export class RifasService {
     return this.http.post(`https://apipikagames.vercel.app/boletos/${rifaId}/apartar`, payload);
   }
 
+  // Generar boletos al azar
+  generarBoletosAzar(rifaId: string, cantidad: number): Observable<any> {
+    return this.http.post(`https://apipikagames.vercel.app/boletos/${rifaId}/azar`, { cantidad });
+  }
+
   // PayPal - Crear orden segura
   crearOrdenPaypal(data: { rifa_id: string | number, boletos: number[], monto: string | number, usuario_id: string }): Observable<any> {
     return this.http.post('https://apipikagames.vercel.app/paypal/crear-orden', data);
