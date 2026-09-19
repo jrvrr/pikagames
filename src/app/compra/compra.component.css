@@ -1,4 +1,4 @@
-/* Container y Layout General */
+﻿/* Container y Layout General */
 .compra-wrapper {
   padding: 20px 5% 60px 5%;
   min-height: 85vh;
@@ -22,7 +22,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Por si en mÃƒÂ³viles se junta mucho */
+  flex-wrap: wrap; /* Por si en mÃƒÆ’Ã‚Â³viles se junta mucho */
   gap: 15px;
 }
 
@@ -277,7 +277,7 @@
   margin-bottom: 20px;
 }
 
-/* Boleto individual (Neubrutalism rediseÃƒÂ±ado) */
+/* Boleto individual (Neubrutalism rediseÃƒÆ’Ã‚Â±ado) */
 .boleto-btn {
   display: flex;
   flex-direction: row;
@@ -363,7 +363,7 @@
   color: #ff3333;
 }
 
-/* Estado: Mío (Comprado/Reservado por el usuario actual) */
+/* Estado: MÃ­o (Comprado/Reservado por el usuario actual) */
 .boleto-btn.mio {
   background: #64748b; /* Gris azulado */
   box-shadow: 4px 4px 0px #000;
@@ -750,7 +750,7 @@
 
 .whatsapp-btn {
   width: 100% !important;
-  background-color: #387F39 !important; /* Verde mÃƒÂ¡s retro, menos "chicle" */
+  background-color: #387F39 !important; /* Verde mÃƒÆ’Ã‚Â¡s retro, menos "chicle" */
   color: #fff !important;
   padding: 18px !important;
   font-size: 1.1rem !important;
@@ -1330,143 +1330,382 @@
 
 
 
-/* --- RULETA STYLES --- */
+
+/* =============================================
+   RULETA DE CASINO - PIKA GAMES
+   ============================================= */
+
+.brutal-btn.yellow {
+  background: #e8ff00;
+  color: #000;
+  font-weight: 900;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  padding: 14px 28px;
+  font-size: 1.05rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.brutal-btn.yellow:hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+/* Overlay */
 .ruleta-overlay {
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.85);
+  inset: 0;
+  background: rgba(0,0,0,0.92);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  backdrop-filter: blur(4px);
 }
 
+/* Modal */
 .ruleta-modal {
-  background: #0b0b0b;
-  border: 4px solid #e8ff00;
-  box-shadow: 8px 8px 0px #e8ff00;
-  padding: 40px;
-  border-radius: 10px;
+  background: linear-gradient(160deg, #1a0033 0%, #0d001a 60%, #000 100%);
+  border: 3px solid #9f00ff;
+  box-shadow: 0 0 40px #9f00ff88, 8px 8px 0 #9f00ff;
+  padding: 32px 28px 28px;
+  border-radius: 16px;
   position: relative;
+  max-width: 460px;
+  width: 94vw;
 }
 
+/* Close button */
 .btn-close-ruleta {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ff4444;
-  color: white;
+  top: 12px; right: 12px;
+  background: #ff2244;
+  color: #fff;
   border: 2px solid #000;
-  box-shadow: 2px 2px 0px #000;
+  box-shadow: 2px 2px 0 #000;
   cursor: pointer;
   border-radius: 50%;
-  width: 40px; height: 40px;
+  width: 38px; height: 38px;
   display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  z-index: 2;
 }
 
-.btn-hit-it {
-  position: absolute;
-  width: 50%;
-  left: 25%;
-  font-size: 24px;
-  background-color: #e8ff00;
-  font-weight: 900;
-  border: 2px solid #000;
-  box-shadow: 4px 4px 0px #000;
-  bottom: -60px;
-  border-radius: 5px;
-  color: #000;
-  padding: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-hit-it:hover:not(:disabled) {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px #000;
-}
-
-.btn-hit-it:disabled {
-  background: #555;
-  color: #888;
-  box-shadow: 2px 2px 0px #000;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.slot-main {
-  display: block;
-  position: relative;
-  background-color: #0f0f0f;
-  border: 4px solid #333;
-  width: 350px;
-  height: 150px;
-  margin: 0 auto;
-  border-radius: 10px;
-  overflow: visible;
-  margin-bottom: 50px;
-}
-
-.slots {
-  position: absolute;
-  width: 100%;
+/* Header */
+.ruleta-header {
   text-align: center;
-  top: 50%;
-  transform: translate(0, -50%);
-  display: flex;
-  justify-content: space-around;
+  margin-bottom: 18px;
+}
+.ruleta-title-icon {
+  font-size: 2.5rem;
+}
+.ruleta-title {
+  color: #e8ff00;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  margin: 6px 0 4px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 12px #e8ff0088;
+}
+.ruleta-subtitle {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin: 0;
 }
 
-.slot {
-  display: inline-block;
-  height: 80px;
-  width: 80px;
-  overflow: hidden;
-  background: #fff;
-  border: 3px solid #000;
-  border-radius: 8px;
-  position: relative;
+/* Cantidad selector */
+.cantidad-selector {
+  text-align: center;
+  margin-bottom: 20px;
 }
-
-.slot-inner {
+.cantidad-label {
+  color: #ddd;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+.cantidad-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  width: 100%;
+  gap: 12px;
+}
+.btn-cantidad {
+  width: 44px; height: 44px;
+  font-size: 1.6rem;
+  font-weight: 900;
+  border-radius: 8px;
+  border: 3px solid #000;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  line-height: 1;
+}
+.btn-cantidad.minus { background: #ff4444; color: #fff; box-shadow: 3px 3px 0 #000; }
+.btn-cantidad.plus  { background: #00cc44; color: #fff; box-shadow: 3px 3px 0 #000; }
+.btn-cantidad:disabled { background: #444; color: #777; box-shadow: 1px 1px 0 #000; cursor: not-allowed; }
+.btn-cantidad:not(:disabled):hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 #000; }
+.cantidad-num {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #e8ff00;
+  min-width: 48px;
+  text-align: center;
+  text-shadow: 0 0 8px #e8ff00aa;
+}
+.cantidad-total {
+  color: #ccc;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+.cantidad-total strong { color: #e8ff00; }
+
+/* Slot machine wrapper */
+.slot-machine-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.slot-num {
-  font-size: 40px;
+/* Casino lights */
+.casino-lights {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.light {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #e8ff00;
+  box-shadow: 0 0 6px #e8ff00;
+  animation: blink 0.8s infinite alternate;
+}
+.light.l1 { animation-delay: 0s; }
+.light.l2 { animation-delay: 0.12s; background:#ff4444; box-shadow:0 0 6px #ff4444; }
+.light.l3 { animation-delay: 0.24s; background:#00ccff; box-shadow:0 0 6px #00ccff; }
+.light.l4 { animation-delay: 0.36s; }
+.light.l5 { animation-delay: 0.48s; background:#ff4444; box-shadow:0 0 6px #ff4444; }
+.light.l6 { animation-delay: 0.60s; background:#00ccff; box-shadow:0 0 6px #00ccff; }
+.light.l7 { animation-delay: 0.72s; }
+
+@keyframes blink {
+  0%  { opacity: 1; }
+  100%{ opacity: 0.2; }
+}
+
+/* Slot machine body */
+.slot-main {
+  background: linear-gradient(180deg, #111 0%, #1a1a1a 100%);
+  border: 4px solid #444;
+  border-radius: 14px;
+  width: 320px;
+  height: 130px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 8px #000, 0 4px 16px #0008;
+}
+
+/* Center line */
+.slot-line {
+  position: absolute;
+  top: 50%; left: 8px; right: 8px;
+  height: 3px;
+  background: rgba(232,255,0,0.5);
+  transform: translateY(-50%);
+  z-index: 3;
+  border-radius: 2px;
+  box-shadow: 0 0 8px #e8ff00;
+}
+
+.slots {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  z-index: 2;
+}
+
+/* Each slot window */
+.slot {
+  width: 82px;
+  height: 90px;
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.slot-reel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinning icons strip */
+.slot-icons-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: reelSpin 0.18s linear infinite;
+}
+.slot-icons-strip.delay2 { animation-delay: -0.06s; }
+.slot-icons-strip.delay3 { animation-delay: -0.12s; }
+.slot-icons-strip span {
+  font-size: 1.8rem;
+  line-height: 1.3;
+  display: block;
+}
+
+@keyframes reelSpin {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-90px); }
+}
+
+/* Static result */
+.slot-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.result-num {
+  font-size: 2rem;
   font-weight: 900;
   color: #000;
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.slot-q {
+  font-size: 2rem;
 }
 
-/* Animations without image (using numbers and background colors to fake spin) */
-.loop .slot-inner {
-  animation: fakeSpin 0.2s infinite linear;
+@keyframes popIn {
+  0%  { transform: scale(0.4); opacity: 0; }
+  100%{ transform: scale(1);   opacity: 1; }
 }
 
-.loop .slot2 .slot-inner {
-  animation-delay: 0.05s;
+/* Lever */
+.lever-wrapper {
+  position: absolute;
+  right: -42px;
+  top: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+}
+.lever-track {
+  width: 18px;
+  height: 100px;
+  background: #333;
+  border-radius: 9px;
+  border: 2px solid #555;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+  cursor: pointer;
+}
+.lever {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  transform-origin: bottom center;
+}
+.lever.lever-pulled {
+  transform: translateY(64px) rotate(8deg);
+}
+.lever-ball {
+  width: 24px; height: 24px;
+  background: radial-gradient(circle at 35% 35%, #ff4444, #aa0000);
+  border-radius: 50%;
+  border: 3px solid #000;
+  box-shadow: 0 3px 8px #0008;
+}
+.lever-arm {
+  width: 6px;
+  height: 52px;
+  background: linear-gradient(180deg, #888 0%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid #333;
 }
 
-.loop .slot3 .slot-inner {
-  animation-delay: 0.1s;
+/* HIT IT button */
+.btn-hit-it {
+  margin-top: 16px;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 900;
+  background: #e8ff00;
+  color: #000;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.15s;
+}
+.btn-hit-it:not(:disabled):hover {
+  transform: translate(-2px,-2px);
+  box-shadow: 6px 6px 0 #000;
+}
+.btn-hit-it:disabled {
+  background: #444;
+  color: #777;
+  box-shadow: 2px 2px 0 #000;
+  cursor: not-allowed;
 }
 
-@keyframes fakeSpin {
-  0% { transform: translateY(-100%); opacity: 0.5; }
-  50% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(100%); opacity: 0.5; }
+/* Resultado */
+.ruleta-resultado {
+  text-align: center;
+  margin-top: 20px;
+  padding: 16px;
+  border: 2px solid #00cc44;
+  border-radius: 10px;
+  background: rgba(0,204,68,0.08);
+  animation: fadeInUp 0.5s ease;
 }
-
-.stop .slot-inner {
-  animation: stopSpin 0.5s normal forwards ease-out;
+.resultado-label {
+  color: #00ff55;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 10px;
 }
+.resultado-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.chip-resultado {
+  background: #e8ff00;
+  color: #000;
+  font-weight: 900;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid #000;
+  font-size: 1rem;
+  box-shadow: 2px 2px 0 #000;
+}
+.resultado-total {
+  color: #ccc;
+  font-size: 0.9rem;
+  margin: 0;
+}
+.resultado-total strong { color: #e8ff00; }
 
-@keyframes stopSpin {
-  0% { transform: translateY(-50%); }
-  50% { transform: translateY(10%); }
-  100% { transform: translateY(0); }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

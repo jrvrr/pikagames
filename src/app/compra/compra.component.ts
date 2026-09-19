@@ -37,6 +37,7 @@ export class CompraComponent implements OnInit {
   ruletaActiva = false;
   ruletaGirando = false;
   numerosObtenidos: number[] = [];
+  cantidadAzar: number = 1;
 
   constructor(
     private rifasService: RifasService,
@@ -282,6 +283,7 @@ export class CompraComponent implements OnInit {
     this.ruletaGirando = false;
     this.numerosObtenidos = [];
     this.boletosSeleccionados = [];
+    this.cantidadAzar = 1; // reset cantidad
   }
 
   cerrarRuleta(): void {
@@ -289,13 +291,25 @@ export class CompraComponent implements OnInit {
     this.ruletaGirando = false;
   }
 
+  aumentarCantidadAzar(): void {
+    if (this.cantidadAzar < (this.rifaSeleccionada?.cantidad_boletos || 10)) {
+      this.cantidadAzar++;
+    }
+  }
+
+  disminuirCantidadAzar(): void {
+    if (this.cantidadAzar > 1) {
+      this.cantidadAzar--;
+    }
+  }
+
   jugarRuleta(): void {
     if (this.ruletaGirando) return;
     this.ruletaGirando = true;
     this.numerosObtenidos = [];
 
-    // Llamar a la API para obtener 3 boletos
-    this.rifasService.generarBoletosAzar(this.rifaSeleccionada.id, 3).subscribe({
+    // Llamar a la API para obtener boletos
+    this.rifasService.generarBoletosAzar(this.rifaSeleccionada.id, this.cantidadAzar).subscribe({
       next: (res) => {
         if (res.success && res.boletos) {
           // Simulamos un retraso para la animación

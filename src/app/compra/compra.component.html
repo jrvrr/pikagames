@@ -95,7 +95,7 @@
           <h4>Selecciona tus boletos:</h4>
           
           <div style="margin-bottom: 20px; text-align: center;">
-            <button class="brutal-btn yellow" (click)="abrirRuleta(rifa)">🎰 ¡QUIERO 3 BOLETOS AL AZAR!</button>
+            <button class="brutal-btn yellow" (click)="abrirRuleta(rifa)">🎰 ¡QUIERO BOLETOS AL AZAR!</button>
           </div>
 
           <div class="boletos-lista">
@@ -306,32 +306,100 @@
     <div class="ruleta-modal animate-slide-up" (click)="$event.stopPropagation()">
       <button class="btn-close-ruleta" (click)="cerrarRuleta()"><span class="material-icons">close</span></button>
       
-      <h2 style="color: #fff; text-align: center; margin-bottom: 20px; font-weight: 900; font-family: 'Roboto', sans-serif;">¡SUERTE!</h2>
-      
-      <div class="slot-main">
-        <div class="slots" [class.loop]="ruletaGirando" [class.stop]="!ruletaGirando && numerosObtenidos.length > 0">
-          <div class="slot slot1">
-            <div class="slot-inner background1">
-              <span *ngIf="!ruletaGirando && numerosObtenidos.length > 0" class="slot-num">{{ numerosObtenidos[0] }}</span>
-              <span *ngIf="!ruletaGirando && numerosObtenidos.length === 0" class="slot-num">?</span>
+      <div class="ruleta-header">
+        <span class="ruleta-title-icon">🎰</span>
+        <h2 class="ruleta-title">RULETA DE BOLETOS</h2>
+        <p class="ruleta-subtitle">Presiona la palanca y el destino elige por ti</p>
+      </div>
+
+      <div class="cantidad-selector" *ngIf="!ruletaGirando && numerosObtenidos.length === 0">
+        <p class="cantidad-label">¿Cuántos boletos quieres?</p>
+        <div class="cantidad-controls">
+          <button class="btn-cantidad minus" (click)="disminuirCantidadAzar()" [disabled]="cantidadAzar <= 1">−</button>
+          <span class="cantidad-num">{{ cantidadAzar }}</span>
+          <button class="btn-cantidad plus" (click)="aumentarCantidadAzar()">+</button>
+        </div>
+        <p class="cantidad-total">Total: <strong>${{ (cantidadAzar * (rifaSeleccionada?.precio || 0)) | number:'1.2-2' }}</strong></p>
+      </div>
+
+      <div class="slot-machine-wrapper">
+        <div class="casino-lights">
+          <span class="light l1"></span><span class="light l2"></span><span class="light l3"></span>
+          <span class="light l4"></span><span class="light l5"></span><span class="light l6"></span>
+          <span class="light l7"></span>
+        </div>
+
+        <div class="slot-main">
+          <div class="slot-line"></div>
+          <div class="slots" [class.loop]="ruletaGirando" [class.stop]="!ruletaGirando && numerosObtenidos.length > 0">
+
+            <div class="slot slot1">
+              <div class="slot-reel" [class.spinning]="ruletaGirando">
+                <div *ngIf="ruletaGirando" class="slot-icons-strip">
+                  <span>🍒</span><span>💎</span><span>7️⃣</span><span>🔔</span><span>⭐</span>
+                  <span>🍋</span><span>🍒</span><span>💎</span><span>7️⃣</span><span>🔔</span>
+                </div>
+                <div *ngIf="!ruletaGirando" class="slot-result">
+                  <span *ngIf="numerosObtenidos.length > 0" class="result-num">{{ numerosObtenidos[0] }}</span>
+                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">🎲</span>
+                </div>
+              </div>
             </div>
-          </div>
-      
-          <div class="slot slot2">
-            <div class="slot-inner background1">
-              <span *ngIf="!ruletaGirando && numerosObtenidos.length > 0" class="slot-num">{{ numerosObtenidos[1] }}</span>
-              <span *ngIf="!ruletaGirando && numerosObtenidos.length === 0" class="slot-num">?</span>
+
+            <div class="slot slot2">
+              <div class="slot-reel" [class.spinning]="ruletaGirando">
+                <div *ngIf="ruletaGirando" class="slot-icons-strip delay2">
+                  <span>🔔</span><span>⭐</span><span>🍒</span><span>💎</span><span>7️⃣</span>
+                  <span>🍋</span><span>🔔</span><span>⭐</span><span>🍒</span><span>💎</span>
+                </div>
+                <div *ngIf="!ruletaGirando" class="slot-result">
+                  <span *ngIf="numerosObtenidos.length > 1" class="result-num">{{ numerosObtenidos[1] }}</span>
+                  <span *ngIf="numerosObtenidos.length === 1" class="result-num">{{ numerosObtenidos[0] }}</span>
+                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">🎲</span>
+                </div>
+              </div>
             </div>
+
+            <div class="slot slot3">
+              <div class="slot-reel" [class.spinning]="ruletaGirando">
+                <div *ngIf="ruletaGirando" class="slot-icons-strip delay3">
+                  <span>💎</span><span>7️⃣</span><span>🍋</span><span>🍒</span><span>🔔</span>
+                  <span>⭐</span><span>💎</span><span>7️⃣</span><span>🍋</span><span>🍒</span>
+                </div>
+                <div *ngIf="!ruletaGirando" class="slot-result">
+                  <span *ngIf="numerosObtenidos.length > 2" class="result-num">{{ numerosObtenidos[2] }}</span>
+                  <span *ngIf="numerosObtenidos.length === 2" class="result-num">{{ numerosObtenidos[1] }}</span>
+                  <span *ngIf="numerosObtenidos.length === 1" class="result-num">{{ numerosObtenidos[0] }}</span>
+                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">🎲</span>
+                </div>
+              </div>
+            </div>
+
           </div>
-      
-          <div class="slot slot3">
-            <div class="slot-inner background1">
-              <span *ngIf="!ruletaGirando && numerosObtenidos.length > 0" class="slot-num">{{ numerosObtenidos[2] }}</span>
-              <span *ngIf="!ruletaGirando && numerosObtenidos.length === 0" class="slot-num">?</span>
+        </div>
+
+        <div class="lever-wrapper">
+          <div class="lever-track">
+            <div class="lever" [class.lever-pulled]="ruletaGirando" (click)="!ruletaGirando && numerosObtenidos.length === 0 && jugarRuleta()">
+              <div class="lever-ball"></div>
+              <div class="lever-arm"></div>
             </div>
           </div>
         </div>
-        <button class="btn-hit-it" (click)="jugarRuleta()" [disabled]="ruletaGirando || numerosObtenidos.length > 0">HIT IT!</button>
+
+        <button class="btn-hit-it" id="hit-it-btn"
+          (click)="jugarRuleta()"
+          [disabled]="ruletaGirando || numerosObtenidos.length > 0">
+          {{ ruletaGirando ? '🎰 GIRANDO...' : '🎰 HIT IT!' }}
+        </button>
+      </div>
+
+      <div class="ruleta-resultado" *ngIf="!ruletaGirando && numerosObtenidos.length > 0">
+        <p class="resultado-label">✅ ¡Tus boletos al azar!</p>
+        <div class="resultado-chips">
+          <span *ngFor="let n of numerosObtenidos" class="chip-resultado">#{{ n }}</span>
+        </div>
+        <p class="resultado-total">Total a pagar: <strong>${{ (cantidadAzar * (rifaSeleccionada?.precio || 0)) | number:'1.2-2' }}</strong></p>
       </div>
 
     </div>
