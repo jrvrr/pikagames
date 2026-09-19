@@ -307,17 +307,16 @@
       <button class="btn-close-ruleta" (click)="cerrarRuleta()"><span class="material-icons">close</span></button>
       
       <div class="ruleta-header">
-        <span class="ruleta-title-icon">🎰</span>
-        <h2 class="ruleta-title">ELIGE TUS BOLETOS AL AZAR</h2>
-        <p class="ruleta-subtitle">El sistema selecciona boletos libres por ti</p>
+        <span class="ruleta-kicker">SELECCIÓN RÁPIDA</span>
+        <h2 class="ruleta-title">Tu suerte, en juego</h2>
       </div>
 
       <div class="cantidad-selector" *ngIf="!ruletaGirando && numerosObtenidos.length === 0">
         <div class="disponibles-badge">
-          <span class="disp-icon">🎟️</span>
-          <span class="disp-text"><strong>{{ getBoletosDisponibles(rifaSeleccionada) }}</strong> boletos disponibles</span>
+          <span class="material-icons">confirmation_number</span>
+          <span class="disp-text"><strong>{{ getBoletosDisponibles(rifaSeleccionada) }}</strong> disponibles</span>
         </div>
-        <p class="cantidad-label">¿Cuántos quieres?</p>
+        <p class="cantidad-label">Boletos a seleccionar</p>
         <div class="cantidad-controls">
           <button class="btn-cantidad minus" (click)="disminuirCantidadAzar()" [disabled]="cantidadAzar <= 1">−</button>
           <div class="cantidad-display">
@@ -326,25 +325,13 @@
           </div>
           <button class="btn-cantidad plus" (click)="aumentarCantidadAzar()" [disabled]="cantidadAzar >= getBoletosDisponibles(rifaSeleccionada)">+</button>
         </div>
-        <p class="cantidad-total">Total a pagar: <strong>${{ (cantidadAzar * (rifaSeleccionada?.precio || 0)) | number:'1.2-2' }}</strong></p>
+        <p class="cantidad-total">Total <strong>${{ (cantidadAzar * (rifaSeleccionada?.precio || 0)) | number:'1.2-2' }}</strong></p>
       </div>
 
       <div class="slot-machine-wrapper">
 
-        <!-- Luces de casino arriba -->
-        <div class="casino-lights">
-          <span class="light l1"></span><span class="light l2"></span><span class="light l3"></span>
-          <span class="light l4"></span><span class="light l5"></span><span class="light l6"></span>
-          <span class="light l7"></span>
-        </div>
-
-        <!-- Contenedor principal: imagen + reels + palanca -->
         <div class="tragamoneda-container">
-
-          <!-- Imagen de fondo de la tragamoneda -->
-          <img src="tragamoneda.png" alt="Tragamonedas" class="tragamoneda-img" />
-
-          <!-- Los 3 carretes sobre las ventanas de la imagen -->
+          <img src="tragamoneda.svg" alt="Tragamonedas dorada" class="tragamoneda-img" />
           <div class="reels-overlay">
 
             <div class="slot-win slot-win-1">
@@ -389,15 +376,12 @@
               </div>
             </div>
 
-          </div><!-- /reels-overlay -->
+          </div>
 
-          <!-- PALANCA DERECHA -->
           <div class="lever-side"
                [class.lever-pulled]="ruletaGirando"
                (click)="!ruletaGirando && numerosObtenidos.length === 0 && jugarRuleta()">
-            <!-- Riel vertical -->
             <div class="lever-rail"></div>
-            <!-- Brazo de la palanca -->
             <div class="lever-arm-group">
               <div class="lever-knob"></div>
               <div class="lever-stick"></div>
@@ -405,17 +389,18 @@
             </div>
           </div>
 
-        </div><!-- /tragamoneda-container -->
+        </div>
 
         <button class="btn-hit-it" id="hit-it-btn"
           (click)="jugarRuleta()"
           [disabled]="ruletaGirando || numerosObtenidos.length > 0">
-          {{ ruletaGirando ? '🎰 GIRANDO...' : '🎰 ¡JALAR!' }}
+          <span class="material-icons">casino</span>
+          {{ ruletaGirando ? 'SELECCIONANDO' : 'PROBAR SUERTE' }}
         </button>
       </div>
 
       <div class="ruleta-resultado" *ngIf="!ruletaGirando && numerosObtenidos.length > 0">
-        <p class="resultado-label">✅ ¡Tus boletos al azar!</p>
+        <p class="resultado-label">Boletos seleccionados</p>
         <div class="resultado-chips">
           <span *ngFor="let n of numerosObtenidos" class="chip-resultado">#{{ n }}</span>
         </div>
