@@ -308,18 +308,25 @@
       
       <div class="ruleta-header">
         <span class="ruleta-title-icon">🎰</span>
-        <h2 class="ruleta-title">RULETA DE BOLETOS</h2>
-        <p class="ruleta-subtitle">Presiona la palanca y el destino elige por ti</p>
+        <h2 class="ruleta-title">ELIGE TUS BOLETOS AL AZAR</h2>
+        <p class="ruleta-subtitle">El sistema selecciona boletos libres por ti</p>
       </div>
 
       <div class="cantidad-selector" *ngIf="!ruletaGirando && numerosObtenidos.length === 0">
-        <p class="cantidad-label">¿Cuántos boletos quieres?</p>
+        <div class="disponibles-badge">
+          <span class="disp-icon">🎟️</span>
+          <span class="disp-text"><strong>{{ getBoletosDisponibles(rifaSeleccionada) }}</strong> boletos disponibles</span>
+        </div>
+        <p class="cantidad-label">¿Cuántos quieres?</p>
         <div class="cantidad-controls">
           <button class="btn-cantidad minus" (click)="disminuirCantidadAzar()" [disabled]="cantidadAzar <= 1">−</button>
-          <span class="cantidad-num">{{ cantidadAzar }}</span>
-          <button class="btn-cantidad plus" (click)="aumentarCantidadAzar()">+</button>
+          <div class="cantidad-display">
+            <span class="cantidad-num">{{ cantidadAzar }}</span>
+            <span class="cantidad-max">de {{ getBoletosDisponibles(rifaSeleccionada) }}</span>
+          </div>
+          <button class="btn-cantidad plus" (click)="aumentarCantidadAzar()" [disabled]="cantidadAzar >= getBoletosDisponibles(rifaSeleccionada)">+</button>
         </div>
-        <p class="cantidad-total">Total: <strong>${{ (cantidadAzar * (rifaSeleccionada?.precio || 0)) | number:'1.2-2' }}</strong></p>
+        <p class="cantidad-total">Total a pagar: <strong>${{ (cantidadAzar * (rifaSeleccionada?.precio || 0)) | number:'1.2-2' }}</strong></p>
       </div>
 
       <div class="slot-machine-wrapper">

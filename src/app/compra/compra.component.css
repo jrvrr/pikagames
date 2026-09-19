@@ -1709,3 +1709,31 @@
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Disponibles badge */
+.disponibles-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,200,80,0.15);
+  border: 2px solid #00cc50;
+  border-radius: 30px;
+  padding: 6px 16px;
+  margin-bottom: 12px;
+}
+.disp-icon { font-size: 1.2rem; }
+.disp-text { color: #ccc; font-size: 0.9rem; }
+.disp-text strong { color: #00ff66; font-size: 1.1rem; }
+
+/* Cantidad display group */
+.cantidad-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+}
+.cantidad-max {
+  font-size: 0.72rem;
+  color: #888;
+  margin-top: 2px;
+}

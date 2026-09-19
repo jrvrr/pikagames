@@ -291,8 +291,15 @@ export class CompraComponent implements OnInit {
     this.ruletaGirando = false;
   }
 
+  getBoletosDisponibles(rifa: any): number {
+    const total = rifa?.cantidad_boletos || 0;
+    const ocupados = rifa?.boletos_ocupados?.length || 0;
+    return Math.max(0, total - ocupados);
+  }
+
   aumentarCantidadAzar(): void {
-    if (this.cantidadAzar < (this.rifaSeleccionada?.cantidad_boletos || 10)) {
+    const maxDisp = this.getBoletosDisponibles(this.rifaSeleccionada);
+    if (this.cantidadAzar < maxDisp) {
       this.cantidadAzar++;
     }
   }
