@@ -95,7 +95,7 @@
           <h4>Selecciona tus boletos:</h4>
           
           <div style="margin-bottom: 20px; text-align: center;">
-            <button class="brutal-btn yellow" (click)="abrirRuleta(rifa)">🎰 ¡QUIERO BOLETOS AL AZAR!</button>
+            <button class="brutal-btn yellow" (click)="abrirRuleta(rifa)">¡QUIERO BOLETOS AL AZAR!</button>
           </div>
 
           <div class="boletos-lista">
@@ -342,7 +342,7 @@
                 </div>
                 <div *ngIf="!ruletaGirando" class="slot-result">
                   <span *ngIf="numerosObtenidos.length > 0" class="result-num">{{ numerosObtenidos[0] }}</span>
-                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">🎲</span>
+                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">?</span>
                 </div>
               </div>
             </div>
@@ -356,7 +356,7 @@
                 <div *ngIf="!ruletaGirando" class="slot-result">
                   <span *ngIf="numerosObtenidos.length > 1" class="result-num">{{ numerosObtenidos[1] }}</span>
                   <span *ngIf="numerosObtenidos.length === 1" class="result-num">{{ numerosObtenidos[0] }}</span>
-                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">🎲</span>
+                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">?</span>
                 </div>
               </div>
             </div>
@@ -371,7 +371,7 @@
                   <span *ngIf="numerosObtenidos.length > 2" class="result-num">{{ numerosObtenidos[2] }}</span>
                   <span *ngIf="numerosObtenidos.length === 2" class="result-num">{{ numerosObtenidos[1] }}</span>
                   <span *ngIf="numerosObtenidos.length === 1" class="result-num">{{ numerosObtenidos[0] }}</span>
-                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">🎲</span>
+                  <span *ngIf="numerosObtenidos.length === 0" class="slot-q">?</span>
                 </div>
               </div>
             </div>
@@ -394,7 +394,6 @@
         <button class="btn-hit-it" id="hit-it-btn"
           (click)="jugarRuleta()"
           [disabled]="ruletaGirando || numerosObtenidos.length > 0">
-          <span class="material-icons">casino</span>
           {{ ruletaGirando ? 'SELECCIONANDO' : 'PROBAR SUERTE' }}
         </button>
       </div>
