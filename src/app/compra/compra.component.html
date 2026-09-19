@@ -330,17 +330,24 @@
       </div>
 
       <div class="slot-machine-wrapper">
+
+        <!-- Luces de casino arriba -->
         <div class="casino-lights">
           <span class="light l1"></span><span class="light l2"></span><span class="light l3"></span>
           <span class="light l4"></span><span class="light l5"></span><span class="light l6"></span>
           <span class="light l7"></span>
         </div>
 
-        <div class="slot-main">
-          <div class="slot-line"></div>
-          <div class="slots" [class.loop]="ruletaGirando" [class.stop]="!ruletaGirando && numerosObtenidos.length > 0">
+        <!-- Contenedor principal: imagen + reels + palanca -->
+        <div class="tragamoneda-container">
 
-            <div class="slot slot1">
+          <!-- Imagen de fondo de la tragamoneda -->
+          <img src="tragamoneda.png" alt="Tragamonedas" class="tragamoneda-img" />
+
+          <!-- Los 3 carretes sobre las ventanas de la imagen -->
+          <div class="reels-overlay">
+
+            <div class="slot-win slot-win-1">
               <div class="slot-reel" [class.spinning]="ruletaGirando">
                 <div *ngIf="ruletaGirando" class="slot-icons-strip">
                   <span>🍒</span><span>💎</span><span>7️⃣</span><span>🔔</span><span>⭐</span>
@@ -353,7 +360,7 @@
               </div>
             </div>
 
-            <div class="slot slot2">
+            <div class="slot-win slot-win-2">
               <div class="slot-reel" [class.spinning]="ruletaGirando">
                 <div *ngIf="ruletaGirando" class="slot-icons-strip delay2">
                   <span>🔔</span><span>⭐</span><span>🍒</span><span>💎</span><span>7️⃣</span>
@@ -367,7 +374,7 @@
               </div>
             </div>
 
-            <div class="slot slot3">
+            <div class="slot-win slot-win-3">
               <div class="slot-reel" [class.spinning]="ruletaGirando">
                 <div *ngIf="ruletaGirando" class="slot-icons-strip delay3">
                   <span>💎</span><span>7️⃣</span><span>🍋</span><span>🍒</span><span>🔔</span>
@@ -382,22 +389,28 @@
               </div>
             </div>
 
-          </div>
-        </div>
+          </div><!-- /reels-overlay -->
 
-        <div class="lever-wrapper">
-          <div class="lever-track">
-            <div class="lever" [class.lever-pulled]="ruletaGirando" (click)="!ruletaGirando && numerosObtenidos.length === 0 && jugarRuleta()">
-              <div class="lever-ball"></div>
-              <div class="lever-arm"></div>
+          <!-- PALANCA DERECHA -->
+          <div class="lever-side"
+               [class.lever-pulled]="ruletaGirando"
+               (click)="!ruletaGirando && numerosObtenidos.length === 0 && jugarRuleta()">
+            <!-- Riel vertical -->
+            <div class="lever-rail"></div>
+            <!-- Brazo de la palanca -->
+            <div class="lever-arm-group">
+              <div class="lever-knob"></div>
+              <div class="lever-stick"></div>
+              <div class="lever-base-cap"></div>
             </div>
           </div>
-        </div>
+
+        </div><!-- /tragamoneda-container -->
 
         <button class="btn-hit-it" id="hit-it-btn"
           (click)="jugarRuleta()"
           [disabled]="ruletaGirando || numerosObtenidos.length > 0">
-          {{ ruletaGirando ? '🎰 GIRANDO...' : '🎰 HIT IT!' }}
+          {{ ruletaGirando ? '🎰 GIRANDO...' : '🎰 ¡JALAR!' }}
         </button>
       </div>
 
