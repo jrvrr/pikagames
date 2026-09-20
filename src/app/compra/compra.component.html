@@ -404,6 +404,7 @@
           <span *ngFor="let n of numerosObtenidos" class="chip-resultado">#{{ n }}</span>
         </div>
         <p class="resultado-total">Total a pagar: <strong>${{ (cantidadAzar * (rifaSeleccionada?.precio || 0)) | number:'1.2-2' }}</strong></p>
+        <button class="btn-comprar-boletos" (click)="continuarCompraRuleta()">COMPRAR BOLETOS</button>
       </div>
 
     </div>

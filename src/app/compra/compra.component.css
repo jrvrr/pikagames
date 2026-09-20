@@ -1776,7 +1776,7 @@
 .ruleta-header { margin: 2px 38px 18px; }
 .ruleta-kicker {
   display: inline-block;
-  color: #e4b547;
+  color: #9b680d;
   font-size: .68rem;
   font-weight: 800;
   letter-spacing: .18em;
@@ -1804,7 +1804,7 @@
   background: #fff;
 }
 .disponibles-badge { grid-column: 1; margin: 0; padding: 0; border: 0; background: none; border-radius: 0; }
-.disponibles-badge .material-icons { color: #e5b743; font-size: 18px; }
+.disponibles-badge .material-icons { color: #9b680d; font-size: 18px; }
 .disp-text { color: #555; font-size: .78rem; }
 .disp-text strong { color: #171717; font-size: .95rem; }
 .cantidad-label { grid-column: 1; color: #555; font-size: .75rem; margin: 0; }
@@ -1822,7 +1822,7 @@
 .cantidad-num { color: #171717; font-size: 1.45rem; min-width: 30px; text-shadow: none; }
 .cantidad-max { display: none; }
 .cantidad-total { grid-column: 1 / -1; margin: 0; color: #555; font-size: .78rem; }
-.cantidad-total strong { color: #f4c653; margin-left: 4px; }
+.cantidad-total strong { color: #9b680d; margin-left: 4px; }
 
 .slot-machine-wrapper { width: 100%; }
 .tragamoneda-container { position: relative; width: min(100%, 410px); margin: 0 auto; }
@@ -1868,10 +1868,24 @@
 .btn-hit-it:disabled { background: #3a3529; border-color: #5a5038; color: #a89b7e; box-shadow: none; }
 
 .ruleta-resultado { margin-top: 14px; padding: 13px; border: 1px solid #171717; border-radius: 12px; background: #fff8e2; }
-.resultado-label { color: #f8d574; font-size: .78rem; margin: 0 0 9px; text-transform: uppercase; letter-spacing: .1em; }
+.resultado-label { color: #9b680d; font-size: .78rem; margin: 0 0 9px; text-transform: uppercase; letter-spacing: .1em; }
 .chip-resultado { border: 1px solid #f4c657; border-radius: 7px; background: #f7e4ae; box-shadow: none; color: #281b06; font-size: .9rem; }
 .resultado-total { color: #555; }
-.resultado-total strong { color: #f8d574; }
+.resultado-total strong { color: #9b680d; }
+.btn-comprar-boletos {
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px;
+  border: 1px solid #171717;
+  border-radius: 8px;
+  background: #171717;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: .76rem;
+  letter-spacing: .1em;
+}
+.btn-comprar-boletos:hover { background: #9b680d; }
 
 @media (max-width: 480px) {
   .ruleta-overlay { padding: 12px; }

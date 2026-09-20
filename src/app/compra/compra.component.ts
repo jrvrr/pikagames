@@ -291,6 +291,22 @@ export class CompraComponent implements OnInit {
     this.ruletaGirando = false;
   }
 
+  continuarCompraRuleta(): void {
+    const rifaId = this.rifaSeleccionada?.id;
+    this.cerrarRuleta();
+
+    if (this.metodoPagoSeleccionado === 'paypal') {
+      setTimeout(() => this.renderizarPayPal(this.rifaSeleccionada, this.boletosSeleccionados), 100);
+    }
+
+    setTimeout(() => {
+      document.querySelector(`#paypal-button-container-${rifaId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 250);
+  }
+
   getBoletosDisponibles(rifa: any): number {
     const total = rifa?.cantidad_boletos || 0;
     const ocupados = rifa?.boletos_ocupados?.length || 0;
@@ -326,13 +342,14 @@ export class CompraComponent implements OnInit {
             this.ruletaGirando = false;
             
             setTimeout(() => {
+              if (!this.ruletaActiva) return;
               this.cerrarRuleta();
               this.toastr.success(`¡Has obtenido los boletos ${this.numerosObtenidos.join(', ')}!`, '¡Suerte!');
               // Re-renderizar PayPal si es necesario
               if (this.metodoPagoSeleccionado === 'paypal') {
                 setTimeout(() => this.renderizarPayPal(this.rifaSeleccionada, this.boletosSeleccionados), 100);
               }
-            }, 3000); // 3 segundos para que vean sus números
+            }, 7000); // 7 segundos para revisar los boletos seleccionados
           }, 2000); // 2 segundos de animación
         } else {
           this.ruletaGirando = false;
