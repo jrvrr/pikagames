@@ -1738,29 +1738,37 @@
   margin-top: 2px;
 }
 
-/* Selección al azar: estética dorada basada en el arte de tragamonedas. */
+/* Selección al azar: misma estética retro/neubrutalista de Pika Games. */
+.brutal-btn.yellow {
+  background: var(--nin-yellow) !important;
+  color: var(--nin-dark) !important;
+  border: 3px solid #000 !important;
+  border-radius: 10px !important;
+  box-shadow: 4px 4px 0 #000 !important;
+}
+.brutal-btn.yellow:hover {
+  background: #ffda47 !important;
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0 #000 !important;
+}
 .ruleta-overlay {
-  background: rgba(8, 7, 3, .78);
-  backdrop-filter: blur(9px);
+  background: rgba(0, 0, 0, .68);
+  backdrop-filter: blur(4px);
   padding: 20px;
 }
 
 .ruleta-modal {
-  --gold: #f8c54d;
-  --gold-light: #ffe486;
   max-width: 490px;
   width: min(100%, 490px);
   max-height: calc(100vh - 40px);
   overflow-y: auto;
   padding: 30px 30px 28px;
-  border: 3px solid #171717;
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(248, 197, 77, .2), transparent 38%),
-    #fffdf7;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, .48), 0 0 0 5px rgba(255, 255, 255, .25);
-  font-family: 'Montserrat', 'Nunito', sans-serif;
-  font-weight: 600;
+  border: 4px solid #000;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 7px 7px 0 var(--nin-yellow), 12px 12px 0 #000;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
 }
 
 .btn-close-ruleta {
@@ -1768,23 +1776,23 @@
   right: 14px;
   width: 34px;
   height: 34px;
-  border: 1px solid #171717;
-  box-shadow: none;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
   background: #fff;
   color: #171717;
 }
-.btn-close-ruleta:hover { background: #b94337; }
+.btn-close-ruleta:hover { background: var(--nin-red); color: #fff; }
 
 .ruleta-header { margin: 2px 38px 18px; }
 .ruleta-kicker {
   display: inline-block;
-  color: #9b680d;
+  color: #9f6200;
   font-size: .68rem;
   font-weight: 900;
   letter-spacing: .18em;
 }
 .ruleta-title {
-  color: #171717;
+  color: #000;
   font-family: inherit;
   font-size: clamp(1.5rem, 5vw, 2rem);
   letter-spacing: -.035em;
@@ -1801,12 +1809,12 @@
   padding: 14px 16px;
   margin: 0 0 16px;
   text-align: left;
-  border: 1px solid #171717;
-  border-radius: 14px;
+  border: 2px solid #000;
+  border-radius: 10px;
   background: #fff;
 }
 .disponibles-badge { grid-column: 1; margin: 0; padding: 0; border: 0; background: none; border-radius: 0; }
-.disponibles-badge .material-icons { color: #9b680d; font-size: 18px; }
+.disponibles-badge .material-icons { color: #9f6200; font-size: 18px; }
 .disp-text { color: #3f3f3f; font-size: .8rem; font-weight: 700; }
 .disp-text strong { color: #171717; font-size: .95rem; }
 .cantidad-label { grid-column: 1; color: #3f3f3f; font-size: .77rem; font-weight: 700; margin: 0; }
@@ -1814,17 +1822,17 @@
 .btn-cantidad {
   width: 34px;
   height: 34px;
-  border: 1px solid rgba(248, 197, 77, .55);
-  border-radius: 9px;
-  box-shadow: none;
+  border: 2px solid #000;
+  border-radius: 8px;
+  box-shadow: 2px 2px 0 #000;
   font-size: 1.25rem;
 }
-.btn-cantidad.minus, .btn-cantidad.plus { background: #292315; color: #f7ce68; }
-.btn-cantidad:not(:disabled):hover { background: #f2c451; color: #181208; box-shadow: none; transform: none; }
+.btn-cantidad.minus, .btn-cantidad.plus { background: var(--nin-yellow); color: #000; }
+.btn-cantidad:not(:disabled):hover { background: #ffda47; color: #000; box-shadow: 1px 1px 0 #000; transform: translate(1px, 1px); }
 .cantidad-num { color: #171717; font-size: 1.45rem; min-width: 30px; text-shadow: none; }
 .cantidad-max { display: none; }
 .cantidad-total { grid-column: 1 / -1; margin: 0; color: #3f3f3f; font-size: .8rem; font-weight: 700; }
-.cantidad-total strong { color: #9b680d; margin-left: 4px; }
+.cantidad-total strong { color: #9f6200; margin-left: 4px; }
 
 .slot-machine-wrapper { width: 100%; }
 .tragamoneda-container { position: relative; width: min(100%, 410px); margin: 0 auto; }
@@ -1857,38 +1865,39 @@
   gap: 9px;
   margin-top: 10px;
   padding: 13px;
-  border: 1px solid #f8c54d;
+  border: 3px solid #000;
   border-radius: 10px;
-  background: linear-gradient(135deg, #ffdb78, #d99d27);
-  box-shadow: inset 0 1px rgba(255, 255, 255, .45), 0 7px 18px rgba(0, 0, 0, .26);
-  color: #211604;
+  background: var(--nin-yellow);
+  box-shadow: 4px 4px 0 #000;
+  color: #000;
   font-size: .82rem;
   font-weight: 900;
   letter-spacing: .12em;
 }
 .btn-hit-it .material-icons { font-size: 19px; }
-.btn-hit-it:not(:disabled):hover { box-shadow: inset 0 1px rgba(255, 255, 255, .45), 0 10px 22px rgba(0, 0, 0, .32); transform: translateY(-1px); }
+.btn-hit-it:not(:disabled):hover { background: #ffda47; box-shadow: 2px 2px 0 #000; transform: translate(2px, 2px); }
 .btn-hit-it:disabled { background: #3a3529; border-color: #5a5038; color: #a89b7e; box-shadow: none; }
 
-.ruleta-resultado { margin-top: 14px; padding: 13px; border: 1px solid #171717; border-radius: 12px; background: #fff8e2; }
-.resultado-label { color: #9b680d; font-size: .78rem; font-weight: 900; margin: 0 0 9px; text-transform: uppercase; letter-spacing: .1em; }
-.chip-resultado { border: 1px solid #f4c657; border-radius: 7px; background: #f7e4ae; box-shadow: none; color: #281b06; font-size: .9rem; }
+.ruleta-resultado { margin-top: 14px; padding: 13px; border: 2px solid #000; border-radius: 10px; background: #fff; box-shadow: 3px 3px 0 var(--nin-yellow); }
+.resultado-label { color: #9f6200; font-size: .78rem; font-weight: 900; margin: 0 0 9px; text-transform: uppercase; letter-spacing: .1em; }
+.chip-resultado { border: 2px solid #000; border-radius: 7px; background: var(--nin-yellow); box-shadow: 2px 2px 0 #000; color: #000; font-size: .9rem; }
 .resultado-total { color: #3f3f3f; font-weight: 700; }
-.resultado-total strong { color: #9b680d; }
+.resultado-total strong { color: #9f6200; }
 .btn-comprar-boletos {
   width: 100%;
   margin-top: 12px;
   padding: 11px;
-  border: 1px solid #171717;
+  border: 3px solid #000;
   border-radius: 8px;
-  background: #171717;
-  color: #fff;
+  background: var(--nin-yellow);
+  box-shadow: 3px 3px 0 #000;
+  color: #000;
   cursor: pointer;
   font-weight: 900;
   font-size: .76rem;
   letter-spacing: .1em;
 }
-.btn-comprar-boletos:hover { background: #9b680d; }
+.btn-comprar-boletos:hover { background: #ffda47; transform: translate(1px, 1px); box-shadow: 2px 2px 0 #000; }
 
 @media (max-width: 480px) {
   .ruleta-overlay { padding: 12px; }
