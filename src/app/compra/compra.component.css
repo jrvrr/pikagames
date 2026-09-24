@@ -1,4 +1,4 @@
-﻿/* Container y Layout General */
+/* Container y Layout General */
 .compra-wrapper {
   padding: 20px 5% 60px 5%;
   min-height: 85vh;
@@ -1836,7 +1836,7 @@
 
 .slot-machine-wrapper { width: 100%; }
 .tragamoneda-container { position: relative; width: min(100%, 410px); margin: 0 auto; }
-.tragamoneda-img { display: block; width: 100%; height: auto; filter: drop-shadow(0 13px 16px rgba(0, 0, 0, .38)); }
+.tragamoneda-img { display: block; width: 100%; height: auto; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.6)) drop-shadow(0 13px 16px rgba(0, 0, 0, .38)); }
 .reels-overlay {
   position: absolute;
   z-index: 1;
