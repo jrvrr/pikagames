@@ -162,7 +162,7 @@
         <div class="compare-head">
           <div>
             <h4>Comparativa de publicaciones</h4>
-            <p>La publicación con más {{ criterio === 'likes' ? 'likes' : 'comentarios' }} será la ganadora.</p>
+            <p>La publicación con más {{ criterio === 'likes' ? 'likes' : 'comentarios' }} será la principal.</p>
           </div>
           <div class="compare-toggle">
             <button [class.active]="criterio === 'comentarios'" (click)="criterio = 'comentarios'">Comentarios</button>
@@ -174,7 +174,7 @@
           <span class="cmp-name">{{ f.cuenta ? '@' + f.cuenta : (f.plataforma === 'facebook' ? 'Publicación FB' : 'Publicación IG') }}</span>
           <div class="cmp-bar"><span [style.width.%]="barra(f)"></span></div>
           <strong class="cmp-value">{{ score(f) | number }}</strong>
-          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Ganadora</span>
+          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Principal</span>
           <span class="cmp-empty" *ngIf="f.id !== fuenteGanadora?.id"></span>
         </div>
       </div>
@@ -267,7 +267,7 @@
 
     <!-- ========================= PASO 2 ========================= -->
     <div class="wizard-body" *ngIf="paso === 2">
-      <p class="step-intro">Define el título, los ganadores y cómo se comparan las publicaciones.</p>
+      <p class="step-intro">Define el sorteo y elige dónde participar y cómo determinar la publicación principal.</p>
 
       <div class="form-grid-2">
         <div class="field-block">
@@ -293,29 +293,39 @@
 
       <div class="settings-grid">
         <div class="setting-card">
-          <h4>¿Cómo comparamos?</h4>
-          <p>Elige qué métrica decide la publicación ganadora.</p>
+          <h4>¿Cómo elegimos la publicación principal?</h4>
+          <p>Compara todas las publicaciones usando una sola métrica.</p>
           <div class="segmented">
             <button [class.active]="criterio === 'comentarios'" (click)="criterio = 'comentarios'">
-              <span class="material-icons">forum</span> Comentarios
+              <span class="material-icons">forum</span> Por comentarios
             </button>
             <button [class.active]="criterio === 'likes'" (click)="criterio = 'likes'">
-              <span class="material-icons">favorite</span> Likes
+              <span class="material-icons">favorite</span> Por likes
             </button>
           </div>
+          <small class="setting-explanation">
+            {{ criterio === 'comentarios'
+              ? 'La publicación con más comentarios será la principal.'
+              : 'La publicación con más likes será la principal.' }}
+          </small>
         </div>
 
         <div class="setting-card">
-          <h4>¿Quiénes participan?</h4>
-          <p>Combina las dos listas o usa solo la publicación ganadora.</p>
+          <h4>¿De dónde salen los participantes?</h4>
+          <p>Elige qué usuarios pueden aparecer en el sorteo.</p>
           <div class="segmented">
             <button [class.active]="modo === 'union'" (click)="modo = 'union'">
-              <span class="material-icons">merge</span> Unir todas
+              <span class="material-icons">groups</span> Todas las publicaciones
             </button>
             <button [class.active]="modo === 'ganadora'" (click)="modo = 'ganadora'">
-              <span class="material-icons">workspace_premium</span> Solo ganadora
+              <span class="material-icons">workspace_premium</span> Solo la principal
             </button>
           </div>
+          <small class="setting-explanation">
+            {{ modo === 'union'
+              ? 'Se reúnen los participantes de todas las publicaciones y se eliminan usuarios repetidos.'
+              : 'Solo se consideran los participantes de la publicación principal.' }}
+          </small>
         </div>
       </div>
 
@@ -347,7 +357,7 @@
           <span class="cmp-name">{{ f.cuenta ? '@' + f.cuenta : (f.plataforma === 'facebook' ? 'Publicación FB' : 'Publicación IG') }}</span>
           <div class="cmp-bar"><span [style.width.%]="barra(f)"></span></div>
           <strong class="cmp-value">{{ score(f) | number }}</strong>
-          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Ganadora</span>
+          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Principal</span>
           <span class="cmp-empty" *ngIf="f.id !== fuenteGanadora?.id"></span>
         </div>
       </div>
@@ -396,7 +406,7 @@
       <div class="compare-card compact" *ngIf="fuentes.length">
         <div class="compare-head">
           <div>
-            <h4>{{ modo === 'union' ? 'Participantes combinados' : 'Participantes de la publicación ganadora' }}</h4>
+            <h4>{{ modo === 'union' ? 'Participantes de todas las publicaciones' : 'Participantes de la publicación principal' }}</h4>
             <p>Comparando por {{ criterio === 'likes' ? 'likes' : 'comentarios' }}.</p>
           </div>
         </div>
@@ -404,7 +414,7 @@
           <span class="cmp-name">{{ f.cuenta ? '@' + f.cuenta : f.plataforma }}</span>
           <div class="cmp-bar"><span [style.width.%]="barra(f)"></span></div>
           <strong class="cmp-value">{{ score(f) | number }}</strong>
-          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Ganadora</span>
+          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Principal</span>
           <span class="cmp-empty" *ngIf="f.id !== fuenteGanadora?.id"></span>
         </div>
       </div>

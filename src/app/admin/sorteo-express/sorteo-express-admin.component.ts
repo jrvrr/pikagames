@@ -577,8 +577,8 @@ export class SorteoExpressAdminComponent implements OnInit, OnDestroy {
     Swal.fire({
       title: '¿Obtener ganadores?',
       html: `Se elegirán <b>${this.cantidadGanadores}</b> ganador(es) entre <b>${this.participantesTotales}</b> participantes.<br><br>
-             Modo: <b>${this.modo === 'union' ? 'Unir todas las publicaciones' : 'Solo la publicación ganadora'}</b><br>
-             Comparando por: <b>${this.criterio === 'likes' ? 'likes' : 'comentarios'}</b>`,
+             Participantes: <b>${this.modo === 'union' ? 'Todos los participantes, sin repetir usuarios' : 'Solo quienes participaron en la publicación principal'}</b><br>
+             Publicación principal: <b>la que tenga más ${this.criterio === 'likes' ? 'likes' : 'comentarios'}</b>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, sortear',
@@ -650,11 +650,11 @@ export class SorteoExpressAdminComponent implements OnInit, OnDestroy {
 
   get resumenParticipantes(): string {
     if (this.modo === 'ganadora' && this.fuenteGanadora) {
-      return `Solo participantes de la publicación ganadora (${this.score(this.fuenteGanadora)} ${
+      return `Solo participantes de la publicación principal (${this.score(this.fuenteGanadora)} ${
         this.criterio === 'likes' ? 'likes' : 'comentarios'
       })`;
     }
-    return `${this.fuentes.length} publicación(es) combinadas, sin usuarios duplicados`;
+    return `Participantes de las ${this.fuentes.length} publicaciones combinadas, sin usuarios repetidos`;
   }
 
   private aInputLocal(iso: string): string {

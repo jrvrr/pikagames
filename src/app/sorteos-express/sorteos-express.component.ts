@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -13,7 +13,7 @@ import { AuthService } from '../service/auth.service';
   templateUrl: './sorteos-express.component.html',
   styleUrl: './sorteos-express.component.css'
 })
-export class SorteosExpressComponent implements OnInit {
+export class SorteosExpressComponent implements OnInit, OnDestroy {
   cargando = true;
   sorteos: any[] = [];
   filtro: 'activos' | 'finalizados' | 'todos' = 'activos';
@@ -23,6 +23,8 @@ export class SorteosExpressComponent implements OnInit {
   form = { username: '', nombre: '', correo: '' };
 
   verGanadores: any = null;
+  revelandoGanadores = false;
+  private revealTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private service: SorteosExpressService,
@@ -37,6 +39,12 @@ export class SorteosExpressComponent implements OnInit {
     if (usuario) {
       this.form.nombre = usuario.nombre || '';
       this.form.correo = usuario.correo || '';
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.revealTimer) {
+      clearTimeout(this.revealTimer);
     }
   }
 
@@ -133,7 +141,21 @@ export class SorteosExpressComponent implements OnInit {
   }
 
   abrirGanadores(s: any): void {
-    this.verGanadores = s;
+    this.iniciarRevelacion(s);
+  }
+
+  iniciarRevelacion(sorteo: any): void {
+    this.verGanadores = sorteo;
+    this.revelandoGanadores = true;
+
+    if (this.revealTimer) {
+      clearTimeout(this.revealTimer);
+    }
+
+    this.revealTimer = setTimeout(() => {
+      this.revelandoGanadores = false;
+      this.revealTimer = null;
+    }, 3200);
   }
 
   private mostrarUltimoSorteoGanador(): void {
@@ -153,7 +175,7 @@ export class SorteosExpressComponent implements OnInit {
     if (sessionStorage.getItem(clave) === '1') return;
 
     sessionStorage.setItem(clave, '1');
-    this.verGanadores = finalizado;
+    this.iniciarRevelacion(finalizado);
   }
 
   copiarGanadores(s: any): void {

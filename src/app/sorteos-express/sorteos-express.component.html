@@ -144,34 +144,50 @@
       <span></span><span></span><span></span><span></span><span></span>
       <span></span><span></span><span></span><span></span><span></span>
     </div>
-    <button class="modal-close" (click)="verGanadores = null">
+    <button class="modal-close" (click)="verGanadores = null; revelandoGanadores = false">
       <span class="material-icons">close</span>
     </button>
 
-    <div class="modal-head">
-      <span class="modal-emoji">🏆</span>
-      <h2>Ganadores</h2>
-      <p>{{ verGanadores.titulo }}</p>
-    </div>
-
-    <div class="public-winner" *ngFor="let g of verGanadores.ganadores">
-      <span class="pub-pos">#{{ g.posicion }}</span>
-      <img *ngIf="g.avatar" [src]="g.avatar" alt="avatar" class="pub-avatar">
-      <span *ngIf="!g.avatar" class="pub-avatar placeholder">
-        {{ (g.nombre || g.username || '?').substring(0, 1).toUpperCase() }}
-      </span>
-      <div class="pub-info">
-        <strong>&#64;{{ g.username }}</strong>
-        <span>{{ g.nombre }}</span>
+    <div class="slot-reveal" *ngIf="revelandoGanadores">
+      <span class="slot-kicker">PREPARANDO EL RESULTADO</span>
+      <div class="slot-machine" aria-label="Sorteando ganadores">
+        <div class="slot-screen">
+          <span class="slot-symbol slot-symbol-1">🎁</span>
+          <span class="slot-symbol slot-symbol-2">🎮</span>
+          <span class="slot-symbol slot-symbol-3">🏆</span>
+        </div>
+        <div class="slot-lever"></div>
       </div>
-      <span class="pub-prize">{{ g.premio }}</span>
+      <h2>Sorteando...</h2>
+      <p>Revelando a los ganadores de <strong>{{ verGanadores.titulo }}</strong></p>
     </div>
 
-    <div class="modal-actions">
-      <button class="brutal-btn action-winners" (click)="copiarGanadores(verGanadores)">
-        Copiar lista
-      </button>
-      <button class="brutal-btn action-primary" (click)="verGanadores = null">Cerrar</button>
-    </div>
+    <ng-container *ngIf="!revelandoGanadores">
+      <div class="modal-head">
+        <span class="modal-emoji">🏆</span>
+        <h2>Ganadores del sorteo</h2>
+        <p>{{ verGanadores.titulo }}</p>
+      </div>
+
+      <div class="public-winner" *ngFor="let g of verGanadores.ganadores">
+        <span class="pub-pos">#{{ g.posicion }}</span>
+        <img *ngIf="g.avatar" [src]="g.avatar" alt="avatar" class="pub-avatar">
+        <span *ngIf="!g.avatar" class="pub-avatar placeholder">
+          {{ (g.nombre || g.username || '?').substring(0, 1).toUpperCase() }}
+        </span>
+        <div class="pub-info">
+          <strong>&#64;{{ g.username }}</strong>
+          <span>{{ g.nombre }}</span>
+        </div>
+        <span class="pub-prize">{{ g.premio }}</span>
+      </div>
+
+      <div class="modal-actions">
+        <button class="brutal-btn action-winners" (click)="copiarGanadores(verGanadores)">
+          Copiar lista
+        </button>
+        <button class="brutal-btn action-primary" (click)="verGanadores = null; revelandoGanadores = false">Cerrar</button>
+      </div>
+    </ng-container>
   </div>
 </div>
