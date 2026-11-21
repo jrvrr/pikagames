@@ -1,16 +1,9 @@
 <!-- ============================ HERO ============================ -->
 <section class="express-hero">
-  <div class="hero-badge">
-    <span class="ig-dot"></span> Sorteos Express
-  </div>
-  <h1>Gana en <span class="accent">Instagram</span> y <span class="accent-blue">Facebook</span></h1>
-  <p>
-    Sorteos transparentes a partir de los comentarios de nuestras publicaciones.
-    Participa comentando y registra tu usuario para aparecer en la lista.
-  </p>
+  <h1>Sorteos Express</h1>
   <div class="hero-actions">
     <a routerLink="/compra" class="brutal-btn hero-cta">Ver rifas de juegos</a>
-    <a href="#sorteos" class="hero-secondary">Ver sorteos activos ↓</a>
+    <a href="#sorteos" class="brutal-btn hero-secondary">Ver sorteos activos ↓</a>
   </div>
 </section>
 
@@ -28,13 +21,6 @@
   <div class="loading-box" *ngIf="cargando">
     <div class="spinner"></div>
     <p>Buscando sorteos express…</p>
-  </div>
-
-  <div class="empty-box" *ngIf="!cargando && sorteosFiltrados.length === 0">
-    <span class="empty-emoji">🎁</span>
-    <h2>No hay sorteos en esta categoría</h2>
-    <p>Vuelve pronto o revisa nuestras rifas de juegos mientras tanto.</p>
-    <a routerLink="/compra" class="brutal-btn hero-cta">Ir a las rifas</a>
   </div>
 
   <div class="express-grid" *ngIf="!cargando && sorteosFiltrados.length > 0">
@@ -102,26 +88,6 @@
     </article>
   </div>
 
-  <div class="how-it-works">
-    <h3>¿Cómo participo?</h3>
-    <div class="steps-row">
-      <div class="how-step">
-        <span class="how-num">1</span>
-        <strong>Comenta la publicación</strong>
-        <p>Sigue la cuenta y comenta en el post del sorteo.</p>
-      </div>
-      <div class="how-step">
-        <span class="how-num">2</span>
-        <strong>Registra tu usuario</strong>
-        <p>Guarda tu &#64;usuario aquí para que tu participación cuente.</p>
-      </div>
-      <div class="how-step">
-        <span class="how-num">3</span>
-        <strong>Espera el resultado</strong>
-        <p>Los ganadores se eligen de forma aleatoria y verificable.</p>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- ============================ MODAL PARTICIPAR ============================ -->
@@ -173,7 +139,11 @@
 
 <!-- ============================ MODAL GANADORES ============================ -->
 <div class="modal-overlay" *ngIf="verGanadores" (click)="verGanadores = null">
-  <div class="modal-card winners-modal" (click)="$event.stopPropagation()">
+  <div class="modal-card winners-modal winner-reveal" (click)="$event.stopPropagation()">
+    <div class="winner-confetti" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
     <button class="modal-close" (click)="verGanadores = null">
       <span class="material-icons">close</span>
     </button>

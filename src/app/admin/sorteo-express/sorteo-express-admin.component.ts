@@ -33,7 +33,6 @@ export class SorteoExpressAdminComponent implements OnInit, OnDestroy {
   programadoPara = '';
   criterio: 'comentarios' | 'likes' = 'comentarios';
   modo: 'union' | 'ganadora' = 'union';
-  incluirParticipaciones = false;
 
   // Publicaciones
   urls: string[] = [''];
@@ -142,7 +141,6 @@ export class SorteoExpressAdminComponent implements OnInit, OnDestroy {
     this.programadoPara = '';
     this.criterio = 'comentarios';
     this.modo = 'union';
-    this.incluirParticipaciones = false;
     this.urls = [''];
     this.fuentes = [];
     this.ganadores = [];
@@ -181,7 +179,6 @@ export class SorteoExpressAdminComponent implements OnInit, OnDestroy {
     this.premioTitulo = sorteo.premios?.[0]?.titulo || 'Premio principal';
     this.criterio = sorteo.criterio_comparacion === 'likes' ? 'likes' : 'comentarios';
     this.modo = sorteo.modo_participacion === 'ganadora' ? 'ganadora' : 'union';
-    this.incluirParticipaciones = Boolean(sorteo.incluir_participaciones);
     this.programar = Boolean(sorteo.programado_para);
     this.programadoPara = sorteo.programado_para ? this.aInputLocal(sorteo.programado_para) : '';
     this.fuentes = sorteo.fuentes || [];
@@ -528,7 +525,6 @@ export class SorteoExpressAdminComponent implements OnInit, OnDestroy {
       premios: [{ titulo: premio, cantidad: Number(this.cantidadGanadores) }],
       criterio_comparacion: this.criterio,
       modo_participacion: this.modo,
-      incluir_participaciones: this.incluirParticipaciones,
       programado_para: this.programar && this.programadoPara
         ? new Date(this.programadoPara).toISOString()
         : null

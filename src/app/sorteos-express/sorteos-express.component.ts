@@ -46,6 +46,7 @@ export class SorteosExpressComponent implements OnInit {
       next: (res: any) => {
         this.sorteos = res.sorteos || [];
         this.cargando = false;
+        this.mostrarUltimoSorteoGanador();
       },
       error: () => {
         this.cargando = false;
@@ -133,6 +134,26 @@ export class SorteosExpressComponent implements OnInit {
 
   abrirGanadores(s: any): void {
     this.verGanadores = s;
+  }
+
+  private mostrarUltimoSorteoGanador(): void {
+    if (this.verGanadores) return;
+
+    const finalizado = this.sorteos
+      .filter((s) => s.estado === 'finalizado' && s.ganadores?.length)
+      .sort((a, b) => {
+        const fechaA = new Date(a.finalizado_en || a.updated_at || 0).getTime();
+        const fechaB = new Date(b.finalizado_en || b.updated_at || 0).getTime();
+        return fechaB - fechaA;
+      })[0];
+
+    if (!finalizado) return;
+
+    const clave = `pika-winner-seen-${finalizado.id}`;
+    if (sessionStorage.getItem(clave) === '1') return;
+
+    sessionStorage.setItem(clave, '1');
+    this.verGanadores = finalizado;
   }
 
   copiarGanadores(s: any): void {
