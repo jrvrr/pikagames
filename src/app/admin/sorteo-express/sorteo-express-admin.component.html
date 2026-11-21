@@ -1,0 +1,492 @@
+<!-- ============================================================ -->
+<!-- LISTA DE SORTEOS EXPRESS                                      -->
+<!-- ============================================================ -->
+<div class="express-admin" *ngIf="vista === 'lista'">
+
+  <div class="express-header">
+    <div>
+      <h2>Sorteos Express</h2>
+      <p>Pega una o varias URLs de Instagram o Facebook, compara comentarios o likes y obtén ganadores.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost" (click)="cargarSorteos()" [disabled]="cargando">
+        <span class="material-icons">refresh</span> Actualizar
+      </button>
+      <button class="btn-primary" (click)="nuevoSorteo()">
+        <span class="material-icons">add</span> Nuevo sorteo express
+      </button>
+    </div>
+  </div>
+
+  <div class="tips-box">
+    <span class="material-icons">tips_and_updates</span>
+    <div>
+      <strong>¿Cómo funciona?</strong>
+      <p>
+        Analizamos las publicaciones con Apify para traer la lista de comentarios. Si Instagram o Facebook
+        bloquean la lectura, puedes importar los comentarios manualmente. También puedes escribir los likes a mano.
+      </p>
+    </div>
+  </div>
+
+  <div class="list-toolbar">
+    <div class="filter-pills">
+      <button [class.active]="filtro === 'todos'" (click)="filtro = 'todos'">Todos</button>
+      <button [class.active]="filtro === 'activos'" (click)="filtro = 'activos'">Activos</button>
+      <button [class.active]="filtro === 'programados'" (click)="filtro = 'programados'">Programados</button>
+      <button [class.active]="filtro === 'finalizados'" (click)="filtro = 'finalizados'">Finalizados</button>
+    </div>
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input type="text" [(ngModel)]="busqueda" placeholder="Buscar sorteo..." />
+    </div>
+  </div>
+
+  <div class="global-loader-inline" *ngIf="cargando">
+    <div class="spinner-sm"></div>
+    <span>Cargando sorteos express…</span>
+  </div>
+
+  <div class="empty-state" *ngIf="!cargando && sorteosFiltrados.length === 0">
+    <span class="material-icons">auto_awesome</span>
+    <h3>Sin sorteos express todavía</h3>
+    <p>Crea tu primer sorteo pegando la URL de una publicación de Instagram o Facebook.</p>
+    <button class="btn-primary" (click)="nuevoSorteo()">Crear sorteo express</button>
+  </div>
+
+  <div class="cards-grid" *ngIf="!cargando && sorteosFiltrados.length > 0">
+    <article class="express-card" *ngFor="let s of sorteosFiltrados">
+      <div
+        class="card-cover"
+        [style.background-image]="portadaSorteo(s) ? 'url(' + portadaSorteo(s) + ')' : null">
+        <span class="status-badge" [ngClass]="'st-' + s.estado">{{ etiquetaEstado(s.estado) }}</span>
+        <span class="platform-badge">{{ s.total_fuentes }} publicación(es)</span>
+      </div>
+
+      <div class="card-body">
+        <h3>{{ s.titulo }}</h3>
+        <p class="card-desc">{{ s.descripcion || 'Sin descripción' }}</p>
+
+        <div class="metrics">
+          <span><span class="material-icons">forum</span> {{ s.comentarios_total }} comentarios</span>
+          <span><span class="material-icons">emoji_events</span> {{ s.cantidad_ganadores }} ganador(es)</span>
+        </div>
+
+        <div class="winners-mini" *ngIf="s.ganadores?.length">
+          🎉 {{ nombresGanadores(s) }}
+        </div>
+
+        <div class="schedule" *ngIf="s.programado_para">
+          <span class="material-icons">schedule</span>
+          {{ s.programado_para | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-secondary" (click)="abrirSorteo(s)">
+          <span class="material-icons">open_in_new</span> Abrir
+        </button>
+        <button class="btn-danger-icon" (click)="eliminarSorteo(s)" title="Eliminar">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </article>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ASISTENTE                                                     -->
+<!-- ============================================================ -->
+<div class="express-admin" *ngIf="vista === 'wizard'">
+
+  <button class="back-link" (click)="volverLista()">
+    <span class="material-icons">arrow_back</span> Volver a Sorteos Express
+  </button>
+
+  <div class="wizard-card">
+
+    <!-- Cabecera de pasos -->
+    <div class="wizard-steps">
+      <div class="wizard-progress" [style.width.%]="paso === 1 ? 33 : (paso === 2 ? 66 : 100)"></div>
+      <button class="wizard-step" [class.active]="paso === 1" [class.done]="paso > 1" (click)="paso = 1">
+        <span class="step-dot">1</span> Elige el post
+      </button>
+      <button class="wizard-step" [class.active]="paso === 2" [class.done]="paso > 2" (click)="fuentes.length && (paso = 2)">
+        <span class="step-dot">2</span> Configura el sorteo
+      </button>
+      <button class="wizard-step" [class.active]="paso === 3" (click)="editandoId && (paso = 3)">
+        <span class="step-dot">3</span> Obtén ganadores
+      </button>
+    </div>
+
+    <!-- ========================= PASO 1 ========================= -->
+    <div class="wizard-body" *ngIf="paso === 1">
+      <p class="step-intro">
+        Pega la URL de la publicación. Puedes comparar hasta 5 publicaciones de Instagram o Facebook.
+      </p>
+
+      <div class="url-list">
+        <div class="url-row" *ngFor="let u of urls; let i = index">
+          <span class="url-icon" [ngClass]="u.toLowerCase().includes('facebook') || u.toLowerCase().includes('fb.') ? 'fb' : 'ig'">
+            <span class="material-icons">{{ u.toLowerCase().includes('facebook') || u.toLowerCase().includes('fb.') ? 'thumb_up' : 'photo_camera' }}</span>
+          </span>
+          <input
+            type="text"
+            [(ngModel)]="urls[i]"
+            class="pro-input"
+            placeholder="https://www.instagram.com/p/… o https://www.facebook.com/…"
+            (keyup.enter)="analizarUrls()">
+          <button class="btn-remove-url" *ngIf="urls.length > 1" (click)="quitarUrl(i)" title="Quitar">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="analyze-row">
+        <div class="limit-field">
+          <label>Máx. comentarios por post</label>
+          <input type="number" min="20" max="5000" [(ngModel)]="limite" class="pro-input">
+        </div>
+        <button class="btn-add-url" (click)="agregarUrl()" *ngIf="urls.length < 5">
+          <span class="material-icons">add</span> Otra URL
+        </button>
+        <button class="btn-primary" (click)="analizarUrls()" [disabled]="analizando">
+          <span class="material-icons" *ngIf="!analizando">travel_explore</span>
+          <span class="spinner-xs" *ngIf="analizando"></span>
+          {{ analizando ? 'Analizando…' : 'Analizar publicaciones' }}
+        </button>
+      </div>
+
+      <!-- Comparativa -->
+      <div class="compare-card" *ngIf="fuentes.length >= 2">
+        <div class="compare-head">
+          <div>
+            <h4>Comparativa de publicaciones</h4>
+            <p>La publicación con más {{ criterio === 'likes' ? 'likes' : 'comentarios' }} será la ganadora.</p>
+          </div>
+          <div class="compare-toggle">
+            <button [class.active]="criterio === 'comentarios'" (click)="criterio = 'comentarios'">Comentarios</button>
+            <button [class.active]="criterio === 'likes'" (click)="criterio = 'likes'">Likes</button>
+          </div>
+        </div>
+
+        <div class="compare-row" *ngFor="let f of fuentes">
+          <span class="cmp-name">{{ f.cuenta ? '@' + f.cuenta : (f.plataforma === 'facebook' ? 'Publicación FB' : 'Publicación IG') }}</span>
+          <div class="cmp-bar"><span [style.width.%]="barra(f)"></span></div>
+          <strong class="cmp-value">{{ score(f) | number }}</strong>
+          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Ganadora</span>
+          <span class="cmp-empty" *ngIf="f.id !== fuenteGanadora?.id"></span>
+        </div>
+      </div>
+
+      <!-- Tarjetas de publicaciones -->
+      <div class="sources-grid" *ngIf="fuentes.length">
+        <div class="source-card" *ngFor="let f of fuentes">
+          <div class="source-image">
+            <img *ngIf="f.imagen_url" [src]="f.imagen_url" alt="Publicación" (error)="f.imagen_url = null">
+            <div class="source-placeholder" *ngIf="!f.imagen_url">
+              <span class="material-icons">{{ f.plataforma === 'facebook' ? 'thumb_up' : 'photo_camera' }}</span>
+            </div>
+            <span class="source-platform">{{ f.plataforma === 'facebook' ? 'Facebook' : (f.plataforma === 'instagram' ? 'Instagram' : 'No soportada') }}</span>
+          </div>
+
+          <div class="source-body">
+            <div class="source-top">
+              <span class="source-account">{{ f.cuenta ? '@' + f.cuenta : 'Cuenta no detectada' }}</span>
+              <span class="extract-state" [ngClass]="'ex-' + f.estado_extraccion">
+                <span class="spinner-xs" *ngIf="f.estado_extraccion === 'procesando'"></span>
+                {{ textoEstadoFuente(f) }}
+              </span>
+            </div>
+
+            <a class="source-url" [href]="f.url" target="_blank" rel="noopener">{{ f.url }}</a>
+
+            <div class="source-counts">
+              <div>
+                <strong>{{ f.comentarios_count || 0 }}</strong>
+                <span>comentarios</span>
+              </div>
+              <div>
+                <strong>{{ f.likes_count === null ? '—' : (f.likes_count | number) }}</strong>
+                <span>likes</span>
+              </div>
+            </div>
+
+            <p class="source-message" *ngIf="f.error_extraccion">{{ f.error_extraccion }}</p>
+            <p class="source-message soft" *ngIf="!f.error_extraccion && f.estado_extraccion === 'procesando'">
+              Apify está leyendo los comentarios. Esto puede tardar hasta un minuto.
+            </p>
+
+            <div class="source-actions">
+              <button class="chip-btn" (click)="reintentarFuente(f)" [disabled]="f.estado_extraccion === 'procesando'">
+                <span class="material-icons">refresh</span> Reintentar
+              </button>
+              <button class="chip-btn" (click)="actualizarLikes(f)" [disabled]="f.estado_extraccion === 'procesando'">
+                <span class="material-icons">favorite_border</span> Likes
+              </button>
+              <button class="chip-btn" (click)="abrirManual(f)">
+                <span class="material-icons">upload_file</span> Importar
+              </button>
+              <button class="chip-btn danger" (click)="quitarFuente(f)">
+                <span class="material-icons">delete_outline</span> Quitar
+              </button>
+            </div>
+
+            <div class="manual-box" *ngIf="manualFuenteId === f.id">
+              <label>Comentarios manuales</label>
+              <p class="manual-hint">
+                Un usuario por línea. También acepta <code>usuario, nombre, comentario, likes</code>.
+              </p>
+              <textarea
+                rows="5"
+                [(ngModel)]="manualTexto"
+                class="pro-textarea"
+                placeholder="@usuario1&#10;@usuario2, Nombre, ¡Quiero participar!, 3"></textarea>
+
+              <div class="manual-likes">
+                <label>Likes del post (opcional)</label>
+                <input type="number" min="0" [(ngModel)]="manualLikes" class="pro-input">
+              </div>
+
+              <div class="manual-actions">
+                <button class="btn-secondary" (click)="manualFuenteId = null">Cancelar</button>
+                <button class="btn-primary" (click)="guardarManual(f)" [disabled]="manualGuardando">
+                  {{ manualGuardando ? 'Guardando…' : 'Guardar' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wizard-actions">
+        <button class="btn-secondary" (click)="volverLista()">Atrás</button>
+        <button class="btn-primary" (click)="irPaso2()">Siguiente</button>
+      </div>
+    </div>
+
+    <!-- ========================= PASO 2 ========================= -->
+    <div class="wizard-body" *ngIf="paso === 2">
+      <p class="step-intro">Define el título, los ganadores y cómo se comparan las publicaciones.</p>
+
+      <div class="form-grid-2">
+        <div class="field-block">
+          <label>Título del sorteo *</label>
+          <input type="text" [(ngModel)]="titulo" class="pro-input" placeholder="Sorteo de @pika.switch">
+        </div>
+
+        <div class="field-block">
+          <label>Número de ganadores *</label>
+          <input type="number" min="1" [(ngModel)]="cantidadGanadores" class="pro-input">
+        </div>
+      </div>
+
+      <div class="field-block">
+        <label>Descripción y reglas</label>
+        <textarea rows="3" [(ngModel)]="descripcion" class="pro-textarea" placeholder="Requisitos para participar, fecha del sorteo, etc."></textarea>
+      </div>
+
+      <div class="field-block">
+        <label>Nombre del premio</label>
+        <input type="text" [(ngModel)]="premioTitulo" class="pro-input" placeholder="Premio principal">
+      </div>
+
+      <div class="settings-grid">
+        <div class="setting-card">
+          <h4>¿Cómo comparamos?</h4>
+          <p>Elige qué métrica decide la publicación ganadora.</p>
+          <div class="segmented">
+            <button [class.active]="criterio === 'comentarios'" (click)="criterio = 'comentarios'">
+              <span class="material-icons">forum</span> Comentarios
+            </button>
+            <button [class.active]="criterio === 'likes'" (click)="criterio = 'likes'">
+              <span class="material-icons">favorite</span> Likes
+            </button>
+          </div>
+        </div>
+
+        <div class="setting-card">
+          <h4>¿Quiénes participan?</h4>
+          <p>Combina las dos listas o usa solo la publicación ganadora.</p>
+          <div class="segmented">
+            <button [class.active]="modo === 'union'" (click)="modo = 'union'">
+              <span class="material-icons">merge</span> Unir todas
+            </button>
+            <button [class.active]="modo === 'ganadora'" (click)="modo = 'ganadora'">
+              <span class="material-icons">workspace_premium</span> Solo ganadora
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="switch-row">
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="programar">
+          <span class="slider"></span>
+        </label>
+        <div class="switch-text">
+          <strong>¿Quieres programar el sorteo?</strong>
+          <span>Los ganadores podrán elegirse a partir de la fecha indicada.</span>
+        </div>
+        <input
+          type="datetime-local"
+          [(ngModel)]="programadoPara"
+          class="pro-input schedule-input"
+          *ngIf="programar">
+      </div>
+
+      <div class="switch-row">
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="incluirParticipaciones">
+          <span class="slider"></span>
+        </label>
+        <div class="switch-text">
+          <strong>Incluir registros de la web</strong>
+          <span>Suma a quienes se registren desde la página pública de sorteos express.</span>
+        </div>
+      </div>
+
+      <!-- Resumen comparativo -->
+      <div class="compare-card compact" *ngIf="fuentes.length">
+        <div class="compare-head">
+          <div>
+            <h4>Comparativa actual</h4>
+            <p>{{ resumenParticipantes }}</p>
+          </div>
+        </div>
+        <div class="compare-row" *ngFor="let f of fuentes">
+          <span class="cmp-name">{{ f.cuenta ? '@' + f.cuenta : (f.plataforma === 'facebook' ? 'Publicación FB' : 'Publicación IG') }}</span>
+          <div class="cmp-bar"><span [style.width.%]="barra(f)"></span></div>
+          <strong class="cmp-value">{{ score(f) | number }}</strong>
+          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Ganadora</span>
+          <span class="cmp-empty" *ngIf="f.id !== fuenteGanadora?.id"></span>
+        </div>
+      </div>
+
+      <div class="participants-strip">
+        <span class="material-icons">groups</span>
+        <strong>{{ participantesTotales | number }}</strong> participantes únicos detectados en {{ fuentes.length }} publicación(es)
+      </div>
+
+      <div class="wizard-actions">
+        <button class="btn-secondary" (click)="paso = 1">Atrás</button>
+        <button class="btn-primary" (click)="guardarConfiguracion()" [disabled]="guardando">
+          <span class="spinner-xs" *ngIf="guardando"></span>
+          {{ guardando ? 'Guardando…' : 'Siguiente' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================= PASO 3 ========================= -->
+    <div class="wizard-body" *ngIf="paso === 3">
+      <p class="step-intro">{{ titulo }}</p>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span class="material-icons">forum</span>
+          <strong>{{ totalComentarios | number }}</strong>
+          <span>comentarios analizados</span>
+        </div>
+        <div class="summary-card">
+          <span class="material-icons">groups</span>
+          <strong>{{ participantesTotales | number }}</strong>
+          <span>participantes únicos</span>
+        </div>
+        <div class="summary-card">
+          <span class="material-icons">emoji_events</span>
+          <strong>{{ cantidadGanadores }}</strong>
+          <span>ganadores</span>
+        </div>
+        <div class="summary-card">
+          <span class="material-icons">schedule</span>
+          <strong>{{ sorteoActual?.programado_para ? (sorteoActual.programado_para | date:'dd/MM HH:mm') : 'Ahora' }}</strong>
+          <span>{{ sorteoActual?.programado_para ? 'programado' : 'sin programar' }}</span>
+        </div>
+      </div>
+
+      <div class="compare-card compact" *ngIf="fuentes.length">
+        <div class="compare-head">
+          <div>
+            <h4>{{ modo === 'union' ? 'Participantes combinados' : 'Participantes de la publicación ganadora' }}</h4>
+            <p>Comparando por {{ criterio === 'likes' ? 'likes' : 'comentarios' }}.</p>
+          </div>
+        </div>
+        <div class="compare-row" *ngFor="let f of fuentes">
+          <span class="cmp-name">{{ f.cuenta ? '@' + f.cuenta : f.plataforma }}</span>
+          <div class="cmp-bar"><span [style.width.%]="barra(f)"></span></div>
+          <strong class="cmp-value">{{ score(f) | number }}</strong>
+          <span class="cmp-winner" *ngIf="f.id === fuenteGanadora?.id">Ganadora</span>
+          <span class="cmp-empty" *ngIf="f.id !== fuenteGanadora?.id"></span>
+        </div>
+      </div>
+
+      <div class="info-banner" *ngIf="fechaProgramadaFutura">
+        <span class="material-icons">schedule</span>
+        <p>
+          Este sorteo está programado para el
+          <strong>{{ sorteoActual.programado_para | date:'dd/MM/yyyy HH:mm' }}</strong>.
+          Puedes esperar a esa fecha o forzar el sorteo ahora.
+        </p>
+      </div>
+
+      <label class="force-row" *ngIf="fechaProgramadaFutura">
+        <input type="checkbox" [(ngModel)]="forzar"> Forzar selección antes de la fecha programada
+      </label>
+
+      <!-- Ganadores -->
+      <div class="winners-panel" *ngIf="ganadores.length">
+        <div class="winners-head">
+          <div>
+            <h3>🎉 Ganadores</h3>
+            <p *ngIf="seed">Semilla de verificación: <code>{{ seed }}</code></p>
+          </div>
+          <div class="winners-head-actions">
+            <button class="chip-btn" (click)="copiarGanadores()">
+              <span class="material-icons">content_copy</span> Copiar
+            </button>
+            <button class="chip-btn danger" (click)="reiniciarSorteo()">
+              <span class="material-icons">restart_alt</span> Reiniciar
+            </button>
+          </div>
+        </div>
+
+        <div class="winner-row" *ngFor="let g of ganadores">
+          <span class="winner-position">#{{ g.posicion }}</span>
+          <img
+            class="winner-avatar"
+            *ngIf="g.avatar"
+            [src]="g.avatar"
+            alt="avatar"
+            (error)="g.avatar = null">
+          <span class="winner-avatar placeholder" *ngIf="!g.avatar">
+            {{ (g.nombre || g.username || '?').substring(0, 1).toUpperCase() }}
+          </span>
+          <div class="winner-info">
+            <strong>&#64;{{ g.username }}</strong>
+            <span>{{ g.nombre }}</span>
+            <p *ngIf="g.comentario">“{{ g.comentario }}”</p>
+          </div>
+          <span class="winner-prize">{{ g.premio }}</span>
+        </div>
+      </div>
+
+      <div class="draw-cta" *ngIf="!ganadores.length">
+        <span class="material-icons">casino</span>
+        <h3>Todo listo para sortear</h3>
+        <p>
+          Se elegirán {{ cantidadGanadores }} ganador(es) entre {{ participantesTotales }} participantes.
+          El resultado usa una semilla verificable y queda guardado.
+        </p>
+        <button class="btn-draw" (click)="obtenerGanadores()" [disabled]="sorteando || !editandoId">
+          <span class="spinner-xs" *ngIf="sorteando"></span>
+          {{ sorteando ? 'Sorteando…' : 'Obtener ganadores' }}
+        </button>
+      </div>
+
+      <div class="wizard-actions">
+        <button class="btn-secondary" (click)="paso = 2">Atrás</button>
+        <button class="btn-secondary" (click)="volverLista()">Ir a la lista</button>
+      </div>
+    </div>
+  </div>
+</div>

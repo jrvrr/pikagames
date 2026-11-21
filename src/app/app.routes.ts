@@ -3,6 +3,7 @@ import { HomeComponent } from './home/home.component';
 import { AdminComponent } from './admin/admin.component';
 import { PagoComponent } from './pago/pago.component';
 import { CompraComponent } from './compra/compra.component';
+import { SorteosExpressComponent } from './sorteos-express/sorteos-express.component';
 import { AdminGuard } from './guards/admin.guard';
 import { Error404Component } from './error404/error404.component';
 
@@ -14,6 +15,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'pago', component: PagoComponent },
   { path: 'compra', component: CompraComponent },
+  { path: 'sorteos-express', component: SorteosExpressComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },

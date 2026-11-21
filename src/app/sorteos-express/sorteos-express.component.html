@@ -1,0 +1,207 @@
+<!-- ============================ HERO ============================ -->
+<section class="express-hero">
+  <div class="hero-badge">
+    <span class="ig-dot"></span> Sorteos Express
+  </div>
+  <h1>Gana en <span class="accent">Instagram</span> y <span class="accent-blue">Facebook</span></h1>
+  <p>
+    Sorteos transparentes a partir de los comentarios de nuestras publicaciones.
+    Participa comentando y registra tu usuario para aparecer en la lista.
+  </p>
+  <div class="hero-actions">
+    <a routerLink="/compra" class="brutal-btn hero-cta">Ver rifas de juegos</a>
+    <a href="#sorteos" class="hero-secondary">Ver sorteos activos ↓</a>
+  </div>
+</section>
+
+<!-- ============================ LISTA ============================ -->
+<div class="express-content" id="sorteos">
+  <div class="express-tabs">
+    <button [class.active]="filtro === 'activos'" (click)="filtro = 'activos'">Activos</button>
+    <button [class.active]="filtro === 'finalizados'" (click)="filtro = 'finalizados'">Ganadores</button>
+    <button [class.active]="filtro === 'todos'" (click)="filtro = 'todos'">Todos</button>
+    <button class="refresh-btn" (click)="cargar()" [disabled]="cargando">
+      <span class="material-icons">refresh</span>
+    </button>
+  </div>
+
+  <div class="loading-box" *ngIf="cargando">
+    <div class="spinner"></div>
+    <p>Buscando sorteos express…</p>
+  </div>
+
+  <div class="empty-box" *ngIf="!cargando && sorteosFiltrados.length === 0">
+    <span class="empty-emoji">🎁</span>
+    <h2>No hay sorteos en esta categoría</h2>
+    <p>Vuelve pronto o revisa nuestras rifas de juegos mientras tanto.</p>
+    <a routerLink="/compra" class="brutal-btn hero-cta">Ir a las rifas</a>
+  </div>
+
+  <div class="express-grid" *ngIf="!cargando && sorteosFiltrados.length > 0">
+    <article class="express-card" *ngFor="let s of sorteosFiltrados">
+      <div
+        class="express-cover"
+        [style.background-image]="portada(s) ? 'url(' + portada(s) + ')' : null"
+        [class.no-image]="!portada(s)">
+        <span class="express-status" [ngClass]="'st-' + s.estado">{{ estadoTexto(s.estado) }}</span>
+        <span class="express-count">{{ s.total_fuentes }} publicación(es)</span>
+      </div>
+
+      <div class="express-body">
+        <h2>{{ s.titulo }}</h2>
+        <p class="express-desc">{{ s.descripcion || 'Sorteo especial de nuestras redes sociales.' }}</p>
+
+        <div class="express-meta">
+          <span *ngIf="cuentaPrincipal(s)" class="meta-item">
+            <span class="material-icons">alternate_email</span> {{ cuentaPrincipal(s) }}
+          </span>
+          <span class="meta-item">
+            <span class="material-icons">forum</span> {{ s.comentarios_total }} comentarios
+          </span>
+          <span class="meta-item">
+            <span class="material-icons">emoji_events</span> {{ s.cantidad_ganadores }} ganador(es)
+          </span>
+        </div>
+
+        <div class="express-schedule" *ngIf="s.programado_para">
+          <span class="material-icons">schedule</span>
+          {{ s.programado_para | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+
+        <div class="winners-preview" *ngIf="s.ganadores?.length">
+          <span class="material-icons">military_tech</span>
+          <span *ngFor="let g of s.ganadores.slice(0, 3)" class="winner-chip">&#64;{{ g.username }}</span>
+          <span *ngIf="s.ganadores.length > 3" class="winner-more">+{{ s.ganadores.length - 3 }}</span>
+        </div>
+
+        <div class="express-actions">
+          <button
+            class="brutal-btn action-primary"
+            *ngIf="s.estado !== 'finalizado' && s.estado !== 'cerrado'"
+            (click)="abrirParticipar(s)">
+            Quiero participar
+          </button>
+
+          <button
+            class="brutal-btn action-winners"
+            *ngIf="s.ganadores?.length"
+            (click)="abrirGanadores(s)">
+            Ver ganadores
+          </button>
+
+          <a
+            *ngIf="enlacePublicacion(s)"
+            [href]="enlacePublicacion(s)"
+            target="_blank"
+            rel="noopener"
+            class="post-link">
+            Ver publicación <span class="material-icons">open_in_new</span>
+          </a>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="how-it-works">
+    <h3>¿Cómo participo?</h3>
+    <div class="steps-row">
+      <div class="how-step">
+        <span class="how-num">1</span>
+        <strong>Comenta la publicación</strong>
+        <p>Sigue la cuenta y comenta en el post del sorteo.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-num">2</span>
+        <strong>Registra tu usuario</strong>
+        <p>Guarda tu &#64;usuario aquí para que tu participación cuente.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-num">3</span>
+        <strong>Espera el resultado</strong>
+        <p>Los ganadores se eligen de forma aleatoria y verificable.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ MODAL PARTICIPAR ============================ -->
+<div class="modal-overlay" *ngIf="participando" (click)="participando = null">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="participando = null">
+      <span class="material-icons">close</span>
+    </button>
+
+    <div class="modal-head">
+      <span class="modal-emoji">🎉</span>
+      <h2>Participar en el sorteo</h2>
+      <p>{{ participando.titulo }}</p>
+    </div>
+
+    <div class="post-box" *ngIf="enlacePublicacion(participando)">
+      <span class="material-icons">info</span>
+      <p>
+        Para que tu comentario cuente debes comentar en la publicación original.
+        <a [href]="enlacePublicacion(participando)" target="_blank" rel="noopener">Abrir publicación</a>
+      </p>
+    </div>
+
+    <form (ngSubmit)="enviarParticipacion()" class="participate-form">
+      <label>
+        Tu usuario de Instagram o Facebook *
+        <div class="input-prefix">
+          <span>&#64;</span>
+          <input type="text" [(ngModel)]="form.username" name="username" placeholder="tu.usuario" required>
+        </div>
+      </label>
+
+      <label>
+        Tu nombre (opcional)
+        <input type="text" [(ngModel)]="form.nombre" name="nombre" placeholder="Nombre y apellido">
+      </label>
+
+      <label>
+        Correo (opcional)
+        <input type="email" [(ngModel)]="form.correo" name="correo" placeholder="tucorreo@ejemplo.com">
+      </label>
+
+      <button type="submit" class="brutal-btn submit-btn" [disabled]="enviando">
+        {{ enviando ? 'Registrando…' : 'Registrar mi participación' }}
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================ MODAL GANADORES ============================ -->
+<div class="modal-overlay" *ngIf="verGanadores" (click)="verGanadores = null">
+  <div class="modal-card winners-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="verGanadores = null">
+      <span class="material-icons">close</span>
+    </button>
+
+    <div class="modal-head">
+      <span class="modal-emoji">🏆</span>
+      <h2>Ganadores</h2>
+      <p>{{ verGanadores.titulo }}</p>
+    </div>
+
+    <div class="public-winner" *ngFor="let g of verGanadores.ganadores">
+      <span class="pub-pos">#{{ g.posicion }}</span>
+      <img *ngIf="g.avatar" [src]="g.avatar" alt="avatar" class="pub-avatar">
+      <span *ngIf="!g.avatar" class="pub-avatar placeholder">
+        {{ (g.nombre || g.username || '?').substring(0, 1).toUpperCase() }}
+      </span>
+      <div class="pub-info">
+        <strong>&#64;{{ g.username }}</strong>
+        <span>{{ g.nombre }}</span>
+      </div>
+      <span class="pub-prize">{{ g.premio }}</span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="brutal-btn action-winners" (click)="copiarGanadores(verGanadores)">
+        Copiar lista
+      </button>
+      <button class="brutal-btn action-primary" (click)="verGanadores = null">Cerrar</button>
+    </div>
+  </div>
+</div>

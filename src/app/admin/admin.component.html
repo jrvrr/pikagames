@@ -45,6 +45,14 @@
 
       <button 
         class="nav-item" 
+        [class.active]="currentTab === 'express'" 
+        (click)="cambiarTab('express')">
+        <span class="material-icons">auto_awesome</span> 
+        <span class="nav-label" *ngIf="!isSidebarCollapsed">Sorteos Express</span>
+      </button>
+
+      <button 
+        class="nav-item" 
         [class.active]="currentTab === 'pendientes'" 
         (click)="cambiarTab('pendientes')">
         <span class="material-icons">payments</span> 
@@ -79,7 +87,7 @@
   <main class="admin-main">
     <header class="main-header">
       <div class="header-left">
-        <h1 class="page-title">{{ currentTab | titlecase }}</h1>
+        <h1 class="page-title">{{ currentTab === 'express' ? 'Sorteos Express' : (currentTab | titlecase) }}</h1>
       </div>
       <div class="header-right">
         <div class="date-now-container">
@@ -440,6 +448,11 @@
             </form>
           </div>
         </div>
+      </ng-container>
+
+      <!-- PANTALLA: SORTEOS EXPRESS -->
+      <ng-container *ngIf="currentTab === 'express'">
+        <app-sorteo-express-admin></app-sorteo-express-admin>
       </ng-container>
 
       <!-- PANTALLA: PAGOS PENDIENTES -->

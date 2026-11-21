@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { RifasService } from '../service/rifas.service';
 import { AuthService } from '../service/auth.service';
+import { SorteoExpressAdminComponent } from './sorteo-express/sorteo-express-admin.component';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import {
@@ -49,7 +50,7 @@ export type ChartOptions = {
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgApexchartsModule],
+  imports: [CommonModule, FormsModule, NgApexchartsModule, SorteoExpressAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
@@ -60,7 +61,7 @@ export class AdminComponent implements OnInit {
   participantesPendientes: any[] = [];
   usuarios: any[] = [];
   searchTerm: string = '';
-  currentTab: 'dashboard' | 'crear' | 'rifas' | 'pendientes' | 'clientes' = 'dashboard';
+  currentTab: 'dashboard' | 'crear' | 'rifas' | 'pendientes' | 'clientes' | 'express' = 'dashboard';
   today = new Date();
   isSidebarCollapsed = false;
   isSidebarVisible = true;
