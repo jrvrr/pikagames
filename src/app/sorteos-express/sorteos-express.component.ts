@@ -16,7 +16,6 @@ import { AuthService } from '../service/auth.service';
 export class SorteosExpressComponent implements OnInit, OnDestroy {
   cargando = true;
   sorteos: any[] = [];
-  filtro: 'activos' | 'finalizados' | 'todos' = 'activos';
 
   participando: any = null;
   enviando = false;
@@ -61,16 +60,6 @@ export class SorteosExpressComponent implements OnInit, OnDestroy {
         this.toastr.error('No se pudieron cargar los sorteos express');
       }
     });
-  }
-
-  get sorteosFiltrados(): any[] {
-    if (this.filtro === 'activos') {
-      return this.sorteos.filter((s) => s.estado === 'activo' || s.estado === 'programado');
-    }
-    if (this.filtro === 'finalizados') {
-      return this.sorteos.filter((s) => s.estado === 'finalizado');
-    }
-    return this.sorteos;
   }
 
   estadoTexto(estado: string): string {
