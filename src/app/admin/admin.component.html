@@ -368,8 +368,20 @@
       <ng-container *ngIf="currentTab === 'crear' && !cargando">
         <div class="management-box compact-creation">
           <div class="section-header-compact">
-            <h3>Nueva Rifa</h3>
-            <p>Configuración directa del sorteo</p>
+            <div class="creation-header-copy">
+              <div class="creation-icon">
+                <span class="material-icons">confirmation_number</span>
+              </div>
+              <div>
+                <span class="creation-eyebrow">CREACIÓN DE SORTEO</span>
+                <h3>Nueva Rifa</h3>
+                <p>Completa los detalles y prepara los premios de tu próxima rifa.</p>
+              </div>
+            </div>
+            <span class="creation-status">
+              <span class="material-icons">edit_note</span>
+              Configuración
+            </span>
           </div>
 
           <div class="content-wrapper-compact">
@@ -378,6 +390,13 @@
               <div class="form-main-layout">
                 <!-- COLUMNA IZQUIERDA: BASICS -->
                 <div class="form-col">
+                  <div class="form-col-heading">
+                    <span class="material-icons">description</span>
+                    <div>
+                      <h4>Información general</h4>
+                      <p>El nombre y las reglas que verán tus participantes.</p>
+                    </div>
+                  </div>
                   <div class="field-group">
                     <label>Nombre del Sorteo</label>
                     <input type="text" [(ngModel)]="nuevaRifa.nombre" name="nombre" placeholder="Nombre descriptivo" class="pro-input-compact" required>
@@ -390,6 +409,13 @@
 
                 <!-- COLUMNA DERECHA: TECH -->
                 <div class="form-col">
+                  <div class="form-col-heading">
+                    <span class="material-icons">tune</span>
+                    <div>
+                      <h4>Detalles de la rifa</h4>
+                      <p>Define el precio, los boletos y la finalización.</p>
+                    </div>
+                  </div>
                   <div class="form-grid-mini">
                     <div class="field-group">
                       <label>Precio ($)</label>
@@ -424,7 +450,11 @@
               <!-- PREMIOS (COMPACTO) -->
               <div class="premios-section-compact mt-4">
                 <div class="section-divider">
-                  <span>Premios</span>
+                  <span class="material-icons">emoji_events</span>
+                  <div>
+                    <strong>Premios</strong>
+                    <small>Agrega los premios y la cantidad disponible de cada uno.</small>
+                  </div>
                 </div>
                 <div class="premios-grid-compact">
                   <div *ngFor="let p of nuevaRifa.premios; let i = index" class="premio-row-compact">
@@ -441,8 +471,13 @@
               </div>
 
               <div class="form-actions-compact">
+                <p class="form-submit-note">
+                  <span class="material-icons">info</span>
+                  Podrás editar estos detalles después de crear la rifa.
+                </p>
                 <button type="submit" class="btn-launch-compact">
-                  Lanzar Sorteo
+                  <span class="material-icons">rocket_launch</span>
+                  Crear rifa
                 </button>
               </div>
             </form>
